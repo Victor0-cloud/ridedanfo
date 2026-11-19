@@ -1,0 +1,273 @@
+002518f53000	Passenger	en-NG-EzinneNeural	+8%	+45Hz	+0%	Driver! We don enter wahala!
+01814e3d84e0	Chidi	en-NG-AbeoNeural	+8%	+40Hz	+0%	Abeg, take ₦300. Na market we dey go.
+02391a0a4bd0	Chidi	en-NG-AbeoNeural	+8%	+40Hz	+0%	CMS! Make una ready! Make we go!
+0539c8e2f0a0	Bobo	en-US-GuyNeural	+4%	+10Hz	+0%	Tire's fixed. Let's roll!
+06e557b779ac	Chidi	en-NG-AbeoNeural	+8%	+40Hz	+0%	Bad news from Lagos: Baba Ibile and his Agberos have taken over the park.
+07b35682f29f	Chidi	en-NG-AbeoNeural	+8%	+40Hz	+0%	Fuel don enter. Make we go!
+0827bd1a70e9	Chidi	en-NG-AbeoNeural	+8%	+40Hz	+0%	One long run, Yaba to Balogun. Earn enough and Alhaji's debt is finished.
+09d133809be2	Chidi	en-NG-AbeoNeural	+8%	+40Hz	+0%	Obalende to CMS. If Sergeant Bello stops us, the choice is yours: settle, or keep the papers clean.
+0b247fd2a944	Koffi	en-NG-AbeoNeural	+4%	+18Hz	+0%	Who can help us push?
+0b2944c88e70	Chidi	en-NG-AbeoNeural	+8%	+40Hz	+0%	Driver, small small! You hear wetin madam talk.
+0ba50146fa51	Chidi	en-NG-AbeoNeural	+8%	+40Hz	+0%	Half way, Oga. Danfo park ahead. Those drivers dey pull out anyhow.
+0ebb98081189	Chidi	en-NG-AbeoNeural	+8%	+40Hz	+0%	Yaba! You stop well for the bay. Yaba people go remember this danfo.
+0f6ef1bc476d	Koffi	en-NG-AbeoNeural	+4%	+18Hz	+0%	Medaase, driver!
+1055b0a57da2	Tunde	en-NG-AbeoNeural	+15%	+2Hz	+0%	Abeg, make we speak with your supervisor.
+126b33410746	Koffi	en-NG-AbeoNeural	+4%	+18Hz	+0%	Circle Circle Circle! Accra, Accra! Ete sen, enter, enter!
+132e079d6860	Passenger	en-NG-EzinneNeural	+8%	+45Hz	+0%	Abeg, we don late for market!
+1367446dc6e4	Chidi	en-NG-AbeoNeural	+8%	+40Hz	+0%	Kano! Kano! Kofar Nassarawa, Kurmi, Gidan Makama! Sannu, enter! Make we go!
+13f7cb720f4d	Bobo	en-US-GuyNeural	+4%	+10Hz	+0%	Driver! We're in trouble now!
+1780c4da5787	Koffi	en-NG-AbeoNeural	+4%	+18Hz	+0%	Me pa wo kyew, calm down.
+199cdc6dadf6	Passenger	en-NG-EzinneNeural	+8%	+45Hz	+0%	Thank you, driver!
+1af8e79436b0	Bobo	en-US-GuyNeural	+4%	+10Hz	+0%	Y'all, stay calm.
+1e678feefcf6	Chidi	en-NG-AbeoNeural	+8%	+40Hz	+0%	Yaba! Ojuelegba to Yaba! Make we go!
+1fea9f52c3eb	Chidi	en-NG-AbeoNeural	+8%	+40Hz	+0%	Balogun! First day done. Alhaji go hear say we dey work.
+21019f6a178b	Koffi	en-NG-AbeoNeural	+4%	+18Hz	+0%	Kwesi, the corner! We turn left for Aburi, not right for the roundabout, eh!
+23efc1b8380e	Chidi	en-NG-AbeoNeural	+8%	+40Hz	+0%	This thing no correct!
+2767bf96aa4b	Chidi	en-NG-AbeoNeural	+8%	+40Hz	+0%	Garin Daji to Kasuwan Daji. Cattle, mud, floods. Drive gently, my mother dey wait.
+2800e18e73cb	Koffi	en-NG-AbeoNeural	+4%	+18Hz	+0%	Road is clear. Let's go!
+2af395b380ed	Bobo	en-US-GuyNeural	+4%	+10Hz	+0%	Fares, y'all! Have your money ready, please.
+2f0c267a2a35	Chidi	en-NG-AbeoNeural	+8%	+40Hz	+0%	Anambra today, Oga. Niger Bridge, Onitsha, then Ogidi for Don P InterContinental. Long road, so we buy extra fuel for park.
+2f243d3304b4	Passenger	en-NG-EzinneNeural	+8%	+45Hz	+0%	Na here we go sleep?
+308dcbf86430	Officer	en-NG-AbeoNeural	-12%	-8Hz	+0%	Your papers complete. But wetin you bring for us?
+31b88664d0d7	Chidi	en-NG-AbeoNeural	+8%	+40Hz	+0%	Na Achebe town be this. Things Fall Apart, but this danfo no go fall apart.
+37655951922e	Koffi	en-NG-AbeoNeural	+4%	+18Hz	+0%	Jamestown lighthouse! Last stop. Medaase, everybody. Safe journey!
+379676097b04	Bobo	en-US-GuyNeural	+4%	+10Hz	+0%	Are we gonna be stuck here all day?
+391881600ca3	Koffi	en-NG-AbeoNeural	+4%	+18Hz	+0%	Chale, stop for the fare stop! We collect the fares first, eh.
+3bf25e742dac	Chidi	en-NG-AbeoNeural	+8%	+40Hz	+0%	Kofar Nassarawa! Kano city gate. Gently, Oga, na maximum thirty for gate.
+3c9e094b90e6	Chidi	en-NG-AbeoNeural	+8%	+40Hz	+0%	We settled Bello. The road opens, but the passengers saw it. Them no too happy.
+3d3ef33b26c3	Koffi	en-NG-AbeoNeural	+4%	+18Hz	+0%	Kwesi, gently on the bends. See the drop!
+3d4d2387514c	Chidi	en-NG-AbeoNeural	+8%	+40Hz	+0%	Stadium! Hop and go! Make we go!
+3eeed2cccf91	Koffi	en-NG-AbeoNeural	+4%	+18Hz	+0%	Driver! Ei, we are in trouble!
+3f4a834964c2	Koffi	en-NG-AbeoNeural	+4%	+18Hz	+0%	Hold on! I am coming with my cart.
+3ff3472e027b	Chidi	en-NG-AbeoNeural	+8%	+40Hz	+0%	Upper Iweka! Ogidi! Awka! Nnewi! Ngwa ngwa, enter! Make we go!
+4307f550d885	Alhaji	en-NG-AbeoNeural	-12%	-15Hz	+0%	My ₦60,000 is complete. The danfo papers are yours. Well done.
+43cd570dd6b8	Officer	en-NG-AbeoNeural	-12%	-8Hz	+0%	Driver, your papers.
+442cb7e707ba	Chidi	en-NG-AbeoNeural	+8%	+40Hz	+0%	Dala Hill dey there. Na where Kano start, long before any danfo.
+452f62bf2d59	Chidi	en-NG-AbeoNeural	+8%	+40Hz	+0%	Onitsha Main Market. Nwanne, shift small make another person siddon.
+4538c2603a21	Chidi	en-NG-AbeoNeural	+8%	+40Hz	+0%	Police ahead, Agbero after. Keep your papers ready and your change counted.
+48798f65b566	Koffi	en-NG-AbeoNeural	+4%	+18Hz	+0%	Kwesi, gently! You heard what Auntie said.
+48f4fc878ece	Chidi	en-NG-AbeoNeural	+8%	+40Hz	+0%	See Don P InterContinental! Ogidi big hotel. Chai, e fine o!
+499026870b78	Bobo	en-US-GuyNeural	+4%	+10Hz	+0%	Ray! We picked up a nail in the tire!
+4a6273c90dc1	Kojo	en-NG-AbeoNeural	+10%	+28Hz	+0%	Driver, take it easy, chale. We are not in a hurry.
+4a6387fc9fcb	Mama Nkechi	en-NG-EzinneNeural	-5%	-4Hz	+0%	So you be the new driver? My pepper must reach Oyingbo fresh, no rough driving.
+4a6d714d5605	Koffi	en-NG-AbeoNeural	+4%	+18Hz	+0%	Fare, fare! Me pa wo kyew, bring your money.
+4aeda5ff789b	Passenger	en-NG-EzinneNeural	+8%	+45Hz	+0%	Oya, make we help. We no fit stay here all day.
+4e49a6c32246	Koffi	en-NG-AbeoNeural	+4%	+18Hz	+0%	Chale, see Black Star Square. Freedom and justice, my brother.
+50efc3d9ec13	Chidi	en-NG-AbeoNeural	+8%	+40Hz	+0%	Slow down for this hill. Na maximum thirty here.
+51432fa4598f	Chidi	en-NG-AbeoNeural	+8%	+40Hz	+0%	Road clear! Make we go.
+522aa5bff3e8	Bobo	en-US-GuyNeural	+4%	+10Hz	+0%	Peachtree Road, baby! Half the streets in this city got Peachtree in the name.
+525281258447	Koffi	en-NG-AbeoNeural	+4%	+18Hz	+0%	Fitter is fixing the tyre...
+52f5a04a6ba1	Koffi	en-NG-AbeoNeural	+4%	+18Hz	+0%	Koforidua! Last stop. Medaase, everybody. We made it!
+53b474e27eb8	Chidi	en-NG-AbeoNeural	+8%	+40Hz	+0%	Change no dey! Abeg, who get change?
+5626db631005	Bobo	en-US-GuyNeural	+4%	+10Hz	+0%	Lenox Mall! Last stop, y'all. Grab your bags and mind the step!
+565bfb0deaad	Officer	en-NG-AbeoNeural	-12%	-8Hz	+0%	Your tyre flat. Go fix am for the vulcanizer.
+568322d97320	Bobo	en-US-GuyNeural	+4%	+10Hz	+0%	Ray, you see them Buckhead towers? One day I'ma live up there.
+57325cd53a6c	Chidi	en-NG-AbeoNeural	+8%	+40Hz	+0%	Aburi! Koforidua! Mountain road, hold tight! Enter, enter!
+5756f1b416e2	Koffi	en-NG-AbeoNeural	+4%	+18Hz	+0%	Okay, let's help. We can't stay here all day.
+5817599ea321	Vulcanizer	en-NG-AbeoNeural	+0%	-5Hz	+0%	Hold on! I dey come with my cart.
+58a8b9524907	Herder	en-NG-AbeoNeural	-5%	-8Hz	+0%	Easy... make we pass.
+58d4e6b3f8a1	Koffi	en-NG-AbeoNeural	+4%	+18Hz	+0%	Me pa wo kyew, calm down. We are fixing it!
+59841f594198	Bobo	en-US-GuyNeural	+4%	+10Hz	+0%	That's my change, all good. Thank you.
+5c2b8672caec	Chidi	en-NG-AbeoNeural	+8%	+40Hz	+0%	CMS! The office crowd pays well.
+5cc5470d3ba7	Chidi	en-NG-AbeoNeural	+8%	+40Hz	+0%	City run next. Sergeant Bello works that road. Him hand no dey rest.
+5e725b224d73	Chidi	en-NG-AbeoNeural	+8%	+40Hz	+0%	Kano today, Oga! Through Kofar Nassarawa, Kurmi Market, Dala Hill, then Gidan Makama. Sannu da zuwa!
+5e78964fd948	Koffi	en-NG-AbeoNeural	+4%	+18Hz	+0%	Circle Circle Circle! Makola! Accra Central! Enter, enter, let's go!
+5e8e6b28372f	Chidi	en-NG-AbeoNeural	+8%	+40Hz	+0%	Checkpoint soon. Remember: whatever you do today, Bello remembers tomorrow.
+5f9bee5e880c	Alhaji	en-NG-AbeoNeural	-12%	-15Hz	+0%	The money is complete. The danfo is yours.
+5fc7c7e137a0	Chidi	en-NG-AbeoNeural	+8%	+40Hz	+0%	Oga... my mother is sick in the village. Abeg, can we take the Village Shuttle?
+60a0950f5456	Officer	en-NG-AbeoNeural	-12%	-8Hz	+0%	These papers no correct. You no fit pass.
+63df61c6ec8a	Bobo	en-US-GuyNeural	+4%	+10Hz	+0%	Y'all, stay calm. We're fixing it!
+64f1a86f157f	Bobo	en-US-GuyNeural	+4%	+10Hz	+0%	Road's clear. Let's roll!
+6566db18e256	Chidi	en-NG-AbeoNeural	+8%	+40Hz	+0%	Yaba Bus Stop! Make una check your belongings!
+67424f452942	Chidi	en-NG-AbeoNeural	+8%	+40Hz	+0%	CMS! Make una ready!
+675b77a3adaf	Chidi	en-NG-AbeoNeural	+8%	+40Hz	+0%	Lenox Mall! Last stop, y'all. Watch your step and have a blessed day!
+684ba52f5ad5	Chidi	en-NG-AbeoNeural	+8%	+40Hz	+0%	Stadium! We beat Tunde to the crowd.
+68a6393dab33	Chidi	en-NG-AbeoNeural	+8%	+40Hz	+0%	Driver! Tyre don catch nail!
+6952c94421d0	Bobo	en-US-GuyNeural	+4%	+10Hz	+0%	Tire guy is fixing the tire...
+6a2cad97671e	Chidi	en-NG-AbeoNeural	+8%	+40Hz	+0%	Oga, na every stop we go pay?
+6a71377db9f0	Bobo	en-US-GuyNeural	+4%	+10Hz	+0%	Tire guy is on his way with his cart...
+6a9f431205d7	Chidi	en-NG-AbeoNeural	+8%	+40Hz	+0%	Who fit help us push?
+6b65bc21e1a6	Keisha	en-US-AriaNeural	+2%	+5Hz	+0%	Driver, can you let me off by the corner store? Thank you, sweetie.
+6c0a46c35454	Chidi	en-NG-AbeoNeural	+8%	+40Hz	+0%	Ojuelegba to Yaba today. Tejuosho, the lagoon, that muddy hill. Long road, so we buy extra fuel for park.
+6d181f915fbb	Ray	en-US-ChristopherNeural	-6%	-10Hz	+0%	Lenox Mall. Good run, Bobo. Y'all have a blessed day now!
+6d68c179718b	Alhaji	en-NG-AbeoNeural	-12%	-15Hz	+0%	Day 30 don pass and my money never complete. I give you 7 more days, but now na ₦75,000.
+6dfe5f1a5fed	Chidi	en-NG-AbeoNeural	+8%	+40Hz	+0%	Madam don comot. Oya, make we go!
+6e48c23d9bf6	Bobo	en-US-GuyNeural	+4%	+10Hz	+0%	Thank you, driver. That's better.
+6e84eee585d2	Auntie Ama	en-NG-EzinneNeural	-4%	-8Hz	+0%	Mate, bus stop! I am dropping at Makola, eh.
+6f5087e1dd16	Chidi	en-NG-AbeoNeural	+8%	+40Hz	+0%	This Brave Heart mud deep o. Gently, gently.
+6f7f8fb9295b	Chidi	en-NG-AbeoNeural	+8%	+40Hz	+0%	Ogidi! Don P InterContinental na the big landmark here. Achebe town.
+705d44765cc1	Bobo	en-US-GuyNeural	+4%	+10Hz	+0%	Driver, you didn't see that pothole?
+70d901b7c41e	Agbero	en-NG-AbeoNeural	+4%	+6Hz	+0%	You wan teach us work?
+71d299bd26a1	Chidi	en-NG-AbeoNeural	+8%	+40Hz	+0%	Oga! You be Oga now. Free play: every route is open.
+71d3a411c978	Chidi	en-NG-AbeoNeural	+8%	+40Hz	+0%	Oga, wetin be the offence? You go give us receipt?
+7246b5f550a3	Bobo	en-US-GuyNeural	+4%	+10Hz	+0%	Hang tight! I'm coming with my cart.
+745b75e7df3a	Chidi	en-NG-AbeoNeural	+8%	+40Hz	+0%	Canal Road short, but the bumps go shake everybody.
+7540aab897c1	Supervisor	en-NG-AbeoNeural	-12%	-8Hz	+0%	Their papers correct. Let them go.
+754d055d39cb	Agbero	en-NG-AbeoNeural	+4%	+6Hz	+0%	Okay, bring am.
+7840e0856cca	Bobo	en-US-GuyNeural	+4%	+10Hz	+0%	Let's roll!
+7b61e25a998d	Koffi	en-NG-AbeoNeural	+4%	+18Hz	+0%	No change o! Who has small change?
+7b833979bc34	Chidi	en-NG-AbeoNeural	+8%	+40Hz	+0%	Oga, your uncle's danfo is all he left you. Alhaji wants ₦60,000 in 30 days or he takes it back.
+7ba6fd96287d	Chidi	en-NG-AbeoNeural	+8%	+40Hz	+0%	₦500? Abeg, help us reduce am.
+7c07c81ef2fc	Officer	en-NG-AbeoNeural	-12%	-8Hz	+0%	Conductor, calm down.
+7d3d908af2d2	Passenger	en-NG-EzinneNeural	+8%	+45Hz	+0%	My change be ₦700.
+7f03d601783d	Chidi	en-NG-AbeoNeural	+8%	+40Hz	+0%	Kasuwan Daji! Village people, enter! Make we go!
+7f8f5b82e9ca	Banana seller	en-NG-EzinneNeural	+15%	+4Hz	+20%	Fine banana!
+7fa3fc6d4a85	Koffi	en-NG-AbeoNeural	+4%	+18Hz	+0%	Let's go, chale!
+8045eba41990	Passenger	en-NG-EzinneNeural	+8%	+45Hz	+0%	Chidi, abeg!
+819f6d0d9c0a	Bobo	en-US-GuyNeural	+4%	+10Hz	+0%	Driver! I'm pregnant, take it easy on this road, please!
+85c22819e331	Bobo	en-US-GuyNeural	+4%	+10Hz	+0%	Can anybody help us push?
+8641ae4640ec	Chidi	en-NG-AbeoNeural	+8%	+40Hz	+0%	Koforidua! Last stop! Medaase, check your things, eh!
+8684ea9f5253	Chidi	en-NG-AbeoNeural	+8%	+40Hz	+0%	Nnewi bus stop dey front! Madam go drop there. Oga, stop for the bus stop.
+890841b092f4	Koffi	en-NG-AbeoNeural	+4%	+18Hz	+0%	Osu! Oxford Street! Chale, the night life here is too much.
+8a10e706c663	Chidi	en-NG-AbeoNeural	+8%	+40Hz	+0%	Oga, stop for the fare stop! We must collect fares before we move on.
+8a83bb914b4b	Koffi	en-NG-AbeoNeural	+4%	+18Hz	+0%	Jamestown! Last stop! Medaase, check your things, eh!
+8ab65906c984	Pregnant passenger	en-NG-EzinneNeural	+8%	+45Hz	+0%	Driver! You don pass my bus stop o!
+8b588e50bbec	Officer	en-NG-AbeoNeural	-12%	-8Hz	+0%	Everything correct. You fit go.
+8bbcda6dcf06	Bobo	en-US-GuyNeural	+4%	+10Hz	+0%	College Park! MARTA station! Y'all hop on, we headed up to Lenox!
+8bc76fe8b8ea	Gala seller	en-NG-EzinneNeural	+15%	+4Hz	+20%	Gala! Gala!
+8c7bb3bd4f44	Koffi	en-NG-AbeoNeural	+4%	+18Hz	+0%	Boss, your tyre is ready!
+90a6bcfc576f	Chidi	en-NG-AbeoNeural	+8%	+40Hz	+0%	Oyingbo! Market people, enter!
+92a2cbac6eab	Alhaji	en-NG-AbeoNeural	-12%	-15Hz	+0%	Extension finished. We start this chapter again from day 1. Keep your savings and your upgrades.
+9392c124c8db	Tunde	en-NG-AbeoNeural	+15%	+2Hz	+0%	Chidi, pay them. Make we go.
+93c8470b8e21	Chidi	en-NG-AbeoNeural	+8%	+40Hz	+0%	Next: the market women at Ojuelegba. If Mama Nkechi trusts you, the whole market follows.
+941c6617bf0a	Bobo	en-US-GuyNeural	+4%	+10Hz	+0%	Boss, your tire's ready!
+9477a689c998	Bobo	en-US-GuyNeural	+4%	+10Hz	+0%	College Park! Peachtree! Buckhead! Lenox Mall! Come on, y'all, hop on!
+956781ea3b1b	Koffi	en-NG-AbeoNeural	+4%	+18Hz	+0%	Tyre is fixed. Let's go, chale!
+96844e1bb6db	Chidi	en-NG-AbeoNeural	+8%	+40Hz	+0%	Gidan Makama! Sauka, everybody! Na gode, check your load!
+96a012854876	Officer	en-NG-AbeoNeural	-12%	-8Hz	+0%	Oya, una fit go.
+972825fbcb53	Chidi	en-NG-AbeoNeural	+8%	+40Hz	+0%	Abeg, make una calm down. We dey fix am!
+97b3cdb20749	Passenger	en-NG-EzinneNeural	+8%	+45Hz	+0%	Abeg! I don late for market!
+9a8af61f206a	Chidi	en-NG-AbeoNeural	+8%	+40Hz	+0%	Ojukwu Gate! Oya come down! Biko check your belongings!
+9aae9123ca10	Agbero	en-NG-AbeoNeural	+4%	+6Hz	+0%	Oya, bring am. Make we push.
+9b5c1f5aaa3b	Kwesi	en-NG-AbeoNeural	-8%	-12Hz	+0%	Jamestown lighthouse. Medaase, Koffi. Good run, chale!
+9d6fe845bf96	Chidi	en-NG-AbeoNeural	+8%	+40Hz	+0%	Kasuwan Daji! Make una check your belongings!
+9ff6c35a0c12	Agbero	en-NG-AbeoNeural	+4%	+6Hz	+0%	Forget that one! Rub my hand small.
+a14982c7daee	Ticket officer	en-NG-AbeoNeural	-6%	-8Hz	+0%	Council route ticket: ₦200. Here is your permit, driver.
+a21565d5eb25	Bobo	en-US-GuyNeural	+4%	+10Hz	+0%	Welcome to Atlanta, y'all! The A-T-L! Hold on to something.
+a387b0d126a6	Chidi	en-NG-AbeoNeural	+8%	+40Hz	+0%	Oga driver, which route we dey run today?
+a5a2ec182fdb	Koffi	en-NG-AbeoNeural	+4%	+18Hz	+0%	Aburi! Koforidua! Mountain road, hold tight!
+a7528eb5f961	Plantain chips seller	en-NG-EzinneNeural	+15%	+4Hz	+20%	Plantain chips!
+a95e13adfa4b	Bobo	en-US-GuyNeural	+4%	+10Hz	+0%	I need seven dollars back, sir.
+aade54eee247	Koffi	en-NG-AbeoNeural	+4%	+18Hz	+0%	Medaase, driver. That's it.
+ab5230a5f17e	Chidi	en-NG-AbeoNeural	+8%	+40Hz	+0%	See Dala Hill. Old Kano start from there. Kai, this city old pass Lagos.
+ab696c566a98	Officer	en-NG-AbeoNeural	-12%	-8Hz	+0%	One light no dey work. Park for the maintenance bay.
+ac7757cceb9e	Koffi	en-NG-AbeoNeural	+4%	+18Hz	+0%	Ete sen, my people! Kwame Nkrumah Circle. Anybody dropping at Circle?
+ac7b8291878c	Chidi	en-NG-AbeoNeural	+8%	+40Hz	+0%	Oga, when this debt is paid... I want my own bus one day.
+ace0ba340173	Passenger	en-NG-EzinneNeural	+8%	+45Hz	+0%	Chidi, abeg, settle am!
+acfcf0686973	Ray	en-US-ChristopherNeural	-6%	-10Hz	+0%	Morning, y'all. I'm Ray, I'll be your driver. College Park up to Lenox. Bobo, call 'em!
+ad5348b81ea5	Chidi	en-NG-AbeoNeural	+8%	+40Hz	+0%	Oga, we pass police! Dem dey wave us down. Stop make dem check us here.
+ae722dd7f9a9	Chidi	en-NG-AbeoNeural	+8%	+40Hz	+0%	Na passengers we carry. Abeg, take ₦100.
+b1220446c9e8	Koffi	en-NG-AbeoNeural	+4%	+18Hz	+0%	Circle Circle Circle! Chale, under the flyover we go gently. Maximum thirty.
+b18c2a63c815	Tyler	en-US-EricNeural	+4%	+0Hz	+0%	Man, traffic's light today. Must be my lucky day.
+b1d18825c477	Bobo	en-US-GuyNeural	+4%	+10Hz	+0%	Buckhead! Look at them towers. Fancy, fancy.
+b1d451d5b956	Bobo	en-US-GuyNeural	+4%	+10Hz	+0%	Whoa, we passed the fare stop! Swing back around, I gotta collect fares first.
+b202cac366e3	Chidi	en-NG-AbeoNeural	+8%	+40Hz	+0%	Sorry ma! Oga, next time stop for the bus stop.
+b2058936d11b	Pregnant passenger	en-NG-EzinneNeural	+8%	+45Hz	+0%	Thank you, driver! Nnewi, I don reach. Daalu!
+b34962b94843	Passenger	en-NG-EzinneNeural	+8%	+45Hz	+0%	My change day complete.
+b50acb0a1e88	Chidi	en-NG-AbeoNeural	+8%	+40Hz	+0%	Balogun! Balogun! Bole! Make una check your belongings!
+b66154fafa44	Baba Ibile	en-NG-AbeoNeural	-5%	-20Hz	+0%	This park is mine now. Every danfo pays me, or it doesn't move.
+b6ce16a05843	Chidi	en-NG-AbeoNeural	+8%	+40Hz	+0%	I was your uncle's conductor. I no dey go anywhere. Make we start with Yaba to Balogun.
+b7ad1cba682d	Chidi	en-NG-AbeoNeural	+8%	+40Hz	+0%	Stadium! Make una check your belongings!
+b8999c842643	Bobo	en-US-GuyNeural	+4%	+10Hz	+0%	Ray, easy! You heard the lady.
+baf718b49fb2	Chidi	en-NG-AbeoNeural	+8%	+40Hz	+0%	Oyingbo! Market people, enter! Make we go!
+bcc9946c4614	Chidi	en-NG-AbeoNeural	+8%	+40Hz	+0%	Oga, our papers correct. Which payment be this?
+bcdfb2013fc5	Agbero	en-NG-AbeoNeural	+4%	+6Hz	+0%	Oga, we fit push am. Na ₦500.
+bfe31aba6e51	Chidi	en-NG-AbeoNeural	+8%	+40Hz	+0%	Oya, Balogun Market! Make we go!
+c01a44a33e4f	Pure water seller	en-NG-EzinneNeural	+15%	+4Hz	+20%	Cold pure water!
+c09b44926f95	Chidi	en-NG-AbeoNeural	+8%	+40Hz	+0%	Tunde dey behind us! Collect the bonuses, keep the passengers happy.
+c10858e109a2	Kwesi	en-NG-AbeoNeural	-8%	-12Hz	+0%	Today we climb Aburi, up to Koforidua. Steep road, chale. Koffi, call them!
+c26b5c5ad848	Chidi	en-NG-AbeoNeural	+8%	+40Hz	+0%	Kurmi Market! Sannu sannu, mai gida. Who dey drop for market?
+c42a85a91ccb	Pregnant passenger	en-NG-EzinneNeural	+8%	+45Hz	+0%	Driver! You wan kill my unborn pikin? Abeg, softly pass this road o!
+c66ac081a29e	Officer	en-NG-AbeoNeural	-12%	-8Hz	+0%	Driver, make we check your vehicle.
+c6f1e3ec015e	Chidi	en-NG-AbeoNeural	+8%	+40Hz	+0%	Match day at the Stadium next. Tunde 'Speed' will try to steal our passengers.
+c843d11f7f31	Officer	en-NG-AbeoNeural	-12%	-8Hz	+0%	You carry pass your capacity. You no fit go like this.
+cc13f39b6fa7	Chidi	en-NG-AbeoNeural	+8%	+40Hz	+0%	Everybody we helped is watching: the market women, the village, even Bello's men.
+cc37c4fef1b5	Chidi	en-NG-AbeoNeural	+8%	+40Hz	+0%	Ogbunike Cave road rough o. Biko, slow down.
+ccd9c54ac699	Koffi	en-NG-AbeoNeural	+4%	+18Hz	+0%	My change is complete. Medaase.
+cd9cc4c2f4ce	Officer	en-NG-AbeoNeural	-12%	-8Hz	+0%	Tyres, lights, passenger capacity. Make everything correct.
+ce5d2c8876ea	Koffi	en-NG-AbeoNeural	+4%	+18Hz	+0%	Aburi road! Chale, hold tight. This hill is steep o.
+cf1c6661803e	Chidi	en-NG-AbeoNeural	+8%	+40Hz	+0%	Oga, fuel don low. Make we enter filling station.
+d00fa01ff759	Chidi	en-NG-AbeoNeural	+8%	+40Hz	+0%	Upper Iweka! Ogidi! Awka! Enter quick quick!
+d0b3e5d7fb74	Chidi	en-NG-AbeoNeural	+8%	+40Hz	+0%	Oga, we don pass the fare stop! Turn back and stop there make I collect fare first.
+d111c420793e	Pregnant passenger	en-NG-EzinneNeural	+8%	+45Hz	+0%	Thank you, driver. Na so.
+d5baa1998234	Chidi	en-NG-AbeoNeural	+8%	+40Hz	+0%	Oga, na vehicle papers you dey check or exercise?
+d68e8b7ac2b9	Koffi	en-NG-AbeoNeural	+4%	+18Hz	+0%	Driver, you didn't see that hole?
+d6dca4bf0d11	Chidi	en-NG-AbeoNeural	+8%	+40Hz	+0%	Cattle crossing! Make we hold on, herder dey come.
+d72054ed3a97	Koffi	en-NG-AbeoNeural	+4%	+18Hz	+0%	Kwesi, gently gently! See the drop there, eh!
+d79c80b5ff90	Bobo	en-US-GuyNeural	+4%	+10Hz	+0%	Easy, driver!
+d8b497f981de	Chidi	en-NG-AbeoNeural	+8%	+40Hz	+0%	Oga, documents dey?
+d8fb51d9f097	Chidi	en-NG-AbeoNeural	+8%	+40Hz	+0%	Oga, careful! That danfo dey pull out. Keep left!
+dbccd204c3d8	Koffi	en-NG-AbeoNeural	+4%	+18Hz	+0%	Chale, my change is seven cedis.
+dc4f25b9e329	Vulcanizer	en-NG-AbeoNeural	+0%	-5Hz	+0%	Oga, your tyre don ready!
+dce58cd15710	Chidi	en-NG-AbeoNeural	+8%	+40Hz	+0%	Papers clean, no settlement. Bello vexed, but the passengers respect you.
+ddb8a93eb959	Officer	en-NG-AbeoNeural	-12%	-8Hz	+0%	Oya, carry your motor go.
+de6a7acf7259	Chidi	en-NG-AbeoNeural	+8%	+40Hz	+0%	Oga, we dey go market.
+df712b5f0865	Koffi	en-NG-AbeoNeural	+4%	+18Hz	+0%	Black Star Square! Freedom and justice. See the Independence Arch there.
+e0a57a7fde93	Chidi	en-NG-AbeoNeural	+8%	+40Hz	+0%	Gidan Makama! Last stop. Yauwa, na gode, everybody sauka.
+e1de78e8d652	Kwesi	en-NG-AbeoNeural	-8%	-12Hz	+0%	I see it, Koffi. Low gear, small small.
+e1e19847c97f	Bobo	en-US-GuyNeural	+4%	+10Hz	+0%	Anybody buying? Hold on to your change!
+e3013d6ef5ab	Chidi	en-NG-AbeoNeural	+8%	+40Hz	+0%	Ikemba gate, Nnewi! Ka anyi ga. Anambra people go remember this danfo.
+e379cef44512	Chidi	en-NG-AbeoNeural	+8%	+40Hz	+0%	Kofar Mata dye pits! See indigo. Haba, no splash am for my passengers.
+e39ba34f5fba	Bobo	en-US-GuyNeural	+4%	+10Hz	+0%	Ray, we're running low on gas. Let's hit the gas station.
+e39bbd909fef	Bobo	en-US-GuyNeural	+4%	+10Hz	+0%	Ray, pull up at the fare stop! Gotta collect fares before we roll.
+e5ef7f2372f9	Bobo	en-US-GuyNeural	+4%	+10Hz	+0%	I'm all out of change! Anybody got small bills?
+e64ae302d31a	Koffi	en-NG-AbeoNeural	+4%	+18Hz	+0%	Driver! Wei, you want to kill my unborn baby? Gently on this road!
+e6b5c6284c6f	Bobo	en-US-GuyNeural	+4%	+10Hz	+0%	Tank's full. Let's roll!
+e74e8f19e6ba	Koffi	en-NG-AbeoNeural	+4%	+18Hz	+0%	Ei! Kwesi, the tyre has caught a nail!
+ea045893a3e4	Chidi	en-NG-AbeoNeural	+8%	+40Hz	+0%	Gidan Makama! Na gode, mai gida. Kano people go remember this danfo.
+eafee703f953	Ray	en-US-ChristopherNeural	-6%	-10Hz	+0%	Easy now, Bobo. Speed limit's thirty-five on Peachtree.
+ec8296e36156	Koffi	en-NG-AbeoNeural	+4%	+18Hz	+0%	Driver, gently, gently!
+ef58215037ce	Koffi	en-NG-AbeoNeural	+4%	+18Hz	+0%	Kwesi, fuel is low o. Let's branch at the filling station.
+ef79d60495af	Bobo	en-US-GuyNeural	+4%	+10Hz	+0%	Alright, let's help. We can't stay here all day.
+ef82c50be7d6	Koffi	en-NG-AbeoNeural	+4%	+18Hz	+0%	Accra Central! Kantamanto, Makola, all of them. Medaase for riding.
+f02c5a872eb2	Koffi	en-NG-AbeoNeural	+4%	+18Hz	+0%	Who wants to buy? Hold your change, eh!
+f1a3bc05ab45	Koffi	en-NG-AbeoNeural	+4%	+18Hz	+0%	Fitter is coming with his cart...
+f1bd580cf727	Chidi	en-NG-AbeoNeural	+8%	+40Hz	+0%	Make we go!
+f21b321b10c1	Chidi	en-NG-AbeoNeural	+8%	+40Hz	+0%	Owo da! Abeg, make una bring your money.
+f3256b4334a2	Officer	en-NG-AbeoNeural	-12%	-8Hz	+0%	Driver! Conductor! Come down. Five push-ups and five frog jumps!
+f4bf843a3574	Koffi	en-NG-AbeoNeural	+4%	+18Hz	+0%	Makola! Makola! Auntie, hold your goods well, eh.
+f77c476fdfa5	Koffi	en-NG-AbeoNeural	+4%	+18Hz	+0%	Are we going to sleep here?
+f7d6730d8427	Koffi	en-NG-AbeoNeural	+4%	+18Hz	+0%	Tank is full. Let's go, chale!
+f87f9df77498	Chidi	en-NG-AbeoNeural	+8%	+40Hz	+0%	Emir palace and the big mosque. Kai, Kano ta Dabo! Slow small, respect.
+f9a81fc5b282	Officer	en-NG-AbeoNeural	-12%	-8Hz	+0%	Oya, move.
+f9c0df0d4dd0	Bobo	en-US-GuyNeural	+4%	+10Hz	+0%	Thanks, driver!
+fab9c659b492	Chidi	en-NG-AbeoNeural	+8%	+40Hz	+0%	Abeg, make una calm down.
+fb3991eaab08	Mama Nkechi	en-NG-EzinneNeural	-5%	-4Hz	+0%	You do well. From today my women ride with you.
+fbedac43ff97	Chidi	en-NG-AbeoNeural	+8%	+40Hz	+0%	Niger Bridge! Na maximum thirty for this bridge, Oga. Gently, gently.
+fc52b520c9a7	Kwesi	en-NG-AbeoNeural	-8%	-12Hz	+0%	Accra run today. I am Kwesi, your trotro driver. Koffi, call them!
+fc610bd29319	Chidi	en-NG-AbeoNeural	+8%	+40Hz	+0%	Why una block road? Who send una?
+fd08fe5efacd	Kwesi	en-NG-AbeoNeural	-8%	-12Hz	+0%	Koforidua. We made it up, Koffi. Medaase, chale!
+fd45c9e250e8	Chidi	en-NG-AbeoNeural	+8%	+40Hz	+0%	Go-slow ahead. Hawkers everywhere. Patience is money on this road.
+fd668b7121fb	Chidi	en-NG-AbeoNeural	+8%	+40Hz	+0%	Who wan buy? Abeg, hold your change!
+ff4b09f99ff9	Koffi	en-NG-AbeoNeural	+4%	+18Hz	+0%	Ei, we passed the fare stop! Turn back, chale, let me collect the fares first.
+fffc9ba72403	Chidi	en-NG-AbeoNeural	+8%	+40Hz	+0%	Wait for the cows to cross, Oga. Stop for the line.
+f04fcf9e5320	Koffi	en-NG-AbeoNeural	+4%	+18Hz	+0%	Go straight, chale — follow the road.
+9d7aca9e6c65	Koffi	en-NG-AbeoNeural	+4%	+18Hz	+0%	Turn left here!
+72b0984a99f2	Koffi	en-NG-AbeoNeural	+4%	+18Hz	+0%	Turn right here!
+376737ea4237	Koffi	en-NG-AbeoNeural	+4%	+18Hz	+0%	Turn left at the roundabout, chale!
+4ec5033e48f5	Koffi	en-NG-AbeoNeural	+4%	+18Hz	+0%	Keep west for the Kotoka border, chale — do not loop Jamestown.
+0bafe6f0f519	Bobo	en-US-GuyNeural	+4%	+10Hz	+0%	Virginia! Almost to the capital. Sit tight.
+0bbb8f37ffdd	Bobo	en-US-GuyNeural	+4%	+10Hz	+0%	Our last bus stop is coming up, y'all.
+1249526c833d	Bobo	en-US-GuyNeural	+4%	+10Hz	+0%	Washington, D.C.! White House on the left, last stop, y'all!
+2ce50798e1aa	Chidi	en-NG-AbeoNeural	+8%	+40Hz	+0%	Our last bus stop is coming up.
+2d12549fad22	Bobo	en-US-GuyNeural	+4%	+10Hz	+0%	Georgia, y'all! Peach State in the rear-view, we headed north.
+2fff42a294c9	Chidi	en-NG-AbeoNeural	+8%	+40Hz	+0%	Turn right here.
+39726b010ca1	Bobo	en-US-GuyNeural	+4%	+10Hz	+0%	Turn right here, y'all.
+4ed2ed3b7b8e	Chidi	en-NG-AbeoNeural	+8%	+40Hz	+0%	Turn left at the roundabout.
+53eed1c714a5	Bobo	en-US-GuyNeural	+4%	+10Hz	+0%	Next bus stop coming up, y'all.
+634dd944bf2e	Bobo	en-US-GuyNeural	+4%	+10Hz	+0%	Tennessee snow on the hill, Ray. Pretty as a postcard, slippery as a banana.
+6dc90b109135	Chidi	en-NG-AbeoNeural	+8%	+40Hz	+0%	Next bus stop coming up.
+7429a3220efd	Bobo	en-US-GuyNeural	+4%	+10Hz	+0%	Go straight ahead — stay on this road.
+8682e7038b1c	Chidi	en-NG-AbeoNeural	+8%	+40Hz	+0%	Oh-yah, go straight. Follow the road.
+8faaf48d9a83	Bobo	en-US-GuyNeural	+4%	+10Hz	+0%	Turn left at the roundabout, y'all.
+93673dbd7506	Bobo	en-US-GuyNeural	+4%	+10Hz	+0%	Tennessee! Hold on — that's a snowy hill up ahead. Easy, Ray.
+9b881171917c	Koffi	en-NG-AbeoNeural	+4%	+18Hz	+0%	Next bus stop coming up, Chah-leh.
+af40e4904cca	Koffi	en-NG-AbeoNeural	+4%	+18Hz	+0%	Border ahead, Chah-leh.
+c564752cf471	Bobo	en-US-GuyNeural	+4%	+10Hz	+0%	The White House! Last stop, Washington D.C. Watch your step, y'all!
+c8200d859876	Bobo	en-US-GuyNeural	+4%	+10Hz	+0%	Turn left at the intersection.
+cc55dac5fb8c	Bobo	en-US-GuyNeural	+4%	+10Hz	+0%	Lenox Mall! All aboard for D.C.! White House, last stop!
+d981c124ae48	Koffi	en-NG-AbeoNeural	+4%	+18Hz	+0%	Our last bus stop is coming up, Chah-leh.
+e82546b5b5bd	Chidi	en-NG-AbeoNeural	+8%	+40Hz	+0%	Border ahead.
+eeda647db025	Bobo	en-US-GuyNeural	+4%	+10Hz	+0%	Border ahead, y'all.
+fbbab5b7f005	Bobo	en-US-GuyNeural	+4%	+10Hz	+0%	Alright folks, sit tight. We're moving.
+ffcf09128309	Chidi	en-NG-AbeoNeural	+8%	+40Hz	+0%	Turn left for the junction.

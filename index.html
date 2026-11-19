@@ -2323,6 +2323,7 @@
       mateBox.classList.add('mate-pop');
       clearTimeout(mateHideTimer);
       mateHideTimer = setTimeout(() => {
+        mateBox.classList.remove('mate-pop');
         mateBox.classList.add('translate-x-[120%]', 'opacity-0');
       }, 4800);
       MusicPlayer.duck(3000);

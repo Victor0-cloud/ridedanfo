@@ -1989,7 +1989,12 @@
         ['my change be ₦700. road clear', '158807960770'],
         ['pass the mtn mast, dangote refinery', 'f39a24be1cca'],
         ['road clear! make we go to cms marina', '78bb44932e66'],
-        ['see mtn mast, dangote refinery and eko hotel', '9b82de6eb4e7']
+        ['see mtn mast, dangote refinery and eko hotel', '9b82de6eb4e7'],
+        ['drop me by the stadium gate corner', 'bcf6c0c285bc'],
+        ['hop down for tejuosho to buy charger', '599851e6c9b2'],
+        ['conductor, drop me for tejuosho', 'f6eb06e0ce01'],
+        ['we don enter yaba tech', '54c9dd109c0f'],
+        ['drop me for tejuosho o! i wan buy charger', '64c4c6581bd4']
       ];
 
       // Load full 368-clip index from ./voices/voices_meta.txt
@@ -2024,7 +2029,7 @@
           const utt = new SpeechSynthesisUtterance(clean);
           const voices = window.speechSynthesis.getVoices();
           const sLow = (speaker + ' ' + text).toLowerCase();
-          const isFemale = sLow.includes('ronke') || sLow.includes('nkechi') || sLow.includes('bisi') || sLow.includes('ama') || sLow.includes('keisha') || sLow.includes('madam') || sLow.includes('amina');
+          const isFemale = sLow.includes('ronke') || sLow.includes('nkechi') || sLow.includes('bisi') || sLow.includes('ama') || sLow.includes('keisha') || sLow.includes('madam') || sLow.includes('amina') || sLow.includes('ngozi') || sLow.includes('shade');
           const isUS = reg === 'usa' || reg === 'usa_dc' || sLow.includes('bobo') || sLow.includes('ray') || sLow.includes('trump');
 
           // Only use real Microsoft Natural / Nigerian / Hausa neural voices (never robotic SAPI fallback!)

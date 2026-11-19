@@ -1269,41 +1269,77 @@
 
       if (ch.id === 'anambra') {
         // =====================================================================
-        // DON P INTERCONTINENTAL HOTEL AT OGIDI, ANAMBRA (Exact _hotel & _hotel_gate from anambra_road.gd!)
+        // DON P INTERCONTINENTAL HOTEL AT OGIDI, ANAMBRA
+        // Modeled after InterContinental Buckhead Atlanta (Georgia, USA):
+        // Stepped limestone & glass tower, sweeping curved porte-cochere, classical columns & garden court!
         // =====================================================================
         const dpX = x0 + 17, dpZ = cz;
-        const creamMat = new THREE.MeshStandardMaterial({ color: 0xf7f2e0, roughness: 0.38 });
-        const darkGlassMat = new THREE.MeshStandardMaterial({ color: 0x2e4257, roughness: 0.15, metalness: 0.75 });
-        const navyMat = new THREE.MeshStandardMaterial({ color: 0x0f1f4d, roughness: 0.4 });
+        const creamMat = new THREE.MeshStandardMaterial({ color: 0xf2ead7, roughness: 0.36 });
+        const darkGlassMat = new THREE.MeshStandardMaterial({ color: 0x243b53, roughness: 0.12, metalness: 0.78 });
+        const navyMat = new THREE.MeshStandardMaterial({ color: 0x0f1f4d, roughness: 0.38 });
+        const bronzeMat = new THREE.MeshStandardMaterial({ color: 0xb08d57, roughness: 0.3, metalness: 0.65 });
         const brickMat = new THREE.MeshStandardMaterial({ color: 0x4d3021, roughness: 0.75 });
         const trimMat = new THREE.MeshStandardMaterial({ color: 0xede3c7, roughness: 0.45 });
+        const hedgeMat = new THREE.MeshStandardMaterial({ color: 0x1e5631, roughness: 0.85 });
 
-        // 8-storey cream-white hotel tower + 8 dark-blue glass window bands + gold cornice + crown block
-        const tower = new THREE.Mesh(new THREE.BoxGeometry(16.5, 25.0, 32.0), creamMat);
-        tower.position.set(dpX, 12.7, dpZ);
+        // Grand 2-storey classical limestone lobby base with expansive multi-story glazing
+        const lobbyBase = new THREE.Mesh(new THREE.BoxGeometry(17.5, 6.2, 34.0), creamMat);
+        lobbyBase.position.set(dpX, 3.1, dpZ);
+        lobbyBase.castShadow = true;
+        const lobbyGlass = new THREE.Mesh(new THREE.BoxGeometry(17.8, 4.4, 24.0), darkGlassMat);
+        lobbyGlass.position.set(dpX, 2.8, dpZ);
+        group.add(lobbyBase, lobbyGlass);
+
+        // Stepped, sculpted Buckhead upper limestone & glass tower + penthouse setback
+        const tower = new THREE.Mesh(new THREE.BoxGeometry(15.2, 19.5, 30.0), creamMat);
+        tower.position.set(dpX + 0.8, 15.8, dpZ);
         tower.castShadow = true;
         group.add(tower);
-        for (let fl = 0; fl < 7; fl++) {
-          const band = new THREE.Mesh(new THREE.BoxGeometry(16.8, 1.15, 32.3), darkGlassMat);
-          band.position.set(dpX, 3.6 + fl * 3.2, dpZ);
+        for (let fl = 0; fl < 6; fl++) {
+          const band = new THREE.Mesh(new THREE.BoxGeometry(15.5, 1.35, 30.3), darkGlassMat);
+          band.position.set(dpX + 0.8, 7.8 + fl * 3.0, dpZ);
           group.add(band);
         }
-        const goldTrim = new THREE.Mesh(new THREE.BoxGeometry(17.4, 0.7, 33.0), MAT.goldCrown);
-        goldTrim.position.set(dpX, 25.4, dpZ);
-        const crownBox = new THREE.Mesh(new THREE.BoxGeometry(10.0, 4.5, 12.0), creamMat);
-        crownBox.position.set(dpX - 1.0, 27.8, dpZ);
+        // Vertical Buckhead architectural mullions across tower facade
+        for (const mz of [-11, -5.5, 0, 5.5, 11]) {
+          const mullion = new THREE.Mesh(new THREE.BoxGeometry(0.45, 25.0, 0.55), creamMat);
+          mullion.position.set(dpX - 6.8, 12.8, dpZ + mz);
+          group.add(mullion);
+        }
+        const goldTrim = new THREE.Mesh(new THREE.BoxGeometry(16.2, 0.7, 31.2), MAT.goldCrown);
+        goldTrim.position.set(dpX + 0.8, 25.7, dpZ);
+        const crownBox = new THREE.Mesh(new THREE.BoxGeometry(10.5, 4.8, 14.0), creamMat);
+        crownBox.position.set(dpX + 1.0, 28.2, dpZ);
+        const crownGlass = new THREE.Mesh(new THREE.BoxGeometry(10.7, 2.2, 12.2), darkGlassMat);
+        crownGlass.position.set(dpX + 1.0, 28.2, dpZ);
         const crownSign = createSignBannerMesh('👑 DON P INTERCONTINENTAL • OGIDI', '#0f1f4d', '#f5c238', 18, 2.5);
-        crownSign.position.set(dpX - 8.6, 23.2, dpZ);
+        crownSign.position.set(dpX - 7.3, 23.4, dpZ);
         crownSign.rotation.y = -Math.PI * 0.5;
-        group.add(goldTrim, crownBox, crownSign);
+        group.add(goldTrim, crownBox, crownGlass, crownSign);
 
-        // Paved drop-off forecourt + Navy drop-off canopy on gold pillars + 3 Flagpoles (Green, White, Gold)
-        const canopy = new THREE.Mesh(new THREE.BoxGeometry(6.2, 0.4, 13.0), navyMat);
-        canopy.position.set(dpX - 9.5, 4.2, dpZ);
-        for (const pz of [-4.8, 4.8]) {
-          const gPillar = new THREE.Mesh(new THREE.BoxGeometry(0.42, 4.2, 0.42), MAT.goldCrown);
-          gPillar.position.set(dpX - 12.0, 2.1, dpZ + pz);
-          group.add(gPillar);
+        // Sweeping Buckhead Porte-Cochere curved arrival canopy + 6 classical white columns + courtyard hedges
+        const porteDeck = new THREE.Mesh(new THREE.CylinderGeometry(8.2, 8.2, 0.55, 24, 1, false, -Math.PI * 0.5, Math.PI), creamMat);
+        porteDeck.position.set(dpX - 7.8, 4.55, dpZ);
+        porteDeck.rotation.y = Math.PI;
+        const porteTrim = new THREE.Mesh(new THREE.CylinderGeometry(8.35, 8.35, 0.22, 24, 1, false, -Math.PI * 0.5, Math.PI), bronzeMat);
+        porteTrim.position.set(dpX - 7.8, 4.85, dpZ);
+        porteTrim.rotation.y = Math.PI;
+        const porteSign = createSignBannerMesh('INTERCONTINENTAL • DON P', '#0f1f4d', '#f5c238', 9.0, 0.95);
+        porteSign.position.set(dpX - 15.9, 4.75, dpZ);
+        porteSign.rotation.y = -Math.PI * 0.5;
+        group.add(porteDeck, porteTrim, porteSign);
+        for (let ci = 0; ci < 6; ci++) {
+          const ang = -Math.PI * 0.4 + (ci / 5) * Math.PI * 0.8;
+          const col = new THREE.Mesh(new THREE.CylinderGeometry(0.32, 0.38, 4.5, 12), creamMat);
+          col.position.set(dpX - 7.8 - Math.cos(ang) * 7.4, 2.25, dpZ + Math.sin(ang) * 7.4);
+          col.castShadow = true;
+          group.add(col);
+        }
+        // Symmetrical Buckhead landscaped hedges & flagpoles (Green, White, Gold)
+        for (const hz of [-11.5, 11.5]) {
+          const hedge = new THREE.Mesh(new THREE.BoxGeometry(2.6, 0.9, 6.2), hedgeMat);
+          hedge.position.set(dpX - 9.2, 0.45, dpZ + hz);
+          group.add(hedge);
         }
         const flagCols = [0x008751, 0xffffff, 0xf5c238];
         flagCols.forEach((fc, fk) => {
@@ -1313,7 +1349,6 @@
           fl.position.set(x0 + 4.5, 6.2, dpZ + 9.65 + fk * 2.2);
           group.add(fp, fl);
         });
-        group.add(canopy);
 
         // Finished Brick-and-Cream Entrance Gate (_hotel_gate from July 2025 photos):
         // Outer slim-brick pillars with cream base & cornice caps
@@ -1946,7 +1981,19 @@
       const metaClips = [];
       // Instant built-in map of key pre-recorded Microsoft Edge Natural Neural .ogg clips (en-NG-AbeoNeural, en-NG-EzinneNeural, en-US-GuyNeural, en-US-ChristopherNeural)
       const FAST_CLIPS = [
-        ['uncle\'s danfo is all he left you', '7b833979bc34'],
+        ['uncle\'s danfo is all he left you', '2fe47f703951'],
+        ['make una check your belongings', '00dd55408c4c'],
+        ['obalende tech corridor to cms marina', 'bb2f1b48e79f'],
+        ['see dangote refinery and eko hotel skyline', '46754b852495'],
+        ['pass the mtn mast, dangote refinery', '8a6391459625'],
+        ['road clear! make we go to cms marina', 'f309aec1f1ee'],
+        ['see don p intercontinental! ogidi big hotel', '90a087641859'],
+        ['grand buckhead columns', '5df09acbd59f'],
+        ['hold your change well, balogun', 'b968f91643c0'],
+        ['inspecting tyres, headlamps', '523ad09baa79'],
+        ['interstate manifest and ecowas passport', 'ee85a6eb04d4'],
+        ['kotoka exit cleared', '705576f76ffb'],
+        ['proceed to the white house', '71a1e8828550'],
         ['police ahead, agbero after', '4538c2603a21'],
         ['first day done', '1fea9f52c3eb'],
         ['my change be ₦700', '7d3d908af2d2'],
@@ -1965,7 +2012,6 @@
         ['easy... make we pass', '58a8b9524907'],
         ['upper iweka! ogidi! awka! nnewi', '3ff3472e027b'],
         ['onitsha main market', '452f62bf2d59'],
-        ['see don p intercontinental! ogidi big hotel', '48f4fc878ece'],
         ['don p intercontinental na the big landmark', '6f7f8fb9295b'],
         ['things fall apart', '31b88664d0d7'],
         ['nnewi bus stop dey front', '8684ea9f5253'],
@@ -1985,10 +2031,7 @@
         ['buckhead towers', '568322d97320'],
         ['let me off by the corner store', '6b65bc21e1a6'],
         ['lenox mall! last stop', '5626db631005'],
-        ['hold your change well, balogun', '14fd1eaaa172'],
         ['my change be ₦700. road clear', '158807960770'],
-        ['pass the mtn mast, dangote refinery', 'f39a24be1cca'],
-        ['road clear! make we go to cms marina', '78bb44932e66'],
         ['see mtn mast, dangote refinery and eko hotel', '9b82de6eb4e7'],
         ['drop me by the stadium gate corner', 'bcf6c0c285bc'],
         ['hop down for tejuosho to buy charger', '599851e6c9b2'],
@@ -2859,7 +2902,7 @@
       anambra: {
         badge: 'LIVE 3D DON P INTERCONTINENTAL OGIDI',
         title: '👑 3D DON P INTERCONTINENTAL HOTEL (OGIDI) & NNEWI MADAM STOP',
-        body: 'Chidi: "See Don P InterContinental in Ogidi! Brick pillars, ornate black gates, security tower & gold crown sign — e fine o!"',
+        body: 'Chidi: "See Don P InterContinental in Ogidi! Grand Buckhead columns, sweeping porte-cochere and gold crown sign — e fine o!"',
         btn1: 'Drop Madam at Nnewi & Cross to Kano',
         btn2: 'Admire 3D Don P InterContinental Gate',
         btn3: null,

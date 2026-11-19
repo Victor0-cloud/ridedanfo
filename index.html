@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
   <title>Danfo Diaries 3D — From Lagos to Washington D.C.</title>
-  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://www.gstatic.com/antigravity/web/dev/tailwindcss.min.js"></script>
   <script src="./three.min.js"></script>
   <style>
     * {
@@ -51,7 +51,7 @@
     }
   </style>
 </head>
-<body class="bg-[#0d1522] text-slate-100 antialiased p-2 m-0 select-none overflow-hidden">
+<body class="bg-transparent text-[var(--foreground)] antialiased p-0 m-0 select-none">
   <div class="py-1.5 space-y-1.5">
     <!-- Top Status, Campaign Chapter & Telemetry Bar -->
     <div class="flex flex-wrap items-center justify-between gap-2 pb-1.5 border-b border-[var(--card-border)] text-xs">
@@ -72,7 +72,7 @@
     </div>
 
     <!-- Main 3D WebGL2 Viewport + HUD Overlay -->
-    <div id="viewport-wrap" class="relative w-full rounded-2xl overflow-hidden border-2 border-[#14233b] shadow-lg" style="height: calc(100dvh - 48px); background: #8ec5fc;">
+    <div id="viewport-wrap" class="relative w-full rounded-2xl overflow-hidden border-2 border-[#14233b] shadow-lg" style="height: calc(100vh - 110px); min-height: 440px; background: #8ec5fc;">
       <canvas id="webgl-canvas" class="block w-full h-full cursor-grab active:cursor-grabbing" style="touch-action: none;"></canvas>
       <canvas id="hud-canvas" class="absolute inset-0 block w-full h-full pointer-events-none"></canvas>
 
@@ -93,22 +93,22 @@
       </div>
 
       <!-- Top-Right Action Bar: Optional Music Toggle, Routes/Story Selector, Auto-Drive, Garage & Horn -->
-      <div class="absolute top-2.5 right-2.5 flex flex-wrap items-center justify-end gap-1.5 pointer-events-auto">
+      <div class="absolute top-2.5 right-2.5 max-w-[calc(100%-130px)] flex flex-wrap items-center justify-end gap-1 pointer-events-auto">
         <button id="btn-music" type="button" title="Toggle Optional Regional Music (Nigeria / Ghana / USA)"
-          class="slab-btn px-2.5 py-1.5 bg-gradient-to-b from-[#fff8ec] to-[#ffe7bd] text-[#14233b] text-xs flex items-center gap-1">
+          class="slab-btn px-2 py-1 bg-gradient-to-b from-[#fff8ec] to-[#ffe7bd] text-[#14233b] text-[11px] flex items-center gap-1">
           <span>🎵</span><span id="music-lbl">Music: OFF</span>
         </button>
         <button id="btn-routes" type="button" title="Switch Story Chapter & Route (Lagos → Ghana → Atlanta → Washington D.C.)"
-          class="slab-btn px-2.5 py-1.5 bg-gradient-to-b from-[#c3cfe4] to-[#94a6c6] text-[#14233b] text-xs flex items-center gap-1">
+          class="slab-btn px-2 py-1 bg-gradient-to-b from-[#c3cfe4] to-[#94a6c6] text-[#14233b] text-[11px] flex items-center gap-1">
           <span>🗺️</span><span>Story / Routes</span>
         </button>
-        <button id="btn-autodrive" type="button" class="slab-btn px-2.5 py-1.5 bg-gradient-to-b from-[#7ff0a8] to-[#46d27a] text-[#08351a] text-xs flex items-center gap-1">
+        <button id="btn-autodrive" type="button" class="slab-btn px-2 py-1 bg-gradient-to-b from-[#7ff0a8] to-[#46d27a] text-[#08351a] text-[11px] flex items-center gap-1">
           <span>🎬</span><span id="autodrive-lbl">Auto-Drive: ON</span>
         </button>
-        <button id="btn-shop" type="button" class="slab-btn px-2.5 py-1.5 bg-gradient-to-b from-[#ffd27a] to-[#ffb347] text-[#2a1800] text-xs flex items-center gap-1">
+        <button id="btn-shop" type="button" class="slab-btn px-2 py-1 bg-gradient-to-b from-[#ffd27a] to-[#ffb347] text-[#2a1800] text-[11px] flex items-center gap-1">
           <span>🔧</span><span>Garage</span>
         </button>
-        <button id="btn-horn" type="button" title="Honk Horn (H)" class="slab-btn w-8 h-8 bg-gradient-to-b from-[#fff8ec] to-[#ffe7bd] text-[#14233b] text-sm flex items-center justify-center">
+        <button id="btn-horn" type="button" title="Honk Horn (H)" class="slab-btn w-7 h-7 bg-gradient-to-b from-[#fff8ec] to-[#ffe7bd] text-[#14233b] text-xs flex items-center justify-center">
           📯
         </button>
       </div>

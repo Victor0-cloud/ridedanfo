@@ -1,0 +1,2177 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+  <title>Danfo Rush 3D — Premium WebGL2 Edition</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="./three.min.js"></script>
+  <style>
+    * {
+      box-sizing: border-box;
+      user-select: none;
+      -webkit-user-select: none;
+      -webkit-touch-callout: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .slab-panel {
+      background: linear-gradient(180deg, #fff8ec, #ffe7bd);
+      border: 3px solid #14233b;
+      border-radius: 14px;
+      color: #14233b;
+      font-weight: 800;
+      box-shadow: 0 4px 0 #0a1526, 0 8px 16px rgba(10, 21, 38, 0.35), inset 0 2px 0 rgba(255, 255, 255, 0.7);
+    }
+    .slab-btn {
+      border: 3px solid #14233b;
+      border-radius: 15px;
+      font-weight: 800;
+      box-shadow: 0 4px 0 #0a1526, 0 8px 16px rgba(10, 21, 38, 0.35), inset 0 2px 0 rgba(255, 255, 255, 0.72);
+      transition: transform 0.12s cubic-bezier(0.3, 2.2, 0.45, 1);
+      cursor: pointer;
+      touch-action: none;
+    }
+    .slab-btn:active, .slab-btn.pressed {
+      transform: translateY(3px);
+      box-shadow: 0 1px 0 #0a1526, 0 4px 8px rgba(10, 21, 38, 0.3);
+    }
+    .spd-outline {
+      color: #ffffff;
+      font-weight: 900;
+      -webkit-text-stroke: 4px #14233b;
+      paint-order: stroke fill;
+      text-shadow: 0 3px 0 #0a1526;
+    }
+    @keyframes popIn {
+      0% { opacity: 0; transform: scale(0.5) translateY(8px); }
+      100% { opacity: 1; transform: scale(1) translateY(0); }
+    }
+    .mate-pop {
+      animation: popIn 0.25s cubic-bezier(0.3, 1.7, 0.45, 1) forwards;
+    }
+  </style>
+</head>
+<body class="bg-[#0d1522] text-slate-100 antialiased p-2 m-0 select-none overflow-hidden">
+  <div class="py-1.5 space-y-1.5">
+    <!-- Top Status & Telemetry Bar -->
+    <div class="flex flex-wrap items-center justify-between gap-2 pb-1.5 border-b border-[var(--card-border)] text-xs">
+      <div class="flex items-center gap-2">
+        <span class="font-bold tracking-tight">🚐 Danfo Rush 3D</span>
+        <span id="district-tag" class="px-2 py-0.5 rounded-full bg-[var(--card)] border border-[var(--card-border)] font-semibold text-[11px]">
+          Lagos Island • Marina
+        </span>
+      </div>
+      <div class="flex items-center gap-3 font-mono tabular-nums text-[11px] text-[var(--muted-foreground)]">
+        <span>Steer: <b id="t-steer" class="text-[var(--foreground)]">0.00</b></span>
+        <span>Mode: <b id="t-zone" class="text-[var(--foreground)]">READY</b></span>
+        <span>Homing: <b id="t-home" class="text-[var(--foreground)]">IDLE</b></span>
+      </div>
+    </div>
+
+    <!-- Main 3D WebGL2 Viewport + HUD Overlay -->
+    <div id="viewport-wrap" class="relative w-full rounded-2xl overflow-hidden border-2 border-[#14233b] shadow-lg" style="height: calc(100dvh - 48px); background: #8ec5fc;">
+      <canvas id="webgl-canvas" class="block w-full h-full cursor-grab active:cursor-grabbing" style="touch-action: none;"></canvas>
+      <canvas id="hud-canvas" class="absolute inset-0 block w-full h-full pointer-events-none"></canvas>
+
+      <!-- Top-Left HUD: Money, Fuel & Passenger Seats -->
+      <div class="absolute top-2.5 left-2.5 flex flex-col gap-1.5 pointer-events-none">
+        <div id="money-panel" class="slab-panel px-3 py-1 flex items-center gap-2 text-sm tabular-nums">
+          <span>💰</span>
+          <span id="hud-cash" class="text-base">₦500</span>
+        </div>
+        <div id="fuel-panel" class="slab-panel px-3 py-1 flex items-center gap-2 text-xs tabular-nums">
+          <span>⛽</span>
+          <span id="hud-fuel" class="text-sm">100</span>
+          <span class="opacity-60">L</span>
+          <span class="mx-0.5 opacity-30">|</span>
+          <span>🪑</span>
+          <span id="hud-seats" class="text-sm">0/8</span>
+        </div>
+      </div>
+
+      <!-- Top-Right Action Ladder: Auto-Drive Watch Mode, Garage Upgrades & Horn -->
+      <div class="absolute top-2.5 right-2.5 flex items-center gap-1.5 pointer-events-auto">
+        <button id="btn-autodrive" type="button" class="slab-btn px-2.5 py-1.5 bg-gradient-to-b from-[#7ff0a8] to-[#46d27a] text-[#08351a] text-xs flex items-center gap-1">
+          <span>🎬</span><span id="autodrive-lbl">Auto-Drive: ON</span>
+        </button>
+        <button id="btn-shop" type="button" class="slab-btn px-2.5 py-1.5 bg-gradient-to-b from-[#ffd27a] to-[#ffb347] text-[#2a1800] text-xs flex items-center gap-1">
+          <span>🔧</span><span>Garage</span>
+        </button>
+        <button id="btn-horn" type="button" title="Honk Danfo Horn (H)" class="slab-btn w-9 h-9 bg-gradient-to-b from-[#fff8ec] to-[#ffe7bd] text-[#14233b] text-base flex items-center justify-center">
+          📯
+        </button>
+      </div>
+
+      <!-- Conductor Chidi Speech Bubble -->
+      <div id="mate-box" class="absolute top-14 right-2.5 max-w-[240px] slab-panel px-3 py-2 text-xs leading-snug pointer-events-none mate-pop">
+        <div class="flex items-center gap-1.5 font-extrabold text-amber-800 text-[11px] uppercase tracking-wider mb-0.5">
+          <span>🧢 Conductor Chidi</span>
+        </div>
+        <div id="mate-text" class="font-bold text-[#14233b]">
+          Oya Boss! Hold road &amp; slide thumb to steer. Green bumper LEDs mean junction turn dey!
+        </div>
+      </div>
+
+      <!-- Center Fare / Milestone Toast -->
+      <div id="fare-toast" class="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 slab-panel px-4 py-2 text-center pointer-events-none hidden">
+        <div id="toast-title" class="text-lg font-black text-emerald-700">+₦400</div>
+        <div id="toast-sub" class="text-xs font-bold text-[#14233b]">Obalende Drop-Off Complete!</div>
+      </div>
+
+      <!-- Bottom-Left Instrument Stack: Speedometer directly over Route Minimap -->
+      <div class="absolute bottom-2.5 left-2.5 flex flex-col items-start gap-1 pointer-events-none">
+        <div class="flex items-baseline gap-1 pl-1">
+          <span id="hud-speed" class="spd-outline text-2xl tabular-nums leading-none">0</span>
+          <span class="spd-outline text-xs">km/h</span>
+        </div>
+        <div class="w-[90px] h-[90px] rounded-xl border-[3px] border-[#14233b] bg-[#d5dfb8] shadow-[0_4px_0_#0a1526] overflow-hidden relative">
+          <canvas id="minimap-canvas" width="90" height="90" class="block w-full h-full"></canvas>
+        </div>
+      </div>
+
+      <!-- Bottom-Right Thumb Cluster: Reverse & 3-Point U-Turn -->
+      <div class="absolute bottom-2.5 right-2.5 flex items-end gap-2 pointer-events-auto">
+        <button id="btn-rev" type="button" title="Hold to Reverse / Brake"
+          class="slab-btn w-12 h-12 bg-gradient-to-b from-[#fff4f1] to-[#ffd3ca] text-[#a82d1b] text-lg flex items-center justify-center">
+          ▼
+        </button>
+        <button id="btn-uturn" type="button" title="3-Point U-Turn (Hold & drag to steer)"
+          class="slab-btn w-12 h-12 bg-gradient-to-b from-[#f7f2ff] to-[#dccdff] text-[#52349f] text-xl flex items-center justify-center">
+          <span style="display:inline-block; transform: scaleX(-1);">↶</span>
+        </button>
+      </div>
+
+      <!-- Garage / Upgrade Modal Overlay -->
+      <div id="shop-modal" class="absolute inset-0 bg-[#0a1526]/75 z-20 hidden items-center justify-center p-4">
+        <div class="slab-panel w-full max-w-sm p-3.5 space-y-2.5 pointer-events-auto">
+          <div class="flex items-center justify-between border-b-2 border-[#14233b]/15 pb-2">
+            <div>
+              <div class="text-base font-black">🔧 Oshodi Danfo Garage</div>
+              <div class="text-xs font-semibold opacity-75">Upgrade your bus with collected fares</div>
+            </div>
+            <button id="btn-shop-close" type="button" class="slab-btn w-8 h-8 bg-[#fff8ec] text-sm flex items-center justify-center">✕</button>
+          </div>
+          <div id="shop-items" class="space-y-1.5 text-xs"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // =========================================================================
+    // 1. WEB AUDIO SYNTHESIZER
+    // =========================================================================
+    const AudioFx = (() => {
+      let ctx = null;
+      function ensure() {
+        if (!ctx) {
+          const AC = window.AudioContext || window.webkitAudioContext;
+          if (AC) ctx = new AC();
+        }
+        if (ctx && ctx.state === 'suspended') ctx.resume();
+        return ctx;
+      }
+      function tone(freq, dur, type = 'sine', gainVal = 0.08, delay = 0) {
+        const c = ensure();
+        if (!c) return;
+        const t0 = c.currentTime + delay;
+        const osc = c.createOscillator();
+        const g = c.createGain();
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, t0);
+        g.gain.setValueAtTime(0.001, t0);
+        g.gain.linearRampToValueAtTime(gainVal, t0 + 0.015);
+        g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+        osc.connect(g);
+        g.connect(c.destination);
+        osc.start(t0);
+        osc.stop(t0 + dur + 0.02);
+      }
+      return {
+        honk() {
+          tone(370, 0.22, 'sawtooth', 0.08, 0);
+          tone(466, 0.22, 'sawtooth', 0.08, 0);
+          tone(370, 0.28, 'sawtooth', 0.08, 0.25);
+          tone(466, 0.28, 'sawtooth', 0.08, 0.25);
+        },
+        board(i = 0) { tone(520 + i * 55, 0.11, 'triangle', 0.08, 0); },
+        cash() {
+          tone(587.33, 0.12, 'triangle', 0.1, 0);
+          tone(880, 0.24, 'triangle', 0.12, 0.09);
+          tone(1174.66, 0.3, 'sine', 0.1, 0.18);
+        },
+        fuel() {
+          tone(440, 0.08, 'sine', 0.06, 0);
+          tone(660, 0.14, 'sine', 0.07, 0.08);
+        }
+      };
+    })();
+
+    // =========================================================================
+    // 2. EXACT TROTRO DRIVER 7-LAYER CHASING-ANCHOR THUMBSTICK (dj, a8, bS, fj, i8, r8, mj)
+    // =========================================================================
+    const DEADZONE_PX = 7;
+    const SPAN_PX = 57;
+    const LEASH_PX = 64; // 7 + 57
+    const FLICK_MAX_MS = 350;
+    const FLICK_MIN_PEAK = 0.30;
+    const FLICK_HOLD_MS = 1000;
+    const RELEASE_DECAY_MS = 260;
+    const TURN_THRESH_KH = 0.70;
+    const TURN_HYST_T8 = 0.40;
+
+    function createStick() {
+      return {
+        id: -1, ax: 0, ay: 0, x: 0, y: 0, down: false,
+        trail: 0, home: 0, t0: 0, peak: 0,
+        homeLim: 0, homeX: 0, homeT: 0, homeGo: false
+      };
+    }
+    function stickDown(t, id, x, y, now) {
+      t.id = id; t.down = true;
+      t.ax = t.x = x; t.ay = t.y = y;
+      t.trail = 0; t.home = 0; t.t0 = now; t.peak = 0;
+      return t;
+    }
+    function stickMove(t, x, y) {
+      t.x = x; t.y = y;
+      const prevAx = t.ax;
+      if (x - t.ax > LEASH_PX) t.ax = x - LEASH_PX;
+      else if (t.ax - x > LEASH_PX) t.ax = x + LEASH_PX;
+      if (Math.abs(x - t.ax) <= DEADZONE_PX) t.trail = 0;
+      else t.trail += t.ax - prevAx;
+      const s = stickSteer(t);
+      if (Math.abs(s) > Math.abs(t.peak || 0)) t.peak = s;
+      return t;
+    }
+    function stickUp(t) { t.id = -1; t.down = false; t.home = 0; return t; }
+    function stickAskHome(t, dir, now) {
+      if (!t.down || !dir) return t;
+      t.home = Math.sign(dir);
+      t.homeLim = t.ax - Math.max(0, t.trail * t.home) * t.home - t.home * 20;
+      t.homeX = t.x; t.homeT = now; t.homeGo = false;
+      return stickStepHome(t, now);
+    }
+    function stickStepHome(t, now) {
+      if (!t.home || !t.down) { t.home = 0; return t; }
+      const n = t.home;
+      const s = (t.x - t.homeX) * n;
+      if (!t.homeGo) {
+        if (s > 0) t.homeX = t.x;
+        else if (s <= -3) { t.homeGo = true; t.homeX = t.x; t.homeT = now; }
+      } else {
+        if (s >= 3 || (s > -3 && now - t.homeT >= 120)) {
+          t.home = 0; t.trail = 0; return t;
+        }
+        if (s <= -3) { t.homeX = t.x; t.homeT = now; }
+      }
+      t.ax = n > 0 ? Math.max(t.x, t.homeLim) : Math.min(t.x, t.homeLim);
+      return t;
+    }
+    function stickSteer(t) {
+      if (!t.down) return 0;
+      const dx = t.x - t.ax;
+      const adx = Math.abs(dx);
+      return adx <= DEADZONE_PX ? 0 : Math.sign(dx) * Math.min(1, (adx - DEADZONE_PX) / SPAN_PX);
+    }
+    function stickFlick(t, now) {
+      return (t.down && (now - t.t0) <= FLICK_MAX_MS && Math.abs(t.peak || 0) >= FLICK_MIN_PEAK) ? t.peak : 0;
+    }
+    function quantizeSteerBar(steer, kh = TURN_THRESH_KH) {
+      const n = Math.abs(steer);
+      if (!(n > 0)) return 0;
+      const inner = 3, total = 5;
+      const s = n < kh
+        ? Math.ceil((n / kh) * inner)
+        : inner + Math.max(1, Math.ceil(((n - kh) / (1 - kh)) * (total - inner)));
+      return Math.sign(steer) * Math.min(total, Math.max(1, s));
+    }
+
+    // =========================================================================
+    // 3. THREE.JS WEBGL2 SCENE, PBR MATERIALS, PROCEDURAL TEXTURES & LIGHTING
+    // =========================================================================
+    const webglCanvas = document.getElementById('webgl-canvas');
+    const hudCanvas = document.getElementById('hud-canvas');
+    const hudCtx = hudCanvas.getContext('2d');
+    const mmCanvas = document.getElementById('minimap-canvas');
+    const mmCtx = mmCanvas.getContext('2d');
+
+    const renderer = new THREE.WebGLRenderer({ canvas: webglCanvas, antialias: true, powerPreference: 'high-performance' });
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.12;
+    renderer.outputColorSpace = THREE.SRGBColorSpace;
+
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x8ec5fc);
+    scene.fog = new THREE.FogExp2(0x9ecbff, 0.0072);
+
+    const camera = new THREE.PerspectiveCamera(56, 16 / 9, 0.3, 240);
+
+    // Warm Golden Lagos Sunlight + Sky/Ground Hemisphere Light
+    const hemiLight = new THREE.HemisphereLight(0xdbeafe, 0x5c7c46, 0.95);
+    hemiLight.position.set(0, 50, 0);
+    scene.add(hemiLight);
+
+    const sunLight = new THREE.DirectionalLight(0xfff4d8, 2.3);
+    sunLight.position.set(35, 58, 28);
+    sunLight.castShadow = true;
+    sunLight.shadow.mapSize.width = 2048;
+    sunLight.shadow.mapSize.height = 2048;
+    sunLight.shadow.camera.near = 5;
+    sunLight.shadow.camera.far = 150;
+    const dShadow = 52;
+    sunLight.shadow.camera.left = -dShadow;
+    sunLight.shadow.camera.right = dShadow;
+    sunLight.shadow.camera.top = dShadow;
+    sunLight.shadow.camera.bottom = -dShadow;
+    sunLight.shadow.bias = -0.0005;
+    scene.add(sunLight);
+    scene.add(sunLight.target);
+
+    // Helper: Create Beveled Rounded Box Geometry for Realistic Vehicles
+    function createRoundedBox(w, h, d, radius = 0.14, smoothness = 4) {
+      const shape = new THREE.Shape();
+      const eps = 0.00001;
+      const r = Math.min(radius, w * 0.45, h * 0.45, d * 0.45) - eps;
+      const hw = w * 0.5 - radius, hh = h * 0.5 - radius;
+      shape.absarc(-hw, -hh, r, -Math.PI, -Math.PI * 0.5, true);
+      shape.absarc( hw, -hh, r, -Math.PI * 0.5, 0, true);
+      shape.absarc( hw,  hh, r, 0, Math.PI * 0.5, true);
+      shape.absarc(-hw,  hh, r, Math.PI * 0.5, Math.PI, true);
+      const geom = new THREE.ExtrudeGeometry(shape, {
+        depth: d - radius * 2,
+        bevelEnabled: true,
+        bevelSegments: smoothness,
+        steps: 1,
+        bevelSize: r,
+        bevelThickness: radius,
+        curveSegments: smoothness
+      });
+      geom.center();
+      return geom;
+    }
+
+    // Procedural High-Resolution Architectural Facade Textures
+    const SHOP_NAMES = [
+      'MAMA PUT KITCHEN', 'EKO ELECTRONICS', 'OBALENDE SUYA',
+      'DANFO SPARES LTD', 'LAGOS POS & PAY', 'YABA TECH CAFE',
+      'BALOGUN TEXTILES', 'OSHODI MOTORS'
+    ];
+    const facadeTextureCache = new Map();
+    function getBuildingTexture(wallHex, shopTitle) {
+      const key = `${wallHex}|${shopTitle}`;
+      if (facadeTextureCache.has(key)) return facadeTextureCache.get(key);
+
+      const c = document.createElement('canvas');
+      c.width = 256; c.height = 512;
+      const g = c.getContext('2d');
+
+      // Base stucco plaster wall with warm gradient
+      g.fillStyle = wallHex;
+      g.fillRect(0, 0, 256, 512);
+
+      // Subtle architectural concrete floor ledges & vertical pilasters
+      g.fillStyle = 'rgba(15, 23, 42, 0.14)';
+      g.fillRect(0, 0, 12, 512);
+      g.fillRect(244, 0, 12, 512);
+      for (let y = 0; y < 512; y += 110) {
+        g.fillStyle = 'rgba(255, 255, 255, 0.45)';
+        g.fillRect(0, y, 256, 8);
+        g.fillStyle = 'rgba(15, 23, 42, 0.22)';
+        g.fillRect(0, y + 8, 256, 5);
+      }
+
+      // Upper story recessed glass windows with frames, curtains & AC units
+      for (let row = 0; row < 3; row++) {
+        const wy = 32 + row * 110;
+        for (let col = 0; col < 3; col++) {
+          const wx = 24 + col * 74;
+          // Outer concrete sill
+          g.fillStyle = '#f1f5f9';
+          g.fillRect(wx - 4, wy - 4, 58, 66);
+          // Dark reflective window pane
+          const wGrad = g.createLinearGradient(wx, wy, wx + 50, wy + 58);
+          wGrad.addColorStop(0, '#0f172a');
+          wGrad.addColorStop(0.5, '#1e3a8a');
+          wGrad.addColorStop(1, '#0f172a');
+          g.fillStyle = wGrad;
+          g.fillRect(wx, wy, 50, 58);
+          // Window mullion bars
+          g.fillStyle = '#e2e8f0';
+          g.fillRect(wx + 24, wy, 2, 58);
+          g.fillRect(wx, wy + 28, 50, 2);
+          // AC split unit box under some windows
+          if ((row + col) % 2 === 0) {
+            g.fillStyle = '#cbd5e1';
+            g.fillRect(wx + 8, wy + 64, 32, 16);
+            g.fillStyle = '#334155';
+            g.beginPath();
+            g.arc(wx + 19, wy + 72, 6, 0, Math.PI * 2);
+            g.fill();
+          }
+        }
+      }
+
+      // Ground-floor storefront with illuminated signboard & glass shop doors
+      g.fillStyle = '#0f172a';
+      g.fillRect(14, 368, 228, 144);
+      // Shop Signboard Header
+      g.fillStyle = '#facc15';
+      g.fillRect(18, 372, 220, 32);
+      g.fillStyle = '#111827';
+      g.font = '900 16px system-ui, sans-serif';
+      g.textAlign = 'center';
+      g.fillText(shopTitle, 128, 394);
+      // Lit storefront interior glass
+      const sGrad = g.createLinearGradient(0, 408, 0, 510);
+      sGrad.addColorStop(0, '#38bdf8');
+      sGrad.addColorStop(1, '#0284c7');
+      g.fillStyle = sGrad;
+      g.fillRect(24, 412, 96, 96);
+      g.fillRect(136, 412, 96, 96);
+
+      const tex = new THREE.CanvasTexture(c);
+      tex.colorSpace = THREE.SRGBColorSpace;
+      tex.anisotropy = 4;
+      facadeTextureCache.set(key, tex);
+      return tex;
+    }
+
+    // Procedural Danfo Side Livery Texture (Yellow + Black Stripes + Route Lettering)
+    function createDanfoSideTexture() {
+      const c = document.createElement('canvas');
+      c.width = 512; c.height = 256;
+      const g = c.getContext('2d');
+      g.fillStyle = '#facc15';
+      g.fillRect(0, 0, 512, 256);
+
+      // Iconic Lagos Danfo Twin Black Waist Stripes
+      g.fillStyle = '#111827';
+      g.fillRect(0, 134, 512, 28);
+      g.fillRect(0, 172, 512, 14);
+
+      // Route inscription on the yellow stripe
+      g.fillStyle = '#facc15';
+      g.font = '900 18px system-ui, sans-serif';
+      g.textAlign = 'center';
+      g.fillText('LASG • OBALENDE - YABA - OSHODI', 256, 154);
+
+      // Sliding Door seam lines & chrome door handle
+      g.strokeStyle = 'rgba(15, 23, 42, 0.45)';
+      g.lineWidth = 4;
+      g.strokeRect(180, 18, 145, 222);
+      g.fillStyle = '#e2e8f0';
+      g.fillRect(305, 120, 14, 6);
+
+      const tex = new THREE.CanvasTexture(c);
+      tex.colorSpace = THREE.SRGBColorSpace;
+      tex.anisotropy = 4;
+      return tex;
+    }
+
+    // Shared PBR Materials
+    const MAT = {
+      glass: new THREE.MeshStandardMaterial({ color: 0x0f172a, roughness: 0.08, metalness: 0.85 }),
+      chrome: new THREE.MeshStandardMaterial({ color: 0xe2e8f0, roughness: 0.18, metalness: 0.92 }),
+      darkSteel: new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.55, metalness: 0.5 }),
+      tire: new THREE.MeshStandardMaterial({ color: 0x111827, roughness: 0.85, metalness: 0.05 }),
+      danfoYellow: new THREE.MeshStandardMaterial({ color: 0xfacc15, roughness: 0.26, metalness: 0.15 }),
+      danfoSide: new THREE.MeshStandardMaterial({ map: createDanfoSideTexture(), roughness: 0.28, metalness: 0.15 }),
+      danfoRoof: new THREE.MeshStandardMaterial({ color: 0xfef08a, roughness: 0.32, metalness: 0.1 }),
+      headlight: new THREE.MeshStandardMaterial({ color: 0xffffff, emissive: 0xfffbeb, emissiveIntensity: 1.4, roughness: 0.1 }),
+      brakeOn: new THREE.MeshStandardMaterial({ color: 0xff1e1e, emissive: 0xff0000, emissiveIntensity: 1.8, roughness: 0.2 }),
+      brakeOff: new THREE.MeshStandardMaterial({ color: 0x7f1d1d, roughness: 0.4 }),
+      amberBlink: new THREE.MeshStandardMaterial({ color: 0xf59e0b, emissive: 0xf59e0b, emissiveIntensity: 1.5 }),
+      asphalt: new THREE.MeshStandardMaterial({ color: 0x2d3748, roughness: 0.88, metalness: 0.04 }),
+      sidewalk: new THREE.MeshStandardMaterial({ color: 0x94a3b8, roughness: 0.82 }),
+      grass: new THREE.MeshStandardMaterial({ color: 0x5c8a47, roughness: 0.92 }),
+      bark: new THREE.MeshStandardMaterial({ color: 0x6b4423, roughness: 0.9 }),
+      foliage: new THREE.MeshStandardMaterial({ color: 0x15803d, roughness: 0.65 }),
+      skin: new THREE.MeshStandardMaterial({ color: 0x6f4228, roughness: 0.55 })
+    };
+
+    // Detailed 3D Wheel Builder (Tire + 5-Spoke Metallic Rim + Hub)
+    const wheelTireGeom = new THREE.CylinderGeometry(0.38, 0.38, 0.28, 20);
+    wheelTireGeom.rotateZ(Math.PI * 0.5);
+    const wheelRimGeom = new THREE.CylinderGeometry(0.23, 0.23, 0.30, 14);
+    wheelRimGeom.rotateZ(Math.PI * 0.5);
+    const wheelHubGeom = new THREE.CylinderGeometry(0.09, 0.09, 0.32, 10);
+    wheelHubGeom.rotateZ(Math.PI * 0.5);
+
+    function createWheel3D() {
+      const wg = new THREE.Group();
+      const tire = new THREE.Mesh(wheelTireGeom, MAT.tire);
+      tire.castShadow = true;
+      const rim = new THREE.Mesh(wheelRimGeom, MAT.chrome);
+      const hub = new THREE.Mesh(wheelHubGeom, MAT.darkSteel);
+      wg.add(tire, rim, hub);
+      return wg;
+    }
+
+    // =========================================================================
+    // 4. SCULPTED 3D LAGOS DANFO MINIBUS + 11-SEGMENT 3D BUMPER LED STEERBAR
+    // =========================================================================
+    function createDanfoMinibus() {
+      const root = new THREE.Group();
+      const bodyTilt = new THREE.Group(); // Pivots for suspension pitch & roll
+      root.add(bodyTilt);
+
+      // 1. Sculpted Lower Chassis (Rounded Beveled Body with Side Livery)
+      const lowerGeom = createRoundedBox(2.08, 1.04, 4.55, 0.16, 4);
+      const lowerMesh = new THREE.Mesh(lowerGeom, MAT.danfoSide);
+      lowerMesh.position.y = 0.88;
+      lowerMesh.castShadow = true;
+      lowerMesh.receiveShadow = true;
+      bodyTilt.add(lowerMesh);
+
+      // 2. Sculpted Upper Cabin Greenhouse & Rounded Roof Cap
+      const cabinGeom = createRoundedBox(1.94, 0.78, 4.18, 0.18, 4);
+      const cabinMesh = new THREE.Mesh(cabinGeom, MAT.danfoYellow);
+      cabinMesh.position.set(0, 1.66, 0.04);
+      cabinMesh.castShadow = true;
+      bodyTilt.add(cabinMesh);
+
+      const roofCapGeom = createRoundedBox(1.82, 0.18, 3.95, 0.08, 3);
+      const roofCap = new THREE.Mesh(roofCapGeom, MAT.danfoRoof);
+      roofCap.position.set(0, 2.08, 0.04);
+      roofCap.castShadow = true;
+      bodyTilt.add(roofCap);
+
+      // 3. Flush Wrap-Around Tinted Glass Windows (Front Windshield, Rear Glass, Side Windows)
+      const windFront = new THREE.Mesh(createRoundedBox(1.74, 0.54, 0.12, 0.04, 2), MAT.glass);
+      windFront.position.set(0, 1.68, -2.02);
+      windFront.rotation.x = 0.12;
+      bodyTilt.add(windFront);
+
+      const windRear = new THREE.Mesh(createRoundedBox(1.66, 0.50, 0.10, 0.04, 2), MAT.glass);
+      windRear.position.set(0, 1.68, 2.11);
+      bodyTilt.add(windRear);
+
+      const sideGlassGeom = createRoundedBox(1.98, 0.48, 3.55, 0.05, 2);
+      const sideGlass = new THREE.Mesh(sideGlassGeom, MAT.glass);
+      sideGlass.position.set(0, 1.68, 0.06);
+      bodyTilt.add(sideGlass);
+
+      // 4. Front Black Radiator Grille, Round Chrome Halogen Headlights & Side Wing Mirrors
+      const grille = new THREE.Mesh(createRoundedBox(1.72, 0.34, 0.08, 0.04, 2), MAT.tire);
+      grille.position.set(0, 0.88, -2.26);
+      bodyTilt.add(grille);
+
+      const hlGeom = new THREE.CylinderGeometry(0.14, 0.14, 0.08, 16);
+      hlGeom.rotateX(Math.PI * 0.5);
+      for (const sx of [-0.66, 0.66]) {
+        const hl = new THREE.Mesh(hlGeom, MAT.headlight);
+        hl.position.set(sx, 0.88, -2.28);
+        bodyTilt.add(hl);
+
+        // Side Wing Mirrors on arms
+        const arm = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.05, 0.05), MAT.darkSteel);
+        arm.position.set(sx * 1.56, 1.48, -1.75);
+        const mirrorHead = new THREE.Mesh(createRoundedBox(0.10, 0.24, 0.14, 0.03, 2), MAT.chrome);
+        mirrorHead.position.set(sx * 1.68, 1.48, -1.75);
+        bodyTilt.add(arm, mirrorHead);
+      }
+
+      // 5. Chrome Front & Rear Bumpers + Number Plate
+      const frontBumper = new THREE.Mesh(createRoundedBox(2.16, 0.18, 0.22, 0.06, 3), MAT.chrome);
+      frontBumper.position.set(0, 0.44, -2.24);
+      const rearBumper = new THREE.Mesh(createRoundedBox(2.16, 0.18, 0.22, 0.06, 3), MAT.chrome);
+      rearBumper.position.set(0, 0.44, 2.24);
+      bodyTilt.add(frontBumper, rearBumper);
+
+      // Rear Tail / Brake Lamps
+      const tailGeom = createRoundedBox(0.34, 0.22, 0.08, 0.04, 2);
+      const brakeLampL = new THREE.Mesh(tailGeom, MAT.brakeOff);
+      brakeLampL.position.set(-0.74, 0.90, 2.26);
+      const brakeLampR = new THREE.Mesh(tailGeom, MAT.brakeOff);
+      brakeLampR.position.set( 0.74, 0.90, 2.26);
+      bodyTilt.add(brakeLampL, brakeLampR);
+
+      // 6. Tubular Steel Roof Rack + Loaded Market Cargo Sacks & Suitcases
+      const rackGroup = new THREE.Group();
+      const railL = new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.03, 3.2, 8), MAT.chrome);
+      railL.rotation.x = Math.PI * 0.5;
+      railL.position.set(-0.78, 2.20, 0.1);
+      const railR = railL.clone();
+      railR.position.x = 0.78;
+      rackGroup.add(railL, railR);
+      for (let z = -1.3; z <= 1.5; z += 0.7) {
+        const cross = new THREE.Mesh(new THREE.CylinderGeometry(0.025, 0.025, 1.56, 8), MAT.chrome);
+        cross.rotation.z = Math.PI * 0.5;
+        cross.position.set(0, 2.20, z);
+        rackGroup.add(cross);
+      }
+      bodyTilt.add(rackGroup);
+
+      // Dynamic Cargo Group (visible when carrying passengers)
+      const cargoGroup = new THREE.Group();
+      const sackMat = new THREE.MeshStandardMaterial({ color: 0xb45309, roughness: 0.85 });
+      const boxMat = new THREE.MeshStandardMaterial({ color: 0xdc2626, roughness: 0.45 });
+      const blueBagMat = new THREE.MeshStandardMaterial({ color: 0x2563eb, roughness: 0.5 });
+      const sack1 = new THREE.Mesh(createRoundedBox(0.68, 0.36, 0.92, 0.12, 3), sackMat);
+      sack1.position.set(-0.36, 2.38, 0.35);
+      const case1 = new THREE.Mesh(createRoundedBox(0.62, 0.32, 0.78, 0.06, 3), boxMat);
+      case1.position.set(0.38, 2.36, -0.25);
+      const bag1 = new THREE.Mesh(createRoundedBox(0.55, 0.30, 0.65, 0.10, 3), blueBagMat);
+      bag1.position.set(0.28, 2.35, 0.65);
+      const spareWheel = createWheel3D();
+      spareWheel.rotation.z = Math.PI * 0.5;
+      spareWheel.position.set(-0.32, 2.34, -0.65);
+      cargoGroup.add(sack1, case1, bag1, spareWheel);
+      bodyTilt.add(cargoGroup);
+
+      // 7. 4 Articulated 3D Wheels (Front pair steers, all 4 spin)
+      const wheels = [];
+      const frontSteerPivots = [];
+      for (const [wx, wz, isFront] of [
+        [-0.98, -1.38, true], [0.98, -1.38, true],
+        [-0.98,  1.38, false], [0.98,  1.38, false]
+      ]) {
+        const pivot = new THREE.Group();
+        pivot.position.set(wx, 0.38, wz);
+        const wMesh = createWheel3D();
+        pivot.add(wMesh);
+        root.add(pivot);
+        wheels.push(wMesh);
+        if (isFront) frontSteerPivots.push(pivot);
+      }
+
+      // 8. 11-SEGMENT 3D REAR-BUMPER LED STEERING BAR (oj / tj from Trotro Driver)
+      const steerBarGroup = new THREE.Group();
+      steerBarGroup.position.set(0, 0.58, 2.31);
+      const barHousing = new THREE.Mesh(createRoundedBox(1.42, 0.16, 0.08, 0.03, 2), MAT.tire);
+      steerBarGroup.add(barHousing);
+
+      const ledMaterials = [];
+      const ledGeom = new THREE.BoxGeometry(0.095, 0.095, 0.04);
+      for (let i = 0; i < 11; i++) {
+        const mat = new THREE.MeshStandardMaterial({
+          color: 0x1e293b,
+          emissive: 0x000000,
+          emissiveIntensity: 1.2,
+          roughness: 0.2
+        });
+        const led = new THREE.Mesh(ledGeom, mat);
+        led.position.set((i - 5) * 0.118, 0, 0.03);
+        steerBarGroup.add(led);
+        ledMaterials.push(mat);
+      }
+      bodyTilt.add(steerBarGroup);
+
+      scene.add(root);
+
+      return {
+        root,
+        bodyTilt,
+        cargoGroup,
+        wheels,
+        frontSteerPivots,
+        brakeLampL,
+        brakeLampR,
+        ledMaterials
+      };
+    }
+
+    const danfoMesh = createDanfoMinibus();
+
+    // =========================================================================
+    // 5. SCULPTED 3D TRAFFIC VEHICLES (Sedans, Yellow Taxis, Korope Vans & Trucks)
+    // =========================================================================
+    function createTrafficMesh(spec) {
+      const group = new THREE.Group();
+      const paintMat = new THREE.MeshStandardMaterial({
+        color: spec.color,
+        roughness: 0.24,
+        metalness: 0.35
+      });
+      const roofMat = new THREE.MeshStandardMaterial({
+        color: spec.roof,
+        roughness: 0.3,
+        metalness: 0.25
+      });
+
+      if (spec.kind === 'truck') {
+        // Detailed Cab + Ribbed Cargo Container Trailer + 6 Wheels
+        const cab = new THREE.Mesh(createRoundedBox(2.15, 1.85, 1.85, 0.14, 3), paintMat);
+        cab.position.set(0, 1.22, -1.75);
+        cab.castShadow = true;
+        const wind = new THREE.Mesh(createRoundedBox(1.92, 0.65, 0.1, 0.04, 2), MAT.glass);
+        wind.position.set(0, 1.55, -2.66);
+        const box = new THREE.Mesh(createRoundedBox(2.32, 2.45, 3.85, 0.08, 2), roofMat);
+        box.position.set(0, 1.62, 1.15);
+        box.castShadow = true;
+        group.add(cab, wind, box);
+      } else if (spec.kind === 'korope') {
+        // Rounded Mini-Van with Tinted Window Band
+        const body = new THREE.Mesh(createRoundedBox(1.88, 1.52, 3.95, 0.18, 4), paintMat);
+        body.position.set(0, 1.05, 0);
+        body.castShadow = true;
+        const stripe = new THREE.Mesh(createRoundedBox(1.91, 0.28, 3.85, 0.05, 2), roofMat);
+        stripe.position.set(0, 0.92, 0);
+        const glass = new THREE.Mesh(createRoundedBox(1.90, 0.48, 3.45, 0.06, 2), MAT.glass);
+        glass.position.set(0, 1.42, 0);
+        group.add(body, stripe, glass);
+      } else {
+        // Sculpted Sedan / Lagos Yellow Taxi (Lower body + Tapered Cabin Greenhouse + Taxi Sign)
+        const lower = new THREE.Mesh(createRoundedBox(1.86, 0.68, 4.15, 0.14, 4), paintMat);
+        lower.position.set(0, 0.64, 0);
+        lower.castShadow = true;
+        const upper = new THREE.Mesh(createRoundedBox(1.64, 0.56, 2.15, 0.16, 4), paintMat);
+        upper.position.set(0, 1.18, 0.12);
+        upper.castShadow = true;
+        const glass = new THREE.Mesh(createRoundedBox(1.66, 0.44, 2.22, 0.10, 3), MAT.glass);
+        glass.position.set(0, 1.18, 0.12);
+        group.add(lower, upper, glass);
+
+        if (spec.kind === 'taxi') {
+          const sign = new THREE.Mesh(createRoundedBox(0.55, 0.18, 0.24, 0.04, 2), MAT.headlight);
+          sign.position.set(0, 1.54, 0.05);
+          group.add(sign);
+        }
+      }
+
+      // 4 Spinning 3D Wheels + Headlights + Brake Lamps
+      const wheels = [];
+      const zOff = spec.kind === 'truck' ? 1.85 : 1.28;
+      const xOff = spec.w * 0.48;
+      for (const wx of [-xOff, xOff]) {
+        for (const wz of [-zOff, zOff]) {
+          const w = createWheel3D();
+          w.scale.setScalar(0.85);
+          w.position.set(wx, 0.32, wz);
+          group.add(w);
+          wheels.push(w);
+        }
+      }
+
+      const tailZ = spec.l * 0.5 + 0.02;
+      const bL = new THREE.Mesh(new THREE.BoxGeometry(0.32, 0.18, 0.06), MAT.brakeOff);
+      bL.position.set(-0.62, 0.68, tailZ);
+      const bR = bL.clone();
+      bR.position.x = 0.62;
+      group.add(bL, bR);
+
+      scene.add(group);
+      return { group, wheels, bL, bR };
+    }
+
+    // =========================================================================
+    // 6. ARTICULATED SMOOTH 3D HUMANS (Spherical Heads, Gele/Caps, Capsule Limbs)
+    // =========================================================================
+    const headGeom = new THREE.SphereGeometry(0.19, 14, 12);
+    const geleGeom = new THREE.TorusGeometry(0.16, 0.075, 10, 16);
+    geleGeom.rotateX(Math.PI * 0.42);
+    const torsoGeom = new THREE.CapsuleGeometry(0.21, 0.36, 6, 12);
+    const limbGeom = new THREE.CapsuleGeometry(0.075, 0.42, 4, 10);
+
+    function createHuman3D(shirtHex, hatHex, hasGele = false) {
+      const root = new THREE.Group();
+      const shirtMat = new THREE.MeshStandardMaterial({ color: shirtHex, roughness: 0.55 });
+      const trouserMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.7 });
+      const hatMat = new THREE.MeshStandardMaterial({ color: hatHex, roughness: 0.45 });
+
+      // Torso
+      const torso = new THREE.Mesh(torsoGeom, shirtMat);
+      torso.position.y = 1.06;
+      torso.castShadow = true;
+      root.add(torso);
+
+      // Head + Cap or Nigerian Gele Headwrap
+      const head = new THREE.Mesh(headGeom, MAT.skin);
+      head.position.y = 1.62;
+      head.castShadow = true;
+      root.add(head);
+
+      if (hasGele) {
+        const gele = new THREE.Mesh(geleGeom, hatMat);
+        gele.position.set(0, 1.72, -0.02);
+        root.add(gele);
+      } else {
+        const cap = new THREE.Mesh(new THREE.SphereGeometry(0.195, 12, 8, 0, Math.PI * 2, 0, Math.PI * 0.55), hatMat);
+        cap.position.y = 1.64;
+        root.add(cap);
+      }
+
+      // Articulated Left & Right Legs (pivot at hip y = 0.72)
+      const legLPivot = new THREE.Group();
+      legLPivot.position.set(-0.12, 0.72, 0);
+      const legL = new THREE.Mesh(limbGeom, trouserMat);
+      legL.position.y = -0.32;
+      legL.castShadow = true;
+      legLPivot.add(legL);
+
+      const legRPivot = new THREE.Group();
+      legRPivot.position.set(0.12, 0.72, 0);
+      const legR = new THREE.Mesh(limbGeom, trouserMat);
+      legR.position.y = -0.32;
+      legR.castShadow = true;
+      legRPivot.add(legR);
+
+      // Articulated Left & Right Arms (pivot at shoulder y = 1.34)
+      const armLPivot = new THREE.Group();
+      armLPivot.position.set(-0.29, 1.34, 0);
+      const armL = new THREE.Mesh(limbGeom, shirtMat);
+      armL.position.y = -0.26;
+      armL.castShadow = true;
+      armLPivot.add(armL);
+
+      const armRPivot = new THREE.Group();
+      armRPivot.position.set(0.29, 1.34, 0);
+      const armR = new THREE.Mesh(limbGeom, shirtMat);
+      armR.position.y = -0.26;
+      armR.castShadow = true;
+      armRPivot.add(armR);
+
+      root.add(legLPivot, legRPivot, armLPivot, armRPivot);
+      scene.add(root);
+
+      return { root, legLPivot, legRPivot, armLPivot, armRPivot };
+    }
+
+    function animateHuman3D(hMesh, px, pz, yaw, phase, now, speed = 2.0, waving = false) {
+      hMesh.root.position.set(px, 0, pz);
+      hMesh.root.rotation.y = yaw;
+      const swing = Math.sin(now * 0.0085 * speed + phase) * 0.55;
+      hMesh.legLPivot.rotation.x = swing;
+      hMesh.legRPivot.rotation.x = -swing;
+      hMesh.armLPivot.rotation.x = -swing * 0.7;
+      if (waving) {
+        // Raise right arm overhead and wave side-to-side!
+        hMesh.armRPivot.rotation.x = -Math.PI * 0.85;
+        hMesh.armRPivot.rotation.z = 0.25 + Math.sin(now * 0.015 + phase) * 0.38;
+      } else {
+        hMesh.armRPivot.rotation.x = swing * 0.7;
+        hMesh.armRPivot.rotation.z = 0;
+      }
+    }
+
+    // =========================================================================
+    // 7. TROPICAL COCONUT PALMS, ARCHITECTURAL CITY BLOCKS & FUEL STATIONS
+    // =========================================================================
+    function createPalmTreeMesh(height = 5.2) {
+      const group = new THREE.Group();
+      // Curved segmented trunk
+      const segs = 6;
+      for (let i = 0; i < segs; i++) {
+        const t = i / segs;
+        const rTop = 0.14 * (1 - t * 0.35);
+        const rBot = 0.17 * (1 - t * 0.35);
+        const seg = new THREE.Mesh(new THREE.CylinderGeometry(rTop, rBot, height / segs + 0.08, 8), MAT.bark);
+        seg.position.set(Math.sin(t * 1.4) * 0.35, (i + 0.5) * (height / segs), 0);
+        seg.rotation.z = -Math.cos(t * 1.4) * 0.08;
+        seg.castShadow = true;
+        group.add(seg);
+      }
+      // Crown of 7 arching palm fronds
+      const topX = Math.sin(1.4) * 0.35;
+      const frondGeom = createRoundedBox(0.42, 0.06, 2.25, 0.03, 2);
+      for (let f = 0; f < 7; f++) {
+        const ang = (f / 7) * Math.PI * 2;
+        const frondPivot = new THREE.Group();
+        frondPivot.position.set(topX, height, 0);
+        frondPivot.rotation.y = ang;
+        const frond = new THREE.Mesh(frondGeom, MAT.foliage);
+        frond.position.set(0, -0.15, 1.05);
+        frond.rotation.x = 0.38;
+        frond.castShadow = true;
+        frondPivot.add(frond);
+        group.add(frondPivot);
+      }
+      return group;
+    }
+
+    const CELL = 90;
+    const ROAD_HALF = 7.5;
+    const DISTRICTS = [
+      'Lagos Island • Marina',
+      'Yaba Tech • Sabo Market',
+      'Oshodi Underbridge',
+      'Obalende Roundabout',
+      'Surulere • Stadium Way',
+      'Victoria Island • Eko'
+    ];
+    const WALL_PALETTE = [
+      '#f4a261', '#e76f51', '#2a9d8f', '#e9c46a', '#60a5fa',
+      '#f8fafc', '#fbbf24', '#a78bfa', '#34d399', '#fb7185'
+    ];
+    const ROOF_PALETTE = [0x7c2d12, 0x991b1b, 0x1e3a8a, 0x334155, 0x78350f];
+    const SHIRT_PALETTE = [0xef4444, 0x3b82f6, 0x10b981, 0xf59e0b, 0x8b5cf6, 0xec4899, 0xffffff];
+
+    function hash2(x, z, salt = 0) {
+      let h = Math.imul(x ^ 0x5bd1e995, 1540483477) ^ Math.imul(z ^ 0x27d4eb2d, 1315423911) ^ Math.imul(salt, 2654435761);
+      h ^= h >>> 13;
+      h = Math.imul(h, 1540483477);
+      return ((h ^ (h >>> 15)) >>> 0) / 4294967296;
+    }
+
+    // Infinite Ground Asphalt Base & Grid Block Pool
+    const groundPlane = new THREE.Mesh(new THREE.PlaneGeometry(600, 600), MAT.asphalt);
+    groundPlane.rotation.x = -Math.PI * 0.5;
+    groundPlane.receiveShadow = true;
+    scene.add(groundPlane);
+
+    const blockGroups = new Map();
+    function ensureCityBlock(qx, qz) {
+      const key = `${qx},${qz}`;
+      if (blockGroups.has(key)) return blockGroups.get(key);
+
+      const group = new THREE.Group();
+      const x0 = qx * CELL + ROAD_HALF;
+      const x1 = (qx + 1) * CELL - ROAD_HALF;
+      const z0 = qz * CELL + ROAD_HALF;
+      const z1 = (qz + 1) * CELL - ROAD_HALF;
+      const bw = x1 - x0, bd = z1 - z0;
+      const cx = (x0 + x1) * 0.5, cz = (z0 + z1) * 0.5;
+
+      // Raised Concrete Sidewalk Slab + Green Inner Courtyard
+      const sidewalk = new THREE.Mesh(createRoundedBox(bw, 0.24, bd, 0.08, 2), MAT.sidewalk);
+      sidewalk.position.set(cx, 0.12, cz);
+      sidewalk.receiveShadow = true;
+      group.add(sidewalk);
+
+      const lawn = new THREE.Mesh(new THREE.BoxGeometry(bw - 4.5, 0.26, bd - 4.5), MAT.grass);
+      lawn.position.set(cx, 0.13, cz);
+      lawn.receiveShadow = true;
+      group.add(lawn);
+
+      // Dashed Yellow Road Markings along West & South Edges of this Cell
+      const dashMat = new THREE.MeshBasicMaterial({ color: 0xfacc15 });
+      for (let s = -34; s <= 34; s += 12) {
+        const dNS = new THREE.Mesh(new THREE.PlaneGeometry(0.28, 5.2), dashMat);
+        dNS.rotation.x = -Math.PI * 0.5;
+        dNS.position.set(qx * CELL, 0.03, cz + s);
+        const dEW = new THREE.Mesh(new THREE.PlaneGeometry(5.2, 0.28), dashMat);
+        dEW.rotation.x = -Math.PI * 0.5;
+        dEW.position.set(cx + s, 0.03, qz * CELL);
+        group.add(dNS, dEW);
+      }
+
+      let fuelStation = null;
+      if (((qx * 3 + qz * 5) & 3) === 0) {
+        const fx = x0 + 6.5, fz = cz;
+        fuelStation = { x: fx, z: fz, pumpX: x0 + 1.2, pumpZ: fz };
+        const canopyMat = new THREE.MeshStandardMaterial({ color: 0x10b981, roughness: 0.3 });
+        const canopy = new THREE.Mesh(createRoundedBox(8.2, 0.75, 13.5, 0.12, 3), canopyMat);
+        canopy.position.set(fx, 4.2, fz);
+        canopy.castShadow = true;
+        group.add(canopy);
+        for (const pz of [-4.8, 4.8]) {
+          const pillar = new THREE.Mesh(new THREE.CylinderGeometry(0.25, 0.25, 4.2, 12), MAT.chrome);
+          pillar.position.set(fx - 2.6, 2.1, fz + pz);
+          group.add(pillar);
+        }
+        const pump = new THREE.Mesh(createRoundedBox(1.1, 1.85, 2.4, 0.08, 2), new THREE.MeshStandardMaterial({ color: 0xef4444, roughness: 0.35 }));
+        pump.position.set(fx - 2.5, 1.05, fz);
+        pump.castShadow = true;
+        group.add(pump);
+      }
+
+      // Multi-Tiered Architectural Buildings around Perimeter
+      const slots = [
+        [x0 + 12, z0 + 12], [x1 - 12, z0 + 12],
+        [x0 + 12, z1 - 12], [x1 - 12, z1 - 12],
+        [cx, z0 + 11.5],    [cx, z1 - 11.5],
+        [x0 + 11.5, cz],    [x1 - 11.5, cz]
+      ];
+
+      slots.forEach(([bx, bz], idx) => {
+        if (fuelStation && Math.hypot(bx - fuelStation.x, bz - fuelStation.z) < 16) return;
+        const r1 = hash2(qx, qz, idx * 7 + 1);
+        const r2 = hash2(qx, qz, idx * 7 + 2);
+        const r3 = hash2(qx, qz, idx * 7 + 3);
+        const w = 11.5 + r1 * 6.5;
+        const d = 11.5 + r2 * 6.5;
+        const floors = 2 + Math.floor(r3 * 3); // 2 to 4 stories
+        const h = floors * 3.6;
+
+        const wallHex = WALL_PALETTE[Math.floor(r1 * WALL_PALETTE.length)];
+        const shopName = SHOP_NAMES[(Math.abs(qx * 5 + qz * 3) + idx) % SHOP_NAMES.length];
+        const bMat = new THREE.MeshStandardMaterial({
+          map: getBuildingTexture(wallHex, shopName),
+          roughness: 0.48,
+          metalness: 0.08
+        });
+
+        const bMesh = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), bMat);
+        bMesh.position.set(bx, h * 0.5 + 0.24, bz);
+        bMesh.castShadow = true;
+        bMesh.receiveShadow = true;
+        group.add(bMesh);
+
+        // Overhanging Pitched Roof / Penthouse Slab + Rooftop Water Tank
+        const roofMat = new THREE.MeshStandardMaterial({
+          color: ROOF_PALETTE[Math.floor(r2 * ROOF_PALETTE.length)],
+          roughness: 0.6
+        });
+        const roof = new THREE.Mesh(createRoundedBox(w + 0.8, 0.65, d + 0.8, 0.1, 2), roofMat);
+        roof.position.set(bx, h + 0.52, bz);
+        roof.castShadow = true;
+        group.add(roof);
+
+        if (r3 > 0.35) {
+          const tank = new THREE.Mesh(new THREE.CylinderGeometry(0.85, 0.85, 1.6, 12), MAT.darkSteel);
+          tank.position.set(bx + w * 0.22, h + 1.5, bz - d * 0.2);
+          tank.castShadow = true;
+          group.add(tank);
+        }
+      });
+
+      // Tropical Coconut Palm Trees along the Sidewalk Edges
+      for (let i = 0; i < 5; i++) {
+        const r = hash2(qx, qz, 90 + i);
+        const tx = i < 2 ? (i === 0 ? x0 + 1.8 : x1 - 1.8) : cx + (r - 0.5) * 36;
+        const tz = i >= 2 ? (i === 2 ? z0 + 1.8 : z1 - 1.8) : cz + (r - 0.5) * 36;
+        if (fuelStation && Math.hypot(tx - fuelStation.x, tz - fuelStation.z) < 13) continue;
+        const palm = createPalmTreeMesh(4.6 + r * 1.8);
+        palm.position.set(tx, 0.22, tz);
+        palm.rotation.y = r * Math.PI * 2;
+        group.add(palm);
+      }
+
+      scene.add(group);
+      const entry = { group, fuelStation };
+      blockGroups.set(key, entry);
+      return entry;
+    }
+
+    // =========================================================================
+    // 8. GAME STATE: DANFO, UPGRADES, WAVING 3D PASSENGERS, PEDESTRIANS & TRAFFIC
+    // =========================================================================
+    const stick = createStick();
+    let autoDriveEnabled = true;
+    let lastHeldSteer = 0;
+    let lastReleaseTime = -1e9;
+    let flickSteer = 0;
+    let flickUntil = 0;
+    let uturnRequestedAt = -1e9;
+    const keys = { left: false, right: false, up: false, down: false, rev: false };
+
+    const upgrades = {
+      engine: { level: 0, max: 3, cost: [300, 650, 1200], name: 'V6 Tokunbo Engine', desc: '+15 km/h top speed & punchier launch' },
+      seats:  { level: 0, max: 3, cost: [350, 750, 1400], name: 'Extra Danfo Bench', desc: '+2 passenger capacity per trip' },
+      tank:   { level: 0, max: 3, cost: [250, 550, 1000], name: 'Long-Range Fuel Tank', desc: '+35L fuel capacity & faster pump' },
+      steer:  { level: 0, max: 3, cost: [280, 600, 1100], name: 'Power Steering Rack', desc: 'Tighter corner radius & quick U-turn' }
+    };
+
+    function getBusStats() {
+      return {
+        speedMax: 46 + upgrades.engine.level * 7,
+        accelMax: 24 + upgrades.engine.level * 5,
+        brakeMax: 54,
+        capacity: 6 + upgrades.seats.level * 2,
+        fuelMax: 100 + upgrades.tank.level * 35,
+        turnRMin: 5.5 - upgrades.steer.level * 0.7
+      };
+    }
+
+    const bus = {
+      x: 3.5,
+      z: -12,
+      y: 0,
+      heading: 0,
+      roadHeading: 0,
+      speed: 0,
+      steer: 0,
+      roll: 0,
+      pitch: 0,
+      wheelSpin: 0,
+      turning: false,
+      turnIntent: null,
+      turnTarget: 0,
+      turnNode: null,
+      turnSpent: 0,
+      homeAsk: 0,
+      lastDir: 0,
+      offerL: false,
+      offerR: false,
+      uTurn: false,
+      uTurnLeg: 0,
+      uTurnTurned: 0,
+      kerbBias: 0,
+      cash: 500,
+      fuel: 100,
+      riders: [],
+      stopHoldT: 0,
+      districtIdx: 0
+    };
+
+    // 3D Bus Stop Zone Marker + Shelter Signpost + Pool of 5 Waving Passenger Meshes
+    const stopZoneGroup = new THREE.Group();
+    const stopPadMat = new THREE.MeshStandardMaterial({ color: 0x22c55e, emissive: 0x16a34a, emissiveIntensity: 0.45, roughness: 0.4 });
+    const stopPad = new THREE.Mesh(createRoundedBox(3.8, 0.08, 6.2, 0.1, 2), stopPadMat);
+    stopPad.position.y = 0.05;
+    const stopPole = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.08, 3.0, 10), MAT.chrome);
+    stopPole.position.set(1.8, 1.5, 0);
+    const stopSign = new THREE.Mesh(createRoundedBox(0.95, 0.65, 0.14, 0.05, 2), stopPadMat);
+    stopSign.position.set(1.8, 2.8, 0);
+    stopZoneGroup.add(stopPad, stopPole, stopSign);
+    scene.add(stopZoneGroup);
+
+    const stopPassengerPool = [];
+    for (let i = 0; i < 5; i++) {
+      const hm = createHuman3D(
+        SHIRT_PALETTE[i % SHIRT_PALETTE.length],
+        SHIRT_PALETTE[(i + 3) % SHIRT_PALETTE.length],
+        i % 2 === 1
+      );
+      stopPassengerPool.push(hm);
+    }
+
+    let activeStop = null;
+    function spawnMissionStop(kind) {
+      const snapH = Math.round(bus.roadHeading / (Math.PI / 2)) * (Math.PI / 2);
+      const fx = Math.round(Math.sin(snapH));
+      const fz = Math.round(-Math.cos(snapH));
+      const rx = Math.cos(snapH);
+      const rz = Math.sin(snapH);
+
+      let targetGx = Math.round(bus.x / CELL) + fx;
+      let targetGz = Math.round(bus.z / CELL) + fz;
+      let sfx = fx, sfz = fz, srx = rx, srz = rz, stopYaw = snapH;
+
+      if (kind === 'dropoff') {
+        const turnSide = Math.random() < 0.65 ? (Math.random() < 0.5 ? 1 : -1) : 0;
+        if (turnSide !== 0) {
+          stopYaw = snapH + turnSide * (Math.PI / 2);
+          sfx = Math.round(Math.sin(stopYaw));
+          sfz = Math.round(-Math.cos(stopYaw));
+          srx = Math.cos(stopYaw);
+          srz = Math.sin(stopYaw);
+          targetGx += sfx;
+          targetGz += sfz;
+        } else {
+          targetGx += sfx;
+          targetGz += sfz;
+        }
+      }
+
+      const stopAlong = 32;
+      // Place bus stop pad along curb edge, and waiting passengers on the raised sidewalk (+1.45m past ROAD_HALF)
+      const curbOffset = ROAD_HALF - 0.3;
+      const sx = targetGx * CELL - sfx * stopAlong + srx * curbOffset;
+      const sz = targetGz * CELL - sfz * stopAlong + srz * curbOffset;
+
+      const col = kind === 'pickup' ? 0x22c55e : 0xf59e0b;
+      stopPadMat.color.setHex(col);
+      stopPadMat.emissive.setHex(col);
+      stopZoneGroup.position.set(sx, 0, sz);
+      stopZoneGroup.rotation.y = -stopYaw;
+
+      const waitingPeople = [];
+      for (let i = 0; i < stopPassengerPool.length; i++) {
+        const hm = stopPassengerPool[i];
+        if (kind === 'pickup' && i < 4) {
+          hm.root.visible = true;
+          waitingPeople.push({
+            mesh: hm,
+            x: sx + srx * (1.85 + (i % 2) * 0.55) - sfx * (i * 1.15 - 1.5),
+            z: sz + srz * (1.85 + (i % 2) * 0.55) - sfz * (i * 1.15 - 1.5),
+            yaw: -stopYaw - Math.PI * 0.5,
+            phase: i * 1.3,
+            boarded: false
+          });
+        } else {
+          hm.root.visible = false;
+        }
+      }
+
+      activeStop = {
+        kind,
+        x: sx,
+        z: sz,
+        fx: sfx,
+        fz: sfz,
+        rx: srx,
+        rz: srz,
+        people: waitingPeople,
+        farePerRider: 150 + Math.floor(Math.random() * 6) * 25
+      };
+    }
+    spawnMissionStop('pickup');
+
+    // Sidewalk Pedestrians Pool (14 Articulated 3D Walkers locked strictly to raised block sidewalks)
+    function snapPedestrianToSidewalk(p, refX, refZ) {
+      const gx = Math.round(refX / CELL);
+      const gz = Math.round(refZ / CELL);
+      const qx = Math.floor(refX / CELL);
+      const qz = Math.floor(refZ / CELL);
+      const side = p.side || (Math.random() < 0.5 ? -1 : 1);
+      p.side = side;
+      p.qx = qx;
+      p.qz = qz;
+      const sidewalkOffset = ROAD_HALF + 2.4;
+      const span = CELL - ROAD_HALF * 2 - 8;
+      if (p.axis === 'z') {
+        p.x = gx * CELL + side * sidewalkOffset;
+        p.z = (qz + 0.5) * CELL + (Math.random() - 0.5) * span;
+      } else {
+        p.z = gz * CELL + side * sidewalkOffset;
+        p.x = (qx + 0.5) * CELL + (Math.random() - 0.5) * span;
+      }
+    }
+
+    const pedestrians = [];
+    for (let i = 0; i < 14; i++) {
+      const hm = createHuman3D(
+        SHIRT_PALETTE[(i * 2) % SHIRT_PALETTE.length],
+        SHIRT_PALETTE[(i + 1) % SHIRT_PALETTE.length],
+        i % 3 === 0
+      );
+      const p = {
+        mesh: hm,
+        x: 0,
+        z: 0,
+        axis: i % 2 === 0 ? 'z' : 'x',
+        side: i % 2 === 0 ? 1 : -1,
+        dir: i % 4 < 2 ? 1 : -1,
+        speed: 1.6 + (i % 3) * 0.4,
+        phase: i * 0.9
+      };
+      snapPedestrianToSidewalk(p, (i % 3 - 1) * CELL, -i * 15);
+      pedestrians.push(p);
+    }
+
+    // 3D Traffic Vehicles Pool (10 Sculpted Taxis, Sedans, Korope Vans & Trucks)
+    const TRAFFIC_SPECS = [
+      { kind: 'taxi',   color: 0xfacc15, roof: 0x111827, w: 1.86, h: 1.45, l: 4.15, speed: 16 },
+      { kind: 'sedan',  color: 0x2563eb, roof: 0xdbeafe, w: 1.86, h: 1.42, l: 4.15, speed: 18 },
+      { kind: 'korope', color: 0xf8fafc, roof: 0xdc2626, w: 1.88, h: 1.85, l: 3.95, speed: 15 },
+      { kind: 'truck',  color: 0xea580c, roof: 0xfed7aa, w: 2.32, h: 2.55, l: 5.50, speed: 13 },
+      { kind: 'sedan',  color: 0x10b981, roof: 0x064e3b, w: 1.86, h: 1.42, l: 4.15, speed: 17 }
+    ];
+    const traffic = [];
+    for (let i = 0; i < 10; i++) {
+      const spec = TRAFFIC_SPECS[i % TRAFFIC_SPECS.length];
+      const tMesh = createTrafficMesh(spec);
+      const headings = [0, Math.PI / 2, Math.PI, -Math.PI / 2];
+      const h = headings[i % 4];
+      const fx = Math.round(Math.sin(h)), fz = Math.round(-Math.cos(h));
+      const rx = Math.cos(h), rz = Math.sin(h);
+      const gx = (i % 3) - 1, gz = Math.floor(i / 3) - 1;
+      traffic.push({
+        ...spec,
+        mesh: tMesh,
+        x: gx * CELL + rx * (ROAD_HALF * 0.48) + fx * ((i * 19) % 60 - 30),
+        z: gz * CELL + rz * (ROAD_HALF * 0.48) + fz * ((i * 19) % 60 - 30),
+        heading: h,
+        curSpeed: spec.speed,
+        wheelSpin: 0,
+        braking: false
+      });
+    }
+
+    // =========================================================================
+    // 9. CONDUCTOR CHIDI SPEECH BUBBLES & UI TOASTS
+    // =========================================================================
+    const mateBox = document.getElementById('mate-box');
+    const mateText = document.getElementById('mate-text');
+    function chidiSay(msg) {
+      mateText.textContent = msg;
+      mateBox.classList.remove('mate-pop');
+      void mateBox.offsetWidth;
+      mateBox.classList.add('mate-pop');
+    }
+
+    const fareToast = document.getElementById('fare-toast');
+    const toastTitle = document.getElementById('toast-title');
+    const toastSub = document.getElementById('toast-sub');
+    let toastTimer = 0;
+    function showToast(title, sub) {
+      toastTitle.textContent = title;
+      toastSub.textContent = sub;
+      fareToast.classList.remove('hidden');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => fareToast.classList.add('hidden'), 2300);
+    }
+
+    // =========================================================================
+    // 10. ROAD-ASSISTED VEHICLE PHYSICS & INTERSECTION STATE MACHINE (zq + Q3e)
+    // =========================================================================
+    // Hard 2D Oriented-Box / City-Block Collision Solver: prevents Danfo from ever entering a sidewalk or building
+    function confineBusToRoadCorridors() {
+      const sinH = Math.sin(bus.heading), cosH = Math.cos(bus.heading);
+      // Effective half-extents of the Danfo (width 2.08m, length 4.55m) projected onto world X and Z axes
+      const extX = Math.abs(cosH) * 1.12 + Math.abs(sinH) * 2.32;
+      const extZ = Math.abs(sinH) * 1.12 + Math.abs(cosH) * 2.32;
+
+      const qx0 = Math.floor(bus.x / CELL);
+      const qz0 = Math.floor(bus.z / CELL);
+
+      for (let qx = qx0 - 1; qx <= qx0 + 1; qx++) {
+        for (let qz = qz0 - 1; qz <= qz0 + 1; qz++) {
+          // City block sidewalk AABB bounds
+          const minX = qx * CELL + ROAD_HALF;
+          const maxX = (qx + 1) * CELL - ROAD_HALF;
+          const minZ = qz * CELL + ROAD_HALF;
+          const maxZ = (qz + 1) * CELL - ROAD_HALF;
+
+          // Expanded Minkowski AABB by Danfo's projected half-extents
+          const eMinX = minX - extX;
+          const eMaxX = maxX + extX;
+          const eMinZ = minZ - extZ;
+          const eMaxZ = maxZ + extZ;
+
+          if (bus.x > eMinX && bus.x < eMaxX && bus.z > eMinZ && bus.z < eMaxZ) {
+            const penLeft = bus.x - eMinX;
+            const penRight = eMaxX - bus.x;
+            const penTop = bus.z - eMinZ;
+            const penBot = eMaxZ - bus.z;
+            const minPenX = Math.min(penLeft, penRight);
+            const minPenZ = Math.min(penTop, penBot);
+
+            if (minPenX < minPenZ) {
+              bus.x = penLeft < penRight ? eMinX : eMaxX;
+              // Gently align heading toward North/South street axis
+              const targetH = cosH >= 0 ? 0 : Math.PI;
+              bus.heading += wrapAngle(bus.heading, targetH) * 0.22;
+            } else {
+              bus.z = penTop < penBot ? eMinZ : eMaxZ;
+              // Gently align heading toward East/West street axis
+              const targetH = sinH >= 0 ? Math.PI * 0.5 : -Math.PI * 0.5;
+              bus.heading += wrapAngle(bus.heading, targetH) * 0.22;
+            }
+            bus.speed *= 0.92;
+          }
+        }
+      }
+    }
+
+    // Repel any pedestrian or passenger outside the Danfo's physical hull so the bus never drives through people
+    function keepPersonOutOfBus(px, pz) {
+      const dx = px - bus.x, dz = pz - bus.z;
+      const sinH = Math.sin(bus.heading), cosH = -Math.cos(bus.heading);
+      const rx = Math.cos(bus.heading), rz = Math.sin(bus.heading);
+      const localF = dx * sinH + dz * cosH;
+      const localR = dx * rx + dz * rz;
+      const halfW = 1.45, halfL = 2.75;
+      if (Math.abs(localR) < halfW && Math.abs(localF) < halfL) {
+        const pushSide = localR >= 0 ? 1 : -1;
+        const newR = pushSide * (halfW + 0.25);
+        return {
+          x: bus.x + sinH * localF + rx * newR,
+          z: bus.z + cosH * localF + rz * newR,
+          pushed: true
+        };
+      }
+      return { x: px, z: pz, pushed: false };
+    }
+    function wrapAngle(a, b) {
+      let d = (b - a) % (Math.PI * 2);
+      if (d > Math.PI) d -= Math.PI * 2;
+      if (d <= -Math.PI) d += Math.PI * 2;
+      return d;
+    }
+
+    function gatherInput(now) {
+      stickStepHome(stick, now);
+      let s = stickSteer(stick);
+      if (stick.down) {
+        lastHeldSteer = s;
+        lastReleaseTime = now;
+      } else {
+        const a = (now - lastReleaseTime) / RELEASE_DECAY_MS;
+        s = a >= 1 ? 0 : lastHeldSteer * (1 - a);
+      }
+      if (stick.down || (now >= flickUntil && !bus.turning)) flickUntil = 0;
+      if (flickUntil > now) s = flickSteer;
+
+      const kbDir = (keys.right ? 1 : 0) - (keys.left ? 1 : 0);
+      const manualActive = stick.down || keys.up || keys.down || keys.left || keys.right || keys.rev || flickUntil > now;
+
+      let autoSteer = 0;
+      if (autoDriveEnabled && !manualActive && activeStop) {
+        const angToStop = Math.atan2(activeStop.x - bus.x, -(activeStop.z - bus.z));
+        const rel = wrapAngle(bus.roadHeading, angToStop);
+        if (bus.offerL && rel < -0.55) autoSteer = -0.88;
+        else if (bus.offerR && rel > 0.55) autoSteer = 0.88;
+        else autoSteer = Math.sin(now * 0.0018) * 0.14;
+      }
+
+      const finalSteer = s || (kbDir * 0.85) || autoSteer;
+      const accel = manualActive ? (stick.down || keys.up || keys.left || keys.right || flickUntil > now) : autoDriveEnabled;
+      const brake = keys.down || keys.rev;
+      return {
+        steer: finalSteer,
+        accel,
+        brake,
+        reverse: keys.down || keys.rev,
+        uturn: (now - uturnRequestedAt) < 650
+      };
+    }
+
+    function stepPhysics(dt, now) {
+      const stats = getBusStats();
+      const inp = gatherInput(now);
+      bus.homeAsk = 0;
+
+      if (Math.abs(bus.speed) > 0.4) {
+        bus.fuel = Math.max(4, bus.fuel - dt * 0.55);
+      }
+
+      // 3-Point U-Turn Solver (wq)
+      if (bus.uTurn) {
+        const legRev = bus.uTurnLeg % 2 === 1;
+        const uSpeed = legRev ? -8.5 : 11.5;
+        bus.speed = uSpeed;
+        bus.steer = legRev ? 0.95 : -0.95;
+        const dYaw = Math.min((Math.abs(uSpeed) / stats.turnRMin) * dt, Math.PI - bus.uTurnTurned);
+        bus.heading -= dYaw;
+        bus.uTurnTurned += dYaw;
+        bus.x += Math.sin(bus.heading) * uSpeed * dt;
+        bus.z += -Math.cos(bus.heading) * uSpeed * dt;
+
+        const rh = bus.roadHeading;
+        const rx = Math.cos(rh), rz = Math.sin(rh);
+        const gx = Math.round(bus.x / CELL) * CELL;
+        const gz = Math.round(bus.z / CELL) * CELL;
+        const lat = (bus.x - gx) * rx + (bus.z - gz) * rz;
+        if (Math.abs(lat) > ROAD_HALF - 1.4 && bus.uTurnLeg < 2) {
+          bus.uTurnLeg++;
+        }
+        if (bus.uTurnTurned >= Math.PI - 1e-3) {
+          bus.heading = bus.turnTarget;
+          bus.roadHeading = bus.heading;
+          bus.uTurn = false;
+          bus.turning = false;
+          bus.speed = 0;
+          chidiSay('One-time U-turn! Road clear ahead Boss.');
+        }
+        return inp;
+      }
+
+      if (inp.uturn && !bus.turning) {
+        uturnRequestedAt = -1e9;
+        const snapH = Math.round(bus.roadHeading / (Math.PI / 2)) * (Math.PI / 2);
+        bus.uTurn = true;
+        bus.turning = true;
+        bus.uTurnLeg = 0;
+        bus.uTurnTurned = 0;
+        bus.turnTarget = Math.atan2(Math.sin(snapH + Math.PI), Math.cos(snapH + Math.PI));
+        return inp;
+      }
+
+      let r = inp.steer;
+      if (bus.turnSpent) {
+        if (Math.sign(r) !== bus.turnSpent || Math.abs(r) < 0.35) {
+          bus.homeAsk = bus.turnSpent;
+          bus.turnSpent = 0;
+        } else {
+          r = 0;
+        }
+      }
+
+      const snapH = Math.round(bus.roadHeading / (Math.PI / 2)) * (Math.PI / 2);
+      const fx = Math.round(Math.sin(snapH));
+      const fz = Math.round(-Math.cos(snapH));
+      const rx = Math.cos(snapH);
+      const rz = Math.sin(snapH);
+
+      let nodeGx = Math.round(bus.x / CELL);
+      let nodeGz = Math.round(bus.z / CELL);
+      const toNode0 = (nodeGx * CELL - bus.x) * fx + (nodeGz * CELL - bus.z) * fz;
+      if (toNode0 < -5) {
+        nodeGx += fx;
+        nodeGz += fz;
+      }
+      const nodeX = nodeGx * CELL;
+      const nodeZ = nodeGz * CELL;
+      const along = (nodeX - bus.x) * fx + (nodeZ - bus.z) * fz;
+
+      const dIdx = Math.abs(nodeGx * 3 + nodeGz * 5) % DISTRICTS.length;
+      if (dIdx !== bus.districtIdx) {
+        bus.districtIdx = dIdx;
+        document.getElementById('district-tag').textContent = DISTRICTS[dIdx];
+      }
+
+      const turnWindow = Math.max(18, Math.abs(bus.speed) * 0.75);
+      const inWindow = !bus.turning && along > -5 && along < turnWindow && bus.speed > 3;
+      bus.offerL = inWindow;
+      bus.offerR = inWindow;
+
+      const thresh = (bus.lastDir !== 0 && Math.sign(r) === bus.lastDir) ? TURN_HYST_T8 : TURN_THRESH_KH;
+      const turnDir = Math.abs(r) >= thresh ? Math.sign(r) : 0;
+      bus.lastDir = turnDir;
+
+      // Start 90° turn only once the bus nose reaches the intersection throat (along < 9.5m) so it never cuts building corners
+      if (inWindow && turnDir !== 0 && along < 9.2) {
+        bus.turning = true;
+        bus.turnIntent = turnDir < 0 ? 'left' : 'right';
+        bus.turnTarget = Math.atan2(Math.sin(snapH + turnDir * Math.PI / 2), Math.cos(snapH + turnDir * Math.PI / 2));
+        bus.turnNode = { x: nodeX, z: nodeZ };
+      }
+
+      let targetSpeed = 0;
+      if (inp.brake && inp.reverse && bus.speed <= 0.2) {
+        targetSpeed = -8;
+      } else if (inp.accel && !inp.brake) {
+        targetSpeed = stats.speedMax * 0.55;
+      }
+
+      bus.kerbBias = 0;
+      if (activeStop && !bus.turning) {
+        const dx = activeStop.x - bus.x;
+        const dz = activeStop.z - bus.z;
+        const dAlong = dx * fx + dz * fz;
+        const dLat = Math.abs(dx * rx + dz * rz);
+
+        if (bus.stopHoldT > 0) {
+          bus.stopHoldT -= dt;
+          targetSpeed = 0;
+          bus.kerbBias = ROAD_HALF * 0.28;
+
+          if (activeStop.kind === 'pickup') {
+            // Walk passengers toward the Danfo's right-side sliding door (+1.18m lateral), NOT through the bus body
+            const doorX = bus.x + rx * 1.18;
+            const doorZ = bus.z + rz * 1.18;
+            for (const p of activeStop.people) {
+              if (p.boarded) continue;
+              const toDoorX = doorX - p.x, toDoorZ = doorZ - p.z;
+              const distDoor = Math.hypot(toDoorX, toDoorZ);
+              if (distDoor < 0.55) {
+                p.boarded = true;
+                p.mesh.root.visible = false;
+              } else {
+                p.x += (toDoorX / distDoor) * Math.min(distDoor, 4.2 * dt);
+                p.z += (toDoorZ / distDoor) * Math.min(distDoor, 4.2 * dt);
+              }
+            }
+          }
+
+          if (bus.stopHoldT <= 0) {
+            if (activeStop.kind === 'pickup') {
+              for (const p of activeStop.people) p.mesh.root.visible = false;
+              const room = Math.max(0, stats.capacity - bus.riders.length);
+              const taken = Math.min(room, activeStop.people.length);
+              for (let i = 0; i < taken; i++) {
+                bus.riders.push({ fare: activeStop.farePerRider });
+                AudioFx.board(i);
+              }
+              chidiSay(`Oya ${taken} passengers enter! Follow the yellow arrow go drop-off!`);
+              spawnMissionStop('dropoff');
+            } else {
+              const count = bus.riders.length;
+              const earned = bus.riders.reduce((s, r) => s + r.fare, 0);
+              bus.riders = [];
+              bus.cash += earned;
+              AudioFx.cash();
+              showToast(`+₦${earned}`, `${count} Passengers Dropped Off!`);
+              chidiSay(`Correct Boss! +₦${earned} enter hand. Look front for next waving passengers!`);
+              spawnMissionStop('pickup');
+            }
+          }
+        } else if (dAlong > -2.5 && dAlong < 34 && dLat < ROAD_HALF * 1.6) {
+          bus.kerbBias = ROAD_HALF * 0.26;
+          const vCurve = dAlong > 0.6 ? Math.sqrt(2 * 9.5 * Math.max(0, dAlong - 0.6)) : 0;
+          targetSpeed = Math.min(targetSpeed, vCurve);
+          if (dAlong < 2.2 && Math.abs(bus.speed) < 2.2) {
+            bus.stopHoldT = 0.95;
+            targetSpeed = 0;
+          }
+        }
+      }
+
+      // Traffic Lead Gap Slowdown
+      for (const tc of traffic) {
+        const dx = tc.x - bus.x, dz = tc.z - bus.z;
+        const ahead = dx * Math.sin(bus.heading) + dz * -Math.cos(bus.heading);
+        const lat = Math.abs(dx * Math.cos(bus.heading) + dz * Math.sin(bus.heading));
+        if (ahead > 0 && ahead < 13 && lat < 2.1) {
+          targetSpeed = Math.min(targetSpeed, Math.max(0, (ahead - 4.8) * 2.4));
+        }
+      }
+
+      const prevSpeed = bus.speed;
+      const accelRate = targetSpeed < bus.speed ? stats.brakeMax : stats.accelMax;
+      const dv = targetSpeed - bus.speed;
+      bus.speed += Math.abs(dv) <= accelRate * dt ? dv : Math.sign(dv) * accelRate * dt;
+
+      const longAccel = (bus.speed - prevSpeed) / Math.max(0.001, dt);
+      bus.pitch += (Math.max(-0.055, Math.min(0.055, -longAccel * 0.0022)) - bus.pitch) * Math.min(1, 10 * dt);
+
+      if (bus.turning && bus.turnNode) {
+        const tfx = Math.sin(bus.turnTarget), tfz = -Math.cos(bus.turnTarget);
+        const trx = Math.cos(bus.turnTarget), trz = Math.sin(bus.turnTarget);
+        const laneOff = ROAD_HALF * 0.46;
+        const aimX = bus.turnNode.x + trx * laneOff + tfx * Math.max(8, bus.speed * 0.45);
+        const aimZ = bus.turnNode.z + trz * laneOff + tfz * Math.max(8, bus.speed * 0.45);
+        const desiredH = Math.atan2(aimX - bus.x, -(aimZ - bus.z));
+        const errH = wrapAngle(bus.heading, desiredH);
+        bus.steer = Math.max(-0.95, Math.min(0.95, errH));
+        const maxYaw = (Math.max(4, Math.abs(bus.speed)) / stats.turnRMin) * dt;
+        const stepYaw = Math.sign(errH) * Math.min(Math.abs(errH * 7.5 * dt), maxYaw);
+        bus.heading += stepYaw;
+
+        bus.x += Math.sin(bus.heading) * bus.speed * dt;
+        bus.z += -Math.cos(bus.heading) * bus.speed * dt;
+
+        if (Math.abs(wrapAngle(bus.heading, bus.turnTarget)) < 0.13) {
+          bus.heading = bus.turnTarget;
+          bus.roadHeading = bus.turnTarget;
+          const finishedDir = bus.turnIntent === 'left' ? -1 : 1;
+          bus.turning = false;
+          bus.turnIntent = null;
+          bus.turnNode = null;
+          if (Math.abs(inp.steer) >= 0.35 && Math.sign(inp.steer) === finishedDir) {
+            bus.turnSpent = finishedDir;
+            bus.homeAsk = finishedDir;
+          }
+        }
+      } else {
+        const absR = Math.abs(r);
+        const quadR = absR * absR;
+        const turnR = Math.max(stats.turnRMin, (bus.speed * bus.speed) / 38);
+        const yawRate = Math.sign(r) * quadR * (bus.speed / turnR);
+        bus.steer = r * 0.95;
+        bus.heading += yawRate * dt;
+
+        const roadCenterX = Math.abs(fx) > 0.5 ? bus.x : nodeX;
+        const roadCenterZ = Math.abs(fz) > 0.5 ? bus.z : nodeZ;
+        const curLat = (bus.x - roadCenterX) * rx + (bus.z - roadCenterZ) * rz;
+        const desiredLat = ROAD_HALF * 0.45 + bus.kerbBias;
+        const latSteer = bus.kerbBias > 0 ? Math.max(-0.22, Math.min(0.22, (desiredLat - curLat) * 0.12)) : 0;
+
+        const alignGain = 4.2 * (1 - Math.min(1, absR / 0.35)) * Math.min(1, Math.abs(bus.speed) / 8);
+        bus.heading += wrapAngle(bus.heading, snapH + latSteer) * Math.min(1, alignGain * dt);
+
+        const crab = wrapAngle(snapH, bus.heading);
+        if (Math.abs(crab) > 0.36) {
+          bus.heading = snapH + Math.sign(crab) * 0.36;
+        }
+
+        bus.x += Math.sin(bus.heading) * bus.speed * dt;
+        bus.z += -Math.cos(bus.heading) * bus.speed * dt;
+
+        const newLat = (bus.x - roadCenterX) * rx + (bus.z - roadCenterZ) * rz;
+        const maxLat = ROAD_HALF - 1.25;
+        if (Math.abs(newLat) > maxLat && along > ROAD_HALF) {
+          const over = newLat - Math.sign(newLat) * maxLat;
+          bus.x -= rx * over;
+          bus.z -= rz * over;
+          bus.heading += wrapAngle(bus.heading, snapH) * Math.min(1, 6 * dt);
+        }
+      }
+
+      // Enforce hard city-block / building collision confinement every frame
+      confineBusToRoadCorridors();
+
+      // Solid Vehicle-to-Vehicle Collision Separation (prevent clipping through traffic cars)
+      for (const tc of traffic) {
+        const dx = bus.x - tc.x, dz = bus.z - tc.z;
+        const minSep = 3.6;
+        const dist = Math.hypot(dx, dz);
+        if (dist > 0.001 && dist < minSep) {
+          const push = (minSep - dist);
+          bus.x += (dx / dist) * push * 0.6;
+          bus.z += (dz / dist) * push * 0.6;
+          tc.x -= (dx / dist) * push * 0.4;
+          tc.z -= (dz / dist) * push * 0.4;
+          bus.speed *= 0.85;
+        }
+      }
+
+      bus.roll += (Math.max(-0.075, Math.min(0.075, -bus.steer * (bus.speed / 28) * 0.08)) - bus.roll) * Math.min(1, 10 * dt);
+      bus.wheelSpin += (bus.speed / 0.38) * dt;
+
+      if (bus.homeAsk) {
+        stickAskHome(stick, bus.homeAsk, now);
+      }
+
+      // Step Ambient Traffic Vehicles
+      for (const tc of traffic) {
+        const tfx = Math.sin(tc.heading), tfz = -Math.cos(tc.heading);
+        const trx = Math.cos(tc.heading), trz = Math.sin(tc.heading);
+        const toBusX = bus.x - tc.x, toBusZ = bus.z - tc.z;
+        const busAhead = toBusX * tfx + toBusZ * tfz;
+        const busLat = Math.abs(toBusX * trx + toBusZ * trz);
+        tc.braking = busAhead > -2 && busAhead < 12 && busLat < 2.6;
+        const spd = tc.braking ? 0 : tc.speed;
+        tc.curSpeed += (spd - tc.curSpeed) * Math.min(1, 6 * dt);
+        tc.x += tfx * tc.curSpeed * dt;
+        tc.z += tfz * tc.curSpeed * dt;
+        tc.wheelSpin += (tc.curSpeed / 0.35) * dt;
+
+        if (Math.hypot(tc.x - bus.x, tc.z - bus.z) > 135) {
+          const hs = [0, Math.PI / 2, Math.PI, -Math.PI / 2];
+          tc.heading = hs[Math.floor(Math.random() * 4)];
+          const nfx = Math.sin(tc.heading), nfz = -Math.cos(tc.heading);
+          const nrx = Math.cos(tc.heading), nrz = Math.sin(tc.heading);
+          const ngx = Math.round(bus.x / CELL) + Math.round(Math.sin(bus.heading));
+          const ngz = Math.round(bus.z / CELL) + Math.round(-Math.cos(bus.heading));
+          tc.x = ngx * CELL + nrx * (ROAD_HALF * 0.48) - nfx * 25;
+          tc.z = ngz * CELL + nrz * (ROAD_HALF * 0.48) - nfz * 25;
+        }
+      }
+
+      // Step Sidewalk Pedestrians (strictly within each block's raised sidewalk bounds [q*CELL + ROAD_HALF + 1.8 .. (q+1)*CELL - ROAD_HALF - 1.8])
+      for (const p of pedestrians) {
+        const gx = Math.round(p.x / CELL);
+        const gz = Math.round(p.z / CELL);
+        const sidewalkOffset = ROAD_HALF + 2.4;
+        if (p.axis === 'z') {
+          const qz = Math.floor(p.z / CELL);
+          const minZ = qz * CELL + ROAD_HALF + 2.0;
+          const maxZ = (qz + 1) * CELL - ROAD_HALF - 2.0;
+          p.x = gx * CELL + p.side * sidewalkOffset;
+          p.z += p.dir * p.speed * dt;
+          if (p.z < minZ) { p.z = minZ; p.dir = 1; }
+          else if (p.z > maxZ) { p.z = maxZ; p.dir = -1; }
+        } else {
+          const qx = Math.floor(p.x / CELL);
+          const minX = qx * CELL + ROAD_HALF + 2.0;
+          const maxX = (qx + 1) * CELL - ROAD_HALF - 2.0;
+          p.z = gz * CELL + p.side * sidewalkOffset;
+          p.x += p.dir * p.speed * dt;
+          if (p.x < minX) { p.x = minX; p.dir = 1; }
+          else if (p.x > maxX) { p.x = maxX; p.dir = -1; }
+        }
+
+        // Physical collision repulsion away from Danfo hull
+        const safe = keepPersonOutOfBus(p.x, p.z);
+        p.x = safe.x;
+        p.z = safe.z;
+
+        if (Math.hypot(p.x - bus.x, p.z - bus.z) > 95) {
+          snapPedestrianToSidewalk(
+            p,
+            bus.x + Math.sin(bus.heading) * (35 + Math.random() * 35),
+            bus.z - Math.cos(bus.heading) * (35 + Math.random() * 35)
+          );
+        }
+      }
+
+      // Also ensure waiting passengers at bus stops never overlap the Danfo hull
+      if (activeStop && activeStop.kind === 'pickup') {
+        for (const p of activeStop.people) {
+          if (!p.boarded) {
+            const safe = keepPersonOutOfBus(p.x, p.z);
+            p.x = safe.x;
+            p.z = safe.z;
+          }
+        }
+      }
+
+      return inp;
+    }
+
+    // =========================================================================
+    // 11. INPUT EVENTS & GARAGE SHOP WIRING
+    // =========================================================================
+    webglCanvas.addEventListener('pointerdown', e => {
+      e.preventDefault();
+      const rect = webglCanvas.getBoundingClientRect();
+      stickDown(stick, e.pointerId, e.clientX - rect.left, e.clientY - rect.top, performance.now());
+      try { webglCanvas.setPointerCapture(e.pointerId); } catch {}
+    });
+    webglCanvas.addEventListener('pointermove', e => {
+      if (e.pointerId !== stick.id) return;
+      const rect = webglCanvas.getBoundingClientRect();
+      stickMove(stick, e.clientX - rect.left, e.clientY - rect.top);
+    });
+    function onPointerEnd(e) {
+      if (e.pointerId !== stick.id) return;
+      const rect = webglCanvas.getBoundingClientRect();
+      if (e.type === 'pointerup') {
+        stickMove(stick, e.clientX - rect.left, e.clientY - rect.top);
+        const now = performance.now();
+        const fl = stickFlick(stick, now);
+        if (fl) {
+          flickSteer = fl;
+          flickUntil = now + FLICK_HOLD_MS;
+        }
+      }
+      stickUp(stick);
+    }
+    webglCanvas.addEventListener('pointerup', onPointerEnd);
+    webglCanvas.addEventListener('pointercancel', onPointerEnd);
+
+    const btnUturn = document.getElementById('btn-uturn');
+    let uturnPtr = -1;
+    btnUturn.addEventListener('pointerdown', e => {
+      e.preventDefault();
+      e.stopPropagation();
+      uturnPtr = e.pointerId;
+      uturnRequestedAt = performance.now();
+      btnUturn.classList.add('pressed');
+      const rect = webglCanvas.getBoundingClientRect();
+      stickDown(stick, e.pointerId, e.clientX - rect.left, e.clientY - rect.top, performance.now());
+      try { btnUturn.setPointerCapture(e.pointerId); } catch {}
+    });
+    btnUturn.addEventListener('pointermove', e => {
+      if (e.pointerId === uturnPtr && stick.id === e.pointerId) {
+        const rect = webglCanvas.getBoundingClientRect();
+        stickMove(stick, e.clientX - rect.left, e.clientY - rect.top);
+      }
+    });
+    btnUturn.addEventListener('pointerup', e => {
+      if (e.pointerId === uturnPtr) {
+        uturnPtr = -1;
+        btnUturn.classList.remove('pressed');
+        if (stick.id === e.pointerId) stickUp(stick);
+      }
+    });
+
+    const btnRev = document.getElementById('btn-rev');
+    btnRev.addEventListener('pointerdown', e => {
+      e.preventDefault();
+      e.stopPropagation();
+      keys.rev = true;
+      btnRev.classList.add('pressed');
+    });
+    const endRev = () => { keys.rev = false; btnRev.classList.remove('pressed'); };
+    btnRev.addEventListener('pointerup', endRev);
+    btnRev.addEventListener('pointercancel', endRev);
+
+    document.getElementById('btn-horn').addEventListener('click', () => {
+      AudioFx.honk();
+      chidiSay('PIM-PIM! Comot for road o! Yellow Danfo dey pass!');
+    });
+
+    const btnAutoDrive = document.getElementById('btn-autodrive');
+    const lblAutoDrive = document.getElementById('autodrive-lbl');
+    btnAutoDrive.addEventListener('click', () => {
+      autoDriveEnabled = !autoDriveEnabled;
+      lblAutoDrive.textContent = `Auto-Drive: ${autoDriveEnabled ? 'ON' : 'OFF'}`;
+      btnAutoDrive.className = autoDriveEnabled
+        ? 'slab-btn px-2.5 py-1.5 bg-gradient-to-b from-[#7ff0a8] to-[#46d27a] text-[#08351a] text-xs flex items-center gap-1'
+        : 'slab-btn px-2.5 py-1.5 bg-gradient-to-b from-[#fff8ec] to-[#ffe7bd] text-[#14233b] text-xs flex items-center gap-1';
+      chidiSay(autoDriveEnabled ? 'Auto-Drive ON! Sit back and watch, or touch road anytime to take wheel!' : 'Manual control! Hold road & slide thumb to drive.');
+    });
+
+    const shopModal = document.getElementById('shop-modal');
+    const shopItemsEl = document.getElementById('shop-items');
+    function renderShop() {
+      shopItemsEl.innerHTML = '';
+      for (const [key, upg] of Object.entries(upgrades)) {
+        const maxed = upg.level >= upg.max;
+        const price = maxed ? 0 : upg.cost[upg.level];
+        const canBuy = !maxed && bus.cash >= price;
+        const row = document.createElement('div');
+        row.className = 'flex items-center justify-between gap-2 p-2 rounded-xl border-2 border-[#14233b] bg-[#fff8ec]';
+        row.innerHTML = `
+          <div>
+            <div class="font-extrabold text-[#14233b]">${upg.name} <span class="text-amber-700">(Lv.${upg.level}/${upg.max})</span></div>
+            <div class="text-[11px] opacity-75">${upg.desc}</div>
+          </div>
+          <button type="button" data-upg="${key}" ${!canBuy ? 'disabled' : ''}
+            class="slab-btn px-3 py-1.5 text-xs ${maxed ? 'bg-slate-300 text-slate-600' : canBuy ? 'bg-[#46d27a] text-[#08351a]' : 'bg-amber-200/60 text-slate-500'}">
+            ${maxed ? 'MAXED' : '₦' + price}
+          </button>
+        `;
+        shopItemsEl.appendChild(row);
+      }
+      shopItemsEl.querySelectorAll('button[data-upg]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const k = btn.dataset.upg;
+          const u = upgrades[k];
+          const cost = u.cost[u.level];
+          if (u.level < u.max && bus.cash >= cost) {
+            bus.cash -= cost;
+            u.level++;
+            if (k === 'tank') bus.fuel = getBusStats().fuelMax;
+            AudioFx.cash();
+            renderShop();
+            chidiSay(`${u.name} upgraded! Bus dey fly now Boss!`);
+          }
+        });
+      });
+    }
+    document.getElementById('btn-shop').addEventListener('click', () => {
+      renderShop();
+      shopModal.classList.remove('hidden');
+      shopModal.classList.add('flex');
+    });
+    document.getElementById('btn-shop-close').addEventListener('click', () => {
+      shopModal.classList.add('hidden');
+      shopModal.classList.remove('flex');
+    });
+
+    window.addEventListener('keydown', e => {
+      const k = e.key.toLowerCase();
+      if (k === 'a' || k === 'arrowleft') keys.left = true;
+      if (k === 'd' || k === 'arrowright') keys.right = true;
+      if (k === 'w' || k === 'arrowup') keys.up = true;
+      if (k === 's' || k === 'arrowdown') keys.down = true;
+      if (k === 'r' && !e.repeat) uturnRequestedAt = performance.now();
+      if (k === 'h' && !e.repeat) AudioFx.honk();
+    });
+    window.addEventListener('keyup', e => {
+      const k = e.key.toLowerCase();
+      if (k === 'a' || k === 'arrowleft') keys.left = false;
+      if (k === 'd' || k === 'arrowright') keys.right = false;
+      if (k === 'w' || k === 'arrowup') keys.up = false;
+      if (k === 's' || k === 'arrowdown') keys.down = false;
+    });
+
+    // =========================================================================
+    // 12. RESIZE & MAIN 60FPS THREE.JS WEBGL2 RENDER LOOP
+    // =========================================================================
+    let camHeading = 0;
+    function resize() {
+      const wrap = document.getElementById('viewport-wrap');
+      const rect = wrap.getBoundingClientRect();
+      const dpr = Math.min(2, window.devicePixelRatio || 1);
+      renderer.setPixelRatio(dpr);
+      renderer.setSize(rect.width, rect.height, false);
+      camera.aspect = rect.width / Math.max(1, rect.height);
+      camera.updateProjectionMatrix();
+
+      hudCanvas.width = Math.max(1, Math.floor(rect.width * dpr));
+      hudCanvas.height = Math.max(1, Math.floor(rect.height * dpr));
+      hudCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    }
+    window.addEventListener('resize', resize);
+    resize();
+
+    let lastTime = performance.now();
+    function frame(now) {
+      requestAnimationFrame(frame);
+      const dt = Math.min(0.05, (now - lastTime) / 1000);
+      lastTime = now;
+
+      const inp = stepPhysics(dt, now);
+      const stats = getBusStats();
+
+      // Stream visible 3D city blocks around player
+      const gxCenter = Math.round(bus.x / CELL);
+      const gzCenter = Math.round(bus.z / CELL);
+      for (let qx = gxCenter - 2; qx <= gxCenter + 1; qx++) {
+        for (let qz = gzCenter - 2; qz <= gzCenter + 1; qz++) {
+          ensureCityBlock(qx, qz);
+        }
+      }
+      groundPlane.position.set(bus.x, 0, bus.z);
+
+      // Update Hero 3D Danfo Minibus Mesh, Wheels, Cargo, Brake Lights & 11-Segment Bumper LEDs
+      danfoMesh.root.position.set(bus.x, 0, bus.z);
+      danfoMesh.root.rotation.y = -bus.heading;
+      danfoMesh.bodyTilt.rotation.z = bus.roll;
+      danfoMesh.bodyTilt.rotation.x = bus.pitch;
+      danfoMesh.cargoGroup.visible = bus.riders.length > 0;
+
+      for (const piv of danfoMesh.frontSteerPivots) {
+        piv.rotation.y = -bus.steer * 0.45;
+      }
+      for (const w of danfoMesh.wheels) {
+        w.rotation.x = -bus.wheelSpin;
+      }
+
+      const isBraking = inp.brake || bus.stopHoldT > 0 || Math.abs(bus.speed) < 0.8;
+      danfoMesh.brakeLampL.material = isBraking ? MAT.brakeOn : MAT.brakeOff;
+      danfoMesh.brakeLampR.material = isBraking ? MAT.brakeOn : MAT.brakeOff;
+
+      // Update 11-Segment 3D Rear-Bumper LED Steering Gauge (oj / tj)
+      const qSteer = quantizeSteerBar(inp.steer, TURN_THRESH_KH);
+      const turnDir = bus.turning && !bus.uTurn ? (bus.turnIntent === 'left' ? -1 : 1) : 0;
+      const blink = (now * 0.007) % 1 < 0.5;
+      for (let i = 0; i < 11; i++) {
+        const m = i - 5;
+        const side = Math.sign(m);
+        const absM = Math.abs(m);
+        const mat = danfoMesh.ledMaterials[i];
+        let hex = 0x1e293b, em = 0x000000;
+        if (m === 0) {
+          hex = stick.down ? 0x94a3b8 : 0x1e293b;
+          em = stick.down ? 0x475569 : 0x000000;
+        } else if (absM <= 3) {
+          if (side === Math.sign(qSteer) && absM <= Math.abs(qSteer)) {
+            hex = 0xf8fafc;
+            em = 0xe2e8f0;
+          }
+        } else {
+          const activeOuter = side === Math.sign(qSteer) && absM <= Math.abs(qSteer);
+          const offered = side < 0 ? bus.offerL : bus.offerR;
+          if (turnDir === side) {
+            hex = blink ? 0xf59e0b : 0x451a03;
+            em = blink ? 0xf59e0b : 0x000000;
+          } else if (activeOuter) {
+            hex = (bus.lastDir === side && offered) ? 0xf59e0b : 0xf8fafc;
+            em = hex;
+          } else if (offered && !turnDir) {
+            hex = 0x46d27a;
+            em = 0x22c55e;
+          }
+        }
+        mat.color.setHex(hex);
+        mat.emissive.setHex(em);
+      }
+
+      // Animate Waving 3D Passengers at Pickup Stop
+      if (activeStop && activeStop.kind === 'pickup') {
+        for (const p of activeStop.people) {
+          animateHuman3D(p.mesh, p.x, p.z, p.yaw, p.phase, now, 1.5, true);
+        }
+      }
+
+      // Animate Sidewalk Pedestrians
+      for (const p of pedestrians) {
+        const pYaw = p.axis === 'z' ? (p.dir > 0 ? Math.PI : 0) : (p.dir > 0 ? -Math.PI * 0.5 : Math.PI * 0.5);
+        animateHuman3D(p.mesh, p.x, p.z, pYaw, p.phase, now, p.speed, false);
+      }
+
+      // Animate 3D Traffic Fleet
+      for (const tc of traffic) {
+        tc.mesh.group.position.set(tc.x, 0, tc.z);
+        tc.mesh.group.rotation.y = -tc.heading;
+        for (const w of tc.mesh.wheels) {
+          w.rotation.x = -tc.wheelSpin;
+        }
+        tc.mesh.bL.material = tc.braking ? MAT.brakeOn : MAT.brakeOff;
+        tc.mesh.bR.material = tc.braking ? MAT.brakeOn : MAT.brakeOff;
+      }
+
+      // Update 3D Chase Camera & Directional Sun Shadow Target (tN from Trotro Driver)
+      const targetCamH = bus.uTurn ? bus.roadHeading : bus.heading;
+      camHeading += wrapAngle(camHeading, targetCamH) * Math.min(1, 6.5 * dt);
+      const camDist = 9.8 + Math.max(0, bus.speed) * 0.08;
+      const sinC = Math.sin(camHeading), cosC = Math.cos(camHeading);
+      camera.position.set(bus.x - sinC * camDist, 4.6, bus.z + cosC * camDist);
+      camera.lookAt(bus.x + sinC * 11, 1.35, bus.z - cosC * 11);
+
+      sunLight.position.set(bus.x + 35, 58, bus.z + 28);
+      sunLight.target.position.set(bus.x, 0, bus.z);
+      sunLight.target.updateMatrixWorld();
+
+      renderer.render(scene, camera);
+
+      // Draw 2D Overlay: Floating Overhead Navigation Arrow & Chasing-Anchor Leash Gizmo
+      const rect = webglCanvas.getBoundingClientRect();
+      const W = rect.width, H = rect.height;
+      hudCtx.clearRect(0, 0, W, H);
+
+      if (activeStop) {
+        const angToStop = Math.atan2(activeStop.x - bus.x, -(activeStop.z - bus.z));
+        const relAng = wrapAngle(camHeading, angToStop);
+        const distM = Math.round(Math.hypot(activeStop.x - bus.x, activeStop.z - bus.z));
+        hudCtx.save();
+        hudCtx.translate(W * 0.5, 42);
+        hudCtx.rotate(relAng);
+        hudCtx.fillStyle = activeStop.kind === 'pickup' ? '#46d27a' : '#ffb347';
+        hudCtx.strokeStyle = '#14233b';
+        hudCtx.lineWidth = 3;
+        hudCtx.beginPath();
+        hudCtx.moveTo(0, -16);
+        hudCtx.lineTo(13, 12);
+        hudCtx.lineTo(0, 6);
+        hudCtx.lineTo(-13, 12);
+        hudCtx.closePath();
+        hudCtx.fill();
+        hudCtx.stroke();
+        hudCtx.restore();
+
+        hudCtx.save();
+        hudCtx.font = '800 11px system-ui, sans-serif';
+        hudCtx.textAlign = 'center';
+        hudCtx.fillStyle = '#14233b';
+        hudCtx.fillText(`${activeStop.kind === 'pickup' ? 'PICKUP' : 'DROP-OFF'} • ${distM}m`, W * 0.5, 68);
+        hudCtx.restore();
+      }
+
+      if (stick.down) {
+        hudCtx.save();
+        hudCtx.strokeStyle = stick.home ? '#46d27a' : 'rgba(255, 248, 236, 0.85)';
+        hudCtx.lineWidth = 2;
+        hudCtx.setLineDash([5, 4]);
+        hudCtx.beginPath();
+        hudCtx.arc(stick.ax, stick.ay, LEASH_PX, 0, Math.PI * 2);
+        hudCtx.stroke();
+        hudCtx.setLineDash([]);
+
+        hudCtx.fillStyle = 'rgba(255, 248, 236, 0.25)';
+        hudCtx.beginPath();
+        hudCtx.arc(stick.ax, stick.ay, DEADZONE_PX, 0, Math.PI * 2);
+        hudCtx.fill();
+
+        hudCtx.strokeStyle = Math.abs(inp.steer) >= TURN_THRESH_KH ? '#f59e0b' : '#46d27a';
+        hudCtx.lineWidth = 3.5;
+        hudCtx.beginPath();
+        hudCtx.moveTo(stick.ax, stick.ay);
+        hudCtx.lineTo(stick.x, stick.ay);
+        hudCtx.stroke();
+
+        hudCtx.fillStyle = Math.abs(inp.steer) >= TURN_THRESH_KH ? '#f59e0b' : '#46d27a';
+        hudCtx.strokeStyle = '#14233b';
+        hudCtx.lineWidth = 2.5;
+        hudCtx.beginPath();
+        hudCtx.arc(stick.x, stick.y, 14, 0, Math.PI * 2);
+        hudCtx.fill();
+        hudCtx.stroke();
+        hudCtx.restore();
+      }
+
+      // Render Bottom-Left 2D Route Minimap
+      mmCtx.fillStyle = '#d5dfb8';
+      mmCtx.fillRect(0, 0, 90, 90);
+      mmCtx.save();
+      mmCtx.translate(45, 53);
+      mmCtx.rotate(camHeading);
+      const mmScale = 0.28;
+      mmCtx.strokeStyle = '#64748b';
+      mmCtx.lineWidth = 5;
+      for (let g = -2; g <= 2; g++) {
+        const rx = (gxCenter + g) * CELL - bus.x;
+        const rz = (gzCenter + g) * CELL - bus.z;
+        mmCtx.beginPath();
+        mmCtx.moveTo(rx * mmScale, -160);
+        mmCtx.lineTo(rx * mmScale, 160);
+        mmCtx.stroke();
+        mmCtx.beginPath();
+        mmCtx.moveTo(-160, rz * mmScale);
+        mmCtx.lineTo(160, rz * mmScale);
+        mmCtx.stroke();
+      }
+      if (activeStop) {
+        const sx = (activeStop.x - bus.x) * mmScale;
+        const sz = (activeStop.z - bus.z) * mmScale;
+        mmCtx.strokeStyle = activeStop.kind === 'pickup' ? '#16a34a' : '#d97706';
+        mmCtx.lineWidth = 2.5;
+        mmCtx.beginPath();
+        mmCtx.moveTo(0, 0);
+        mmCtx.lineTo(sx, sz);
+        mmCtx.stroke();
+        mmCtx.fillStyle = activeStop.kind === 'pickup' ? '#22c55e' : '#f59e0b';
+        mmCtx.beginPath();
+        mmCtx.arc(sx, sz, 4.5, 0, Math.PI * 2);
+        mmCtx.fill();
+      }
+      mmCtx.restore();
+      mmCtx.fillStyle = '#facc15';
+      mmCtx.strokeStyle = '#14233b';
+      mmCtx.lineWidth = 2;
+      mmCtx.beginPath();
+      mmCtx.moveTo(45, 46);
+      mmCtx.lineTo(50, 57);
+      mmCtx.lineTo(40, 57);
+      mmCtx.closePath();
+      mmCtx.fill();
+      mmCtx.stroke();
+
+      // Update HUD Readouts
+      document.getElementById('hud-cash').textContent = `₦${bus.cash.toLocaleString()}`;
+      document.getElementById('hud-fuel').textContent = Math.round(bus.fuel);
+      document.getElementById('hud-seats').textContent = `${bus.riders.length}/${stats.capacity}`;
+      document.getElementById('hud-speed').textContent = Math.round(Math.abs(bus.speed) * 2.2);
+      document.getElementById('t-steer').textContent = (inp.steer >= 0 ? '+' : '') + inp.steer.toFixed(2);
+      document.getElementById('t-zone').textContent = bus.uTurn
+        ? '3-PT U-TURN'
+        : bus.turning
+          ? `90° ${bus.turnIntent.toUpperCase()}`
+          : flickUntil > now
+            ? 'FLICK LATCH'
+            : Math.abs(inp.steer) >= TURN_THRESH_KH
+              ? 'TURN (>=0.70)'
+              : Math.abs(inp.steer) > 0.01
+                ? 'LANE (<0.70)'
+                : 'CRUISE';
+      document.getElementById('t-home').textContent = stick.home
+        ? `HOMING (${stick.home > 0 ? 'R' : 'L'})`
+        : bus.turnSpent
+          ? 'TURN SPENT'
+          : 'IDLE';
+    }
+    requestAnimationFrame(frame);
+  </script>
+</body>
+</html>
+

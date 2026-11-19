@@ -2518,21 +2518,26 @@
     })();
 
     // =========================================================================
-    // 3D WEATHER SYSTEM: RAIN, SNOW, FOG, HARMATTAN DUST, BREEZE & CLEAR
+    // 3D WEATHER SYSTEM: TERRAIN-AWARE INTERMITTENT WEATHER (NO SNOW IN AFRICA/USA)
     // =========================================================================
     const WeatherSystem = (() => {
-      const MODES = ['auto', 'rain', 'snow', 'fog', 'dust', 'breeze', 'clear'];
+      const MODES = ['auto', 'rain', 'thunderstorm', 'fog', 'dust', 'breeze', 'clear'];
       const META = {
-        auto:   { ico: '🌦️', lbl: 'Auto' },
-        rain:   { ico: '🌧️', lbl: 'Rain' },
-        snow:   { ico: '❄️', lbl: 'Snow' },
-        fog:    { ico: '🌫️', lbl: 'Fog' },
-        dust:   { ico: '🌪️', lbl: 'Dust' },
-        breeze: { ico: '🍃', lbl: 'Breeze' },
-        clear:  { ico: '☀️', lbl: 'Clear' }
+        auto:         { ico: '🌦️', lbl: 'Auto' },
+        rain:         { ico: '🌧️', lbl: 'Rain' },
+        thunderstorm: { ico: '⛈️', lbl: 'Thunderstorm' },
+        fog:          { ico: '🌫️', lbl: 'Fog' },
+        dust:         { ico: '🌪️', lbl: 'Dust' },
+        breeze:       { ico: '🍃', lbl: 'Breeze' },
+        clear:        { ico: '☀️', lbl: 'Clear' }
       };
       let userMode = 'auto';
       let activeKind = 'clear';
+      let autoBurstKind = 'clear';
+      let nextEventAt = performance.now() + 14000 + Math.random() * 10000;
+      let burstEndAt = 0;
+      let nextLightningAt = 0;
+      let flashUntil = 0;
 
       const COUNT = 700;
       const BOX_W = 54, BOX_H = 26, BOX_D = 54;
@@ -2558,7 +2563,7 @@
       points.frustumCulled = false;
       scene.add(points);
 
-      // Slanted Rain Streak Lines for crisp 3D rainfall
+      // Slanted Rain Streak Lines for crisp 3D rainfall & thunderstorms
       const RAIN_COUNT = 420;
       const rainPos = new Float32Array(RAIN_COUNT * 6);
       const rainGeom = new THREE.BufferGeometry();
@@ -2568,24 +2573,29 @@
       rainLines.frustumCulled = false;
       scene.add(rainLines);
 
-      function routeDefaultWeather(ch) {
-        if (ch.id === 'anambra') return 'rain';
-        if (ch.id === 'usa_dc') return 'snow';
-        if (ch.id === 'aburi' || ch.id === 'koforidua_downhill') return 'fog';
-        if (ch.id === 'kano' || ch.id === 'countryside') return 'dust';
-        if (ch.id === 'ghana' || ch.id === 'usa' || ch.id === 'city') return 'breeze';
-        return 'breeze';
+      // Study terrain & region before picking possible weather (never snow in Africa or USA)
+      function getTerrainWeatherPool(ch) {
+        if (!ch) return ['breeze', 'rain'];
+        if (ch.id === 'kano' || ch.id === 'countryside') return ['dust', 'breeze', 'thunderstorm'];
+        if (ch.id === 'aburi' || ch.id === 'koforidua_downhill') return ['fog', 'breeze', 'rain', 'thunderstorm'];
+        if (ch.id === 'anambra') return ['rain', 'thunderstorm', 'fog', 'breeze'];
+        if (ch.region === 'usa' || ch.region === 'usa_dc') return ['breeze', 'rain', 'thunderstorm', 'fog'];
+        return ['breeze', 'rain', 'thunderstorm']; // Lagos / Accra coastal & urban corridors
       }
 
       function applyAtmosphere(ch) {
-        activeKind = userMode === 'auto' ? routeDefaultWeather(ch) : userMode;
+        activeKind = userMode === 'auto' ? autoBurstKind : userMode;
         const icoEl = document.getElementById('weather-ico');
         const lblEl = document.getElementById('weather-lbl');
         if (icoEl && lblEl) {
           const m = META[userMode] || META.auto;
-          icoEl.textContent = m.ico;
+          icoEl.textContent = userMode === 'auto' ? META[activeKind].ico : m.ico;
           lblEl.textContent = userMode === 'auto' ? `Auto (${META[activeKind].lbl})` : m.lbl;
         }
+
+        // Reset lights to base values before applying weather mood
+        hemiLight.intensity = 0.95;
+        sunLight.intensity = 2.3;
 
         if (activeKind === 'rain') {
           scene.background.setHex(0x64748b);
@@ -2593,15 +2603,16 @@
           scene.fog.density = 0.015;
           points.visible = false;
           rainLines.visible = true;
-        } else if (activeKind === 'snow') {
-          scene.background.setHex(0x94a3b8);
-          scene.fog.color.setHex(0xdbeafe);
-          scene.fog.density = 0.013;
-          ptMat.color.setHex(0xffffff);
-          ptMat.size = 0.42;
-          ptMat.opacity = 0.9;
-          points.visible = true;
-          rainLines.visible = false;
+        } else if (activeKind === 'thunderstorm') {
+          scene.background.setHex(0x334155);
+          scene.fog.color.setHex(0x475569);
+          scene.fog.density = 0.019;
+          hemiLight.intensity = 0.65;
+          sunLight.intensity = 1.25;
+          nextLightningAt = performance.now() + 1800 + Math.random() * 2500;
+          flashUntil = 0;
+          points.visible = false;
+          rainLines.visible = true;
         } else if (activeKind === 'fog') {
           scene.background.setHex(0xcbd5e1);
           scene.fog.color.setHex(0xe2e8f0);
@@ -2643,28 +2654,67 @@
         cycle(ch) {
           const i = MODES.indexOf(userMode);
           userMode = MODES[(i + 1) % MODES.length];
+          if (userMode === 'auto') {
+            autoBurstKind = 'clear';
+            nextEventAt = performance.now() + 12000 + Math.random() * 10000;
+          }
           applyAtmosphere(ch);
           return userMode;
         },
         syncChapter(ch) {
+          autoBurstKind = 'clear';
+          nextEventAt = performance.now() + 14000 + Math.random() * 12000;
+          burstEndAt = 0;
           applyAtmosphere(ch);
         },
-        update(now, dt, bx, bz) {
+        update(now, dt, bx, bz, ch) {
+          // Intermittent out-of-the-blue weather bursts that cut off back to Clear
+          if (userMode === 'auto' && ch) {
+            if (autoBurstKind === 'clear' && now >= nextEventAt) {
+              const pool = getTerrainWeatherPool(ch);
+              autoBurstKind = pool[Math.floor(Math.random() * pool.length)];
+              burstEndAt = now + 12000 + Math.random() * 10000;
+              applyAtmosphere(ch);
+            } else if (autoBurstKind !== 'clear' && now >= burstEndAt) {
+              autoBurstKind = 'clear';
+              nextEventAt = now + 18000 + Math.random() * 14000;
+              applyAtmosphere(ch);
+            }
+          }
+
           if (activeKind === 'clear') return;
           const t = now * 0.001;
 
-          if (activeKind === 'rain') {
+          if (activeKind === 'rain' || activeKind === 'thunderstorm') {
+            const isStorm = activeKind === 'thunderstorm';
+            if (isStorm) {
+              if (now >= nextLightningAt) {
+                flashUntil = now + 110;
+                nextLightningAt = now + 3500 + Math.random() * 4500;
+              }
+              if (now < flashUntil) {
+                scene.background.setHex(0xe2e8f0);
+                hemiLight.intensity = 1.9;
+                sunLight.intensity = 4.2;
+              } else {
+                scene.background.setHex(0x334155);
+                hemiLight.intensity = 0.65;
+                sunLight.intensity = 1.25;
+              }
+            }
+            const fallSpeed = isStorm ? 36.0 : 28.0;
+            const slantX = isStorm ? 0.55 : 0.35;
             rainLines.position.set(bx, 0, bz);
             for (let i = 0; i < RAIN_COUNT; i++) {
               const s = seeds[i];
-              let x = ((positions[i * 3] + t * 5.0) % BOX_W + BOX_W) % BOX_W - BOX_W * 0.5;
-              let y = ((positions[i * 3 + 1] - t * 28.0) % BOX_H + BOX_H) % BOX_H;
+              let x = ((positions[i * 3] + t * (isStorm ? 8.5 : 5.0)) % BOX_W + BOX_W) % BOX_W - BOX_W * 0.5;
+              let y = ((positions[i * 3 + 1] - t * fallSpeed) % BOX_H + BOX_H) % BOX_H;
               let z = positions[i * 3 + 2];
               const idx = i * 6;
               rainPos[idx]     = x;
               rainPos[idx + 1] = y;
               rainPos[idx + 2] = z;
-              rainPos[idx + 3] = x + 0.35;
+              rainPos[idx + 3] = x + slantX;
               rainPos[idx + 4] = y - 1.55;
               rainPos[idx + 5] = z + 0.12 * Math.sin(s);
             }
@@ -2677,11 +2727,7 @@
           for (let i = 0; i < COUNT; i++) {
             const k = i * 3;
             const s = seeds[i];
-            if (activeKind === 'snow') {
-              posArr[k]     += Math.sin(t * 1.4 + s) * 1.8 * dt;
-              posArr[k + 1] -= (3.2 + (s % 1.5)) * dt;
-              posArr[k + 2] += Math.cos(t * 1.1 + s) * 1.4 * dt;
-            } else if (activeKind === 'fog') {
+            if (activeKind === 'fog') {
               posArr[k]     += (2.2 + Math.sin(s)) * dt;
               posArr[k + 1] += Math.sin(t * 0.7 + s) * 0.4 * dt;
             } else if (activeKind === 'dust') {
@@ -3922,7 +3968,7 @@
 
       // Animate Physical 3D Road Checkpoint / Border Stage & 3D Weather (Rain, Snow, Fog, Dust, Breeze)
       physicalStage.update(now, dt);
-      WeatherSystem.update(now, dt, bus.x, bus.z);
+      WeatherSystem.update(now, dt, bus.x, bus.z, ch);
 
       for (const tc of traffic) {
         tc.mesh.group.position.set(tc.x, 0, tc.z);

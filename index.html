@@ -102,9 +102,9 @@
           class="slab-btn px-2 py-1 bg-gradient-to-b from-[#c3cfe4] to-[#94a6c6] text-[#14233b] text-[11px] flex items-center gap-1">
           <span>🗺️</span><span>Story / Routes</span>
         </button>
-        <button id="btn-event" type="button" title="Open Illustrated Route Event / Police Checkpoint Card"
+        <button id="btn-event" type="button" title="Open Physical 3D Route Event & Border Scene"
           class="slab-btn px-2 py-1 bg-gradient-to-b from-[#fde047] to-[#f59e0b] text-[#14233b] text-[11px] flex items-center gap-1">
-          <span>👮</span><span>Event Scene</span>
+          <span>🎬</span><span>Route Scene</span>
         </button>
         <button id="btn-autodrive" type="button" class="slab-btn px-2 py-1 bg-gradient-to-b from-[#7ff0a8] to-[#46d27a] text-[#08351a] text-[11px] flex items-center gap-1">
           <span>🎬</span><span id="autodrive-lbl">Auto-Drive: ON</span>
@@ -245,7 +245,7 @@
         speaker: '🧢 Chidi & Tunde (Classic)',
         midDrop: "Auntie Bola: 'Mate, I dey drop for the corner o! Stop for me!' → 'Thank you, driver. I don reach the corner.'",
         startLine: "Chidi: 'Oga, your uncle's danfo is all he left you. Alhaji wants ₦60,000 in 30 days or he takes it back. Oya, Balogun Market! Make we go!'",
-        midLine: "Clerk Ife: 'Council route ticket: ₦200.' Aunty Ronke: 'My change be ₦700!' Hawkers: 'Cold pure water! Gala! Plantain chips!'",
+        midLine: "Clerk Ife: 'Council route ticket: ₦200.' Aunty Ronke: 'My change be ₦700!' Chidi: 'Hold your change well, Balogun ahead!'",
         arrivalLine: "Chidi: 'Balogun! Balogun! Bole! Make una check your belongings!' Next leg: Market Shuttle (Ojuelegba → Oyingbo)!"
       },
       {
@@ -257,13 +257,13 @@
         biome: 'residential',
         currency: '₦',
         fareBase: 1500,
-        encounter: 'mama_bisi',
+        encounter: 'ojuelegba_traffic',
         livery: { body: '#facc15', stripe: '#111827', text: 'LSD-402YR • OJUELEGBA FLYOVER - OYINGBO', roof: 0xfef08a, flag: 'NG' },
         sky: 0x93c5fd, fog: 0xd6b88a, ground: 0x6b5b45,
-        speaker: '👴 Baba Sule, Kunle & Chidi',
+        speaker: '👴 Baba Sule & Chidi',
         midDrop: "Auntie Bola: 'Mate, I dey drop for the corner o! Stop for me!'",
         startLine: "Chidi: 'Oyingbo! Market people, enter! Make we go!' Baba Sule: 'My son, hold my walking stick small, make I sit down well.'",
-        midLine: "Agbero Kunle: 'Ojuelegba under-bridge! Na hold-up, driver, wait your turn!' Warden Mama Bisi: 'Ojuelegba junction no be free, rub my hand.'",
+        midLine: "Chidi: 'Ojuelegba under-bridge traffic! Danfo don break down for front, small time e go move.'",
         arrivalLine: "Chidi: 'Oyingbo Market reached! Next leg: City Shuttle (Obalende → CMS Tech Corridor)!'"
       },
       {
@@ -275,13 +275,13 @@
         biome: 'commercial',
         currency: '₦',
         fareBase: 1500,
-        encounter: 'sgt_bello',
+        encounter: 'cms_tech',
         livery: { body: '#facc15', stripe: '#111827', text: 'LSD-402YR • OBALENDE TECH CORRIDOR - CMS', roof: 0xfef08a, flag: 'NG' },
         sky: 0x7dd3fc, fog: 0xbae6fd, ground: 0x4b5563,
-        speaker: '💼 Mr Emeka, Sgt. Bello & Chidi',
+        speaker: '💼 Mr Emeka & Chidi',
         midDrop: "Oga Emeka: 'Drop me for this corner before CMS! My nine o'clock meeting don reach.'",
-        startLine: "Chidi: 'CMS! Make una ready! Obalende to CMS — if Sergeant Bello stops us, the choice is yours: settle, or keep papers clean.'",
-        midLine: "Mr Emeka: 'Conductor, I get meeting for CMS by nine. Abeg make this bus move past the laptop tables, MTN mast and Eko Hotel!'",
+        startLine: "Chidi: 'CMS! Make una ready! Obalende Tech Corridor to CMS Marina — make we go!'",
+        midLine: "Mr Emeka: 'Conductor, I get meeting for CMS by nine. Abeg make this bus move past the MTN mast, Dangote Refinery and Eko Hotel!'",
         arrivalLine: "Chidi: 'CMS Marina! See Dangote Refinery & Eko Hotel skyline! Next leg: Arcade Run (Costain → National Stadium)!'"
       },
       {
@@ -2402,18 +2402,19 @@
           root.rotation.y = -snapH;
           root.visible = true;
 
-          // Configure 3D scene pieces for the specific route event
+          // Configure 3D scene pieces for the specific route event (no police checkpoints or agberos!)
           cattleGroup.visible = routeId === 'countryside';
-          patrolCar.visible = ['classic', 'city', 'arcade', 'kano', 'kotoka_atlanta'].includes(routeId);
+          patrolCar.visible = false;
           leftBooth.visible = ['kano', 'kotoka_atlanta'].includes(routeId);
           supervisor3D.root.visible = false;
           tunde3D.root.visible = false;
+          officer3D.root.visible = ['kano', 'kotoka_atlanta', 'countryside'].includes(routeId); // Border Immigration officers only
           chidi3D.root.visible = true;
           ronke3D.root.visible = ['classic', 'market', 'yaba', 'anambra', 'ghana', 'usa'].includes(routeId);
 
           if (routeId === 'classic') {
             boothMat.color.setHex(0x15803d); // Green Council Ticket Booth ₦200
-            updateBannerText('🎟️ FARE STOP • COUNCIL ROUTE TICKET ₦200 & POLICE', '#15803d', '#fde047');
+            updateBannerText('🎟️ FARE STOP • COUNCIL ROUTE TICKET ₦200 & AUNTY RONKE', '#15803d', '#fde047');
           } else if (routeId === 'kotoka_atlanta') {
             boothMat.color.setHex(0x15803d);     // Ghana Kotoka Exit Booth
             leftBoothMat.color.setHex(0x1e3a8a); // USA Hartsfield Entry Booth
@@ -2429,8 +2430,8 @@
             boothMat.color.setHex(0x0f1f4d);
             updateBannerText('👑 DON P INTERCONTINENTAL OGIDI & NNEWI BUS STOP', '#0f1f4d', '#f5c238');
           } else {
-            boothMat.color.setHex(0x1e3a8a);
-            updateBannerText('👮 POLICE CHECKPOINT • STOP & SEARCH (PAPERS CHECK)', '#0f172a', '#facc15');
+            boothMat.color.setHex(0x0f1f4d);
+            updateBannerText('🚌 ROUTE STOP • PASSENGER BOARDING & FARE COLLECTION', '#0f172a', '#facc15');
           }
         },
         triggerSupervisor() {
@@ -2554,31 +2555,31 @@
 
     const EVENT_SPECS = {
       classic: {
-        badge: 'LIVE 3D FARE STOP & POLICE CHECKPOINT',
-        title: '🎟️ 3D COUNCIL TICKET BOOTH (₦200), AUNTY RONKE (₦700) & OFFICER ADEWALE',
-        body: 'Clerk Ife: "Council route ticket: ₦200." Aunty Ronke: "My change be ₦700!" Officer Adewale: "Driver, your papers!"',
+        badge: 'LIVE 3D FARE STOP & COUNCIL TICKET',
+        title: '🎟️ 3D COUNCIL TICKET BOOTH (₦200) & AUNTY RONKE (₦700 CHANGE)',
+        body: 'Clerk Ife: "Council route ticket: ₦200." Aunty Ronke: "My change be ₦700!" Chidi: "Fare ₦300, paid ₦1,000, change owed ₦700."',
         btn1: "Use Chidi's Change (0s)",
-        btn2: 'Request Supervisor (3D)',
-        btn3: '5 Push-Ups & Frog Jumps (3D)',
-        btn4: 'Kiosk Change (+15s)'
+        btn2: 'Ask Other Passengers (+10s)',
+        btn3: 'Stop at Kiosk for Change (+15s)',
+        btn4: null
       },
       market: {
         badge: 'LIVE 3D OJUELEGBA FLYOVER SCENE',
-        title: '🚧 3D WARDEN MAMA BISI & AGBERO KUNLE UNDER-BRIDGE HOLD-UP',
-        body: 'Agbero Kunle: "Ojuelegba under-bridge! Na hold-up, driver, wait your turn!" Mama Bisi: "Ojuelegba junction no be free, rub my hand!"',
+        title: '🌉 3D OJUELEGBA FLYOVER & ELDER BABA SULE DROP',
+        body: 'Chidi: "Ojuelegba under-bridge traffic! Danfo don break down for front." Baba Sule: "Hold my walking stick small, make I sit down well."',
         btn1: 'Wait Turn Patiently (Respect +1)',
-        btn2: 'Settle Mama Bisi ₦100',
-        btn3: 'Let Chidi Argue (10s)',
+        btn2: 'Drop Auntie Bola at Corner',
+        btn3: null,
         btn4: null
       },
       city: {
-        badge: 'LIVE 3D POLICE CHECKPOINT ON ROAD',
-        title: '👮 3D SERGEANT BELLO CHECKPOINT (OBALENDE TECH CORRIDOR → CMS)',
-        body: 'Officer: "Driver, your papers." Chidi: "Oga, documents dey? Watch the 3D officer, supervisor & barrier right on the road!"',
-        btn1: 'Show Clean Papers (Respect +1)',
-        btn2: 'Request Supervisor (Walks Over)',
-        btn3: '5 Push-Ups & Frog Jumps (3D)',
-        btn4: 'Settle ₦200 (Fast Pass)'
+        badge: 'LIVE 3D OBALENDE TECH CORRIDOR → CMS',
+        title: '🏙️ 3D OBALENDE TECH CORRIDOR, MTN MAST & DANGOTE SKYLINE',
+        body: 'Mr Emeka: "Conductor, I get meeting for CMS by nine! Abeg make this bus move past the MTN mast, Dangote Refinery and Eko Hotel!"',
+        btn1: 'Express Lane to CMS Marina (+₦300)',
+        btn2: 'Drop Oga Emeka at Corner',
+        btn3: null,
+        btn4: null
       },
       arcade: {
         badge: 'LIVE 3D ROAD SAFETY & STADIUM ARCH',
@@ -2590,11 +2591,11 @@
         btn4: null
       },
       yaba: {
-        badge: 'LIVE 3D TEJUOSHO MARKET STOP',
-        title: '🎓 3D STUDENT TOBI DROP-OFF & TEJUOSHO ELECTRONICS HAWKERS',
-        body: 'Student Tobi: "Drop me for Tejuosho o! I wan buy charger (₦200) before lecture!" Hawkers: "Phone pouch! Charger! Earpiece!"',
-        btn1: 'Drop Tobi & Buy Charger (₦200)',
-        btn2: 'Drop Tobi & Head to Yaba Tech',
+        badge: 'LIVE 3D TEJUOSHO & YABA TECH STOP',
+        title: '🎓 3D STUDENT TOBI DROP-OFF AT TEJUOSHO & YABA TECH',
+        body: 'Student Tobi: "Drop me for Tejuosho o! I wan buy charger before lecture!" Shopper Bisi: "Hold lane steady — my flatscreen TV dey inside!"',
+        btn1: 'Drop Tobi at Tejuosho (+₦300)',
+        btn2: 'Continue to Yaba Tech Hackathon',
         btn3: null,
         btn4: null
       },
@@ -2715,41 +2716,14 @@
     function resolveEncounter(choice) {
       const ch = STORY_CHAPTERS[currentChapterIdx];
 
-      // Handle 3D Supervisor Walk-Over or 3D Tunde & Chidi Push-Ups & Frog Jumps before opening the 3D barrier!
-      if ((ch.id === 'city' || ch.id === 'classic') && choice === 2) {
-        physicalStage.triggerSupervisor();
-        storySay('👮 Supervisor', 'Their papers correct. Let them go.', ch.region);
-        setTimeout(() => {
-          cpModal.classList.add('hidden');
-          physicalStage.openBarrierAndClear();
-        }, 2200);
-        return;
-      }
-      if ((ch.id === 'city' || ch.id === 'classic') && choice === 3) {
-        physicalStage.triggerExercise();
-        storySay('👮 Officer Adewale', 'Oya, 5 push-ups and 5 frog jumps beside the danfo! One, two, three, jump!', ch.region);
-        setTimeout(() => {
-          cpModal.classList.add('hidden');
-          physicalStage.openBarrierAndClear(() => {
-            storySay('🧢 Conductor Chidi', 'Road clear! Make we go.', ch.region);
-          });
-        }, 3800);
-        return;
-      }
-
       cpModal.classList.add('hidden');
       physicalStage.openBarrierAndClear(() => {
         if (ch.id === 'classic') {
           bus.cash = Math.max(0, bus.cash - 200);
           storySay('🌶️ Aunty Ronke & Chidi', 'My change be ₦700. Road clear! Make we go.', ch.region);
         } else if (ch.id === 'city') {
-          if (choice === 1) {
-            campaign.respect++;
-            storySay('🧢 Conductor Chidi', 'Papers clean, no settlement! Road clear! Make we go.', ch.region);
-          } else {
-            bus.cash = Math.max(0, bus.cash - 200);
-            storySay('🧢 Conductor Chidi', 'We settled Bello. The road opens, but the passengers saw it. Them no too happy.', ch.region);
-          }
+          campaign.respect++;
+          storySay('💼 Mr Emeka & Chidi', 'Road clear! Make we go to CMS Marina!', ch.region);
         } else if (ch.id === 'anambra') {
           storySay('🧢 Conductor Chidi', 'See Don P InterContinental! Ogidi big hotel. Chai, e fine o!', ch.region);
         } else if (ch.id === 'kano') {
@@ -3530,9 +3504,9 @@
             <div class="text-[10px] text-amber-900 font-bold truncate">${ch.midDrop || ''}</div>
           </div>
           <div class="flex items-center gap-1 shrink-0">
-            <button type="button" data-ev="${ch.id}" data-ch-ev="${idx}" title="View Illustrated Event Scene"
+            <button type="button" data-ev="${ch.id}" data-ch-ev="${idx}" title="View Physical 3D Route Scene"
               class="slab-btn px-2 py-1 text-[11px] bg-[#fde047] text-[#14233b]">
-              👮 Event
+              🎬 Scene
             </button>
             <button type="button" data-ch="${idx}"
               class="slab-btn px-2.5 py-1 text-xs ${active ? 'bg-[#14233b] text-white' : 'bg-[#46d27a] text-[#08351a]'}">

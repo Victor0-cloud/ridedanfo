@@ -491,7 +491,7 @@
     // 2. CANONICAL CC0 / CC-BY REGIONAL MUSIC MANAGER (Exact Pools from music_manager.gd)
     // =========================================================================
     const MusicPlayer = (() => {
-      let enabled = false; // Optional: starts OFF until user clicks "Music: OFF"
+      let enabled = true; // Starts ON; auto-resumes on first user gesture if browser blocks autoplay
       let currentRegion = 'nigeria';
       let currentAudio = null;
       let currentTrackFile = '';
@@ -592,7 +592,16 @@
         a.play().then(() => {
           stopSynthLoop();
         }).catch(() => {
-          startSynthLoop();
+          // Wait for first user gesture to play the real .ogg track
+          const unlockMusic = () => {
+            if (enabled && currentAudio === a && a.paused) {
+              a.play().catch(() => {});
+            }
+            window.removeEventListener('pointerdown', unlockMusic);
+            window.removeEventListener('keydown', unlockMusic);
+          };
+          window.addEventListener('pointerdown', unlockMusic, { once: true });
+          window.addEventListener('keydown', unlockMusic, { once: true });
         });
       }
 
@@ -625,7 +634,7 @@
         },
         setRegion(reg) {
           const targetReg = POOLS[reg] ? reg : 'nigeria';
-          if (targetReg !== currentRegion) {
+          if (targetReg !== currentRegion || (enabled && !currentAudio)) {
             currentRegion = targetReg;
             if (enabled) syncPlayback();
           }

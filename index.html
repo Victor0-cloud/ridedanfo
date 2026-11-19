@@ -3662,10 +3662,10 @@
           if (pad.kind === 'gas' && bus.fuel < stats.fuelMax - 3) {
             bus.fuel = stats.fuelMax;
             AudioFx.cash();
-            showFareToast('⛽ FULL TANK!', 'Refueled at Gas Station');
+            showToast('⛽ FULL TANK!', 'Refueled at Gas Station');
           } else if (pad.kind === 'repair') {
             AudioFx.cash();
-            showFareToast('🔧 DANFO TUNED!', 'Brakes & tyres checked at Repair Shop');
+            showToast('🔧 DANFO TUNED!', 'Brakes & tyres checked at Repair Shop');
           }
         }
       }
@@ -4271,7 +4271,7 @@
         const relAng = wrapAngle(camHeading, angToStop);
         const distM = Math.round(Math.hypot(activeStop.x - bus.x, activeStop.z - bus.z));
         hudCtx.save();
-        hudCtx.translate(W * 0.5, 42);
+        hudCtx.translate(W * 0.5, 76);
         hudCtx.rotate(relAng);
         hudCtx.fillStyle = activeStop.kind === 'pickup' ? '#46d27a' : '#ffb347';
         hudCtx.strokeStyle = '#14233b';
@@ -4290,7 +4290,7 @@
         hudCtx.font = '800 11px system-ui, sans-serif';
         hudCtx.textAlign = 'center';
         hudCtx.fillStyle = '#14233b';
-        hudCtx.fillText(`${activeStop.kind === 'pickup' ? 'PICKUP' : 'DROP-OFF'} • ${distM}m`, W * 0.5, 68);
+        hudCtx.fillText(`${activeStop.kind === 'pickup' ? 'PICKUP' : 'DROP-OFF'} • ${distM}m`, W * 0.5, 104);
         hudCtx.restore();
       }
 

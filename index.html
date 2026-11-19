@@ -92,15 +92,19 @@
         </div>
       </div>
 
-      <!-- Top-Right Action Bar: Optional Music Toggle, Routes/Story Selector, Auto-Drive, Garage & Horn -->
+      <!-- Top-Right Action Bar: Optional Music Toggle, Routes/Story Selector, Event Card, Auto-Drive, Garage & Horn -->
       <div class="absolute top-2.5 right-2.5 max-w-[calc(100%-130px)] flex flex-wrap items-center justify-end gap-1 pointer-events-auto">
         <button id="btn-music" type="button" title="Toggle Optional Regional Music (Nigeria / Ghana / USA)"
           class="slab-btn px-2 py-1 bg-gradient-to-b from-[#fff8ec] to-[#ffe7bd] text-[#14233b] text-[11px] flex items-center gap-1">
           <span>🎵</span><span id="music-lbl">Music: OFF</span>
         </button>
-        <button id="btn-routes" type="button" title="Switch Story Chapter & Route (Lagos → Ghana → Atlanta → Washington D.C.)"
+        <button id="btn-routes" type="button" title="Switch Story Chapter & Route (Lagos → Ghana → Atlanta → The White House)"
           class="slab-btn px-2 py-1 bg-gradient-to-b from-[#c3cfe4] to-[#94a6c6] text-[#14233b] text-[11px] flex items-center gap-1">
           <span>🗺️</span><span>Story / Routes</span>
+        </button>
+        <button id="btn-event" type="button" title="Open Illustrated Route Event / Police Checkpoint Card"
+          class="slab-btn px-2 py-1 bg-gradient-to-b from-[#fde047] to-[#f59e0b] text-[#14233b] text-[11px] flex items-center gap-1">
+          <span>👮</span><span>Event Scene</span>
         </button>
         <button id="btn-autodrive" type="button" class="slab-btn px-2 py-1 bg-gradient-to-b from-[#7ff0a8] to-[#46d27a] text-[#08351a] text-[11px] flex items-center gap-1">
           <span>🎬</span><span id="autodrive-lbl">Auto-Drive: ON</span>
@@ -113,35 +117,47 @@
         </button>
       </div>
 
-      <!-- Story / Conductor Speech Bubble -->
-      <div id="mate-box" class="absolute top-14 right-2.5 max-w-[265px] slab-panel px-3 py-2 text-xs leading-snug pointer-events-none mate-pop">
-        <div class="flex items-center justify-between gap-1.5 font-extrabold text-amber-800 text-[11px] uppercase tracking-wider mb-0.5">
-          <span id="mate-speaker">🧢 Conductor Chidi</span>
-          <span id="mate-region" class="text-[10px] px-1.5 py-0.2 rounded bg-amber-500/20">NIGERIA</span>
-        </div>
-        <div id="mate-text" class="font-bold text-[#14233b]">
-          Oga, your uncle's danfo is all he left you. Alhaji wants ₦60,000 in 30 days or he takes it back. Make we start Yaba to Balogun!
+      <!-- Story / Conductor Speech Bubble with Live Character Portrait (chidi_portrait.gd) -->
+      <div id="mate-box" class="absolute top-14 right-2.5 max-w-[295px] slab-panel px-2.5 py-2 text-xs leading-snug pointer-events-none mate-pop flex items-center gap-2">
+        <canvas id="mate-portrait" width="54" height="64" class="w-[54px] h-[64px] rounded-lg border-2 border-[#14233b] bg-[#fef3c7] shrink-0"></canvas>
+        <div class="min-w-0 flex-1">
+          <div class="flex items-center justify-between gap-1 font-extrabold text-amber-800 text-[11px] uppercase tracking-wider mb-0.5">
+            <span id="mate-speaker" class="truncate">🧢 Conductor Chidi</span>
+            <span id="mate-region" class="text-[10px] px-1.5 py-0.2 rounded bg-amber-500/20 shrink-0">NIGERIA</span>
+          </div>
+          <div id="mate-text" class="font-bold text-[#14233b]">
+            Oga, your uncle's danfo is all he left you. Alhaji wants ₦60,000 in 30 days or he takes it back. Make we start Yaba to Balogun!
+          </div>
         </div>
       </div>
 
       <!-- Center Fare / Chapter Milestone Toast -->
       <div id="fare-toast" class="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 slab-panel px-4 py-2.5 text-center pointer-events-none hidden z-10">
-        <div id="toast-title" class="text-lg font-black text-emerald-700">+₦2,400</div>
+        <div id="toast-title" class="text-lg font-black text-emerald-700">+₦1,500</div>
         <div id="toast-sub" class="text-xs font-bold text-[#14233b]">Balogun Market Arrival!</div>
       </div>
 
-      <!-- Sergeant Bello / Border Checkpoint Choice Card -->
-      <div id="checkpoint-modal" class="absolute inset-x-0 top-16 mx-auto w-full max-w-xs slab-panel p-3 z-20 hidden pointer-events-auto">
-        <div id="cp-title" class="text-xs font-black uppercase text-amber-900">👮 Sergeant Bello Checkpoint</div>
-        <div id="cp-body" class="text-xs font-bold text-[#14233b] mt-1">
-          "Park well! Wetin you carry for roof? Settle ₦500 or make we check your papers!"
+      <!-- Illustrated Event Scene Modal: Police Checkpoint / Aunty Ronke ₦700 Change / Agbero / Cattle / Borders / White House -->
+      <div id="checkpoint-modal" class="absolute inset-x-0 top-12 mx-auto w-full max-w-[365px] slab-panel p-2.5 z-20 hidden pointer-events-auto">
+        <div class="relative w-full h-[138px] rounded-xl overflow-hidden border-2 border-[#14233b] bg-[#0f172a] mb-2">
+          <canvas id="cp-scene-canvas" width="352" height="138" class="block w-full h-full"></canvas>
+          <span id="cp-badge" class="absolute top-1.5 left-1.5 px-2 py-0.5 rounded-full bg-[#14233b]/85 text-[#facc15] font-black text-[10px] uppercase tracking-wider border border-[#facc15]/50">
+            LIVE ROUTE EVENT
+          </span>
         </div>
-        <div class="flex items-center gap-2 mt-2.5">
-          <button id="btn-cp-clean" type="button" class="slab-btn flex-1 py-1.5 bg-[#46d27a] text-[#08351a] text-xs">
-            Show Clean Papers (Respect +1)
+        <div id="cp-title" class="text-xs font-black uppercase text-amber-900">👮 Sergeant Bello Checkpoint</div>
+        <div id="cp-body" class="text-xs font-bold text-[#14233b] mt-0.5 leading-snug">
+          "Driver, your papers."
+        </div>
+        <div id="cp-actions" class="flex flex-wrap items-center gap-1.5 mt-2">
+          <button id="btn-cp-clean" type="button" class="slab-btn flex-1 py-1.5 px-2 bg-[#46d27a] text-[#08351a] text-[11px]">
+            Show Clean Papers
           </button>
-          <button id="btn-cp-settle" type="button" class="slab-btn flex-1 py-1.5 bg-[#ffd27a] text-[#2a1800] text-xs">
-            Settle ₦500 (Fast Pass)
+          <button id="btn-cp-settle" type="button" class="slab-btn flex-1 py-1.5 px-2 bg-[#ffd27a] text-[#2a1800] text-[11px]">
+            Settle ₦200
+          </button>
+          <button id="btn-cp-third" type="button" class="slab-btn flex-1 py-1.5 px-2 bg-[#fff8ec] text-[#14233b] text-[11px] hidden">
+            Stop for Change
           </button>
         </div>
       </div>
@@ -169,15 +185,22 @@
         </button>
       </div>
 
-      <!-- Story Campaign & Route Selector Modal (Lagos -> Ghana -> Atlanta -> Washington D.C.) -->
-      <div id="routes-modal" class="absolute inset-0 bg-[#0a1526]/80 z-30 hidden items-center justify-center p-3">
-        <div class="slab-panel w-full max-w-md p-3.5 space-y-2 pointer-events-auto max-h-[370px] flex flex-col">
+      <!-- Motor Park & Route Selector Modal (ALL ROUTES / NIGERIA / GHANA / ATLANTA / USA) -->
+      <div id="routes-modal" class="absolute inset-0 bg-[#0a1526]/80 z-30 hidden items-center justify-center p-2.5">
+        <div class="slab-panel w-full max-w-lg p-3 space-y-2 pointer-events-auto max-h-[378px] flex flex-col">
           <div class="flex items-center justify-between border-b-2 border-[#14233b]/15 pb-1.5">
             <div>
-              <div class="text-sm font-black">🗺️ Story Campaign: From Lagos to Washington D.C.</div>
-              <div class="text-[11px] font-semibold opacity-75">Jump to any chapter or drive through the full campaign</div>
+              <div class="text-sm font-black">🗺️ Motor Park: Lagos to The White House (14 Chained Legs)</div>
+              <div class="text-[11px] font-semibold opacity-75">Filter by region or drive the full linked journey</div>
             </div>
             <button id="btn-routes-close" type="button" class="slab-btn w-7 h-7 bg-[#fff8ec] text-xs flex items-center justify-center">✕</button>
+          </div>
+          <div id="route-tabs" class="flex flex-wrap items-center gap-1">
+            <button type="button" data-tab="ALL" class="slab-btn px-2.5 py-1 text-[11px] bg-[#14233b] text-white">ALL ROUTES (14)</button>
+            <button type="button" data-tab="NIGERIA" class="slab-btn px-2.5 py-1 text-[11px] bg-[#fff8ec] text-[#14233b]">🇳🇬 NIGERIA (₦)</button>
+            <button type="button" data-tab="GHANA" class="slab-btn px-2.5 py-1 text-[11px] bg-[#fff8ec] text-[#14233b]">🇬🇭 GHANA (GH₵)</button>
+            <button type="button" data-tab="ATLANTA" class="slab-btn px-2.5 py-1 text-[11px] bg-[#fff8ec] text-[#14233b]">🍑 ATLANTA ($)</button>
+            <button type="button" data-tab="USA" class="slab-btn px-2.5 py-1 text-[11px] bg-[#fff8ec] text-[#14233b]">🇺🇸 USA ($)</button>
           </div>
           <div id="routes-list" class="space-y-1.5 overflow-y-auto pr-1 text-xs flex-1"></div>
         </div>
@@ -201,180 +224,322 @@
 
   <script>
     // =========================================================================
-    // 1. FULL STORYLINE DATA: LAGOS -> KANO/ANAMBRA -> GHANA -> ATLANTA -> WASHINGTON D.C.
+    // 1. CANONICAL 14-ROUTE JOURNEY CHAIN: LAGOS -> ANAMBRA -> KANO -> GHANA -> ATLANTA -> THE WHITE HOUSE
     // =========================================================================
     const STORY_CHAPTERS = [
       {
         id: 'classic',
         num: 1,
-        title: 'Prologue: Yaba → Balogun Market',
+        title: '1. Classic Run: Yaba Bus Stop → Balogun Market',
         region: 'nigeria',
+        tabs: ['ALL', 'NIGERIA'],
+        biome: 'market',
         currency: '₦',
-        fareBase: 1200,
-        livery: { body: '#facc15', stripe: '#111827', text: 'LASG • YABA - BALOGUN MARKET', roof: 0xfef08a },
+        fareBase: 1500,
+        ticketFee: 200,
+        encounter: 'ronke_change',
+        livery: { body: '#facc15', stripe: '#111827', text: 'LSD-402YR • NO FOOD FOR LAZY MAN • GOD DEY', roof: 0xfef08a, flag: 'NG' },
         sky: 0x8ec5fc, fog: 0x9ecbff, ground: 0x5c8a47,
-        speaker: '🧢 Conductor Chidi',
-        startLine: "Oga, your uncle's danfo is all he left you. Alhaji wants ₦60,000 in 30 days or he takes it back. Make we start Yaba to Balogun!",
-        midLine: "Police ahead, Agbero after. Keep your papers ready and your change counted!",
-        arrivalLine: "Balogun! First day done. Alhaji go hear say we dey work. Next: Mama Nkechi at Ojuelegba Market!"
+        speaker: '🧢 Chidi & Tunde (Classic)',
+        midDrop: "Auntie Bola: 'Mate, I dey drop for the corner o! Stop for me!' → 'Thank you, driver. I don reach the corner.'",
+        startLine: "Chidi: 'Oga, your uncle's danfo is all he left you. Alhaji wants ₦60,000 in 30 days or he takes it back. Oya, Balogun Market! Make we go!'",
+        midLine: "Clerk Ife: 'Council route ticket: ₦200.' Aunty Ronke: 'My change be ₦700!' Hawkers: 'Cold pure water! Gala! Plantain chips!'",
+        arrivalLine: "Chidi: 'Balogun! Balogun! Bole! Make una check your belongings!' Next leg: Market Shuttle (Ojuelegba → Oyingbo)!"
       },
       {
         id: 'market',
         num: 2,
-        title: 'Ch. 1: Ojuelegba → Oyingbo Market',
+        title: '2. Market Shuttle: Ojuelegba → Oyingbo Market',
         region: 'nigeria',
+        tabs: ['ALL', 'NIGERIA'],
+        biome: 'residential',
         currency: '₦',
-        fareBase: 1450,
-        livery: { body: '#facc15', stripe: '#111827', text: 'LASG • OJUELEGBA - OYINGBO', roof: 0xfef08a },
-        sky: 0x93c5fd, fog: 0xfde68a, ground: 0x658a47,
-        speaker: '🌶️ Mama Nkechi & Chidi',
-        startLine: "Mama Nkechi: 'So you be the new driver? My pepper must reach Oyingbo fresh, no rough driving!'",
-        midLine: "Chidi: 'Go-slow ahead. Hawkers everywhere. Patience is money on this road, Oga!'",
-        arrivalLine: "Mama Nkechi: 'You do well! From today all my market women ride with you.' Next: Obalende to CMS!"
+        fareBase: 1500,
+        encounter: 'mama_bisi',
+        livery: { body: '#facc15', stripe: '#111827', text: 'LSD-402YR • OJUELEGBA FLYOVER - OYINGBO', roof: 0xfef08a, flag: 'NG' },
+        sky: 0x93c5fd, fog: 0xd6b88a, ground: 0x6b5b45,
+        speaker: '👴 Baba Sule, Kunle & Chidi',
+        midDrop: "Auntie Bola: 'Mate, I dey drop for the corner o! Stop for me!'",
+        startLine: "Chidi: 'Oyingbo! Market people, enter! Make we go!' Baba Sule: 'My son, hold my walking stick small, make I sit down well.'",
+        midLine: "Agbero Kunle: 'Ojuelegba under-bridge! Na hold-up, driver, wait your turn!' Warden Mama Bisi: 'Ojuelegba junction no be free, rub my hand.'",
+        arrivalLine: "Chidi: 'Oyingbo Market reached! Next leg: City Shuttle (Obalende → CMS Tech Corridor)!'"
       },
       {
         id: 'city',
         num: 3,
-        title: 'Ch. 2: Obalende → CMS (Sgt. Bello)',
+        title: '3. City Shuttle: Obalende → CMS (Tech Corridor)',
         region: 'nigeria',
+        tabs: ['ALL', 'NIGERIA'],
+        biome: 'commercial',
         currency: '₦',
-        fareBase: 1650,
-        livery: { body: '#facc15', stripe: '#111827', text: 'LASG • OBALENDE - CMS MARINA', roof: 0xfef08a },
+        fareBase: 1500,
+        encounter: 'sgt_bello',
+        livery: { body: '#facc15', stripe: '#111827', text: 'LSD-402YR • OBALENDE TECH CORRIDOR - CMS', roof: 0xfef08a, flag: 'NG' },
         sky: 0x7dd3fc, fog: 0xbae6fd, ground: 0x4b5563,
-        speaker: '👮 Sgt. Bello & Chidi',
-        checkpoint: true,
-        startLine: "Chidi: 'Obalende to CMS. Sergeant Bello works this road — if he stops us, decide whether to settle or show clean papers!'",
-        midLine: "Chidi: 'Checkpoint ahead! Remember: whatever you do today, Sergeant Bello remembers tomorrow.'",
-        arrivalLine: "CMS! The Marina office crowd pays well. Next: Match day race against Tunde 'Speed' to the National Stadium!"
+        speaker: '💼 Mr Emeka, Sgt. Bello & Chidi',
+        midDrop: "Oga Emeka: 'Drop me for this corner before CMS! My nine o'clock meeting don reach.'",
+        startLine: "Chidi: 'CMS! Make una ready! Obalende to CMS — if Sergeant Bello stops us, the choice is yours: settle, or keep papers clean.'",
+        midLine: "Mr Emeka: 'Conductor, I get meeting for CMS by nine. Abeg make this bus move past the laptop tables, MTN mast and Eko Hotel!'",
+        arrivalLine: "Chidi: 'CMS Marina! See Dangote Refinery & Eko Hotel skyline! Next leg: Arcade Run (Costain → National Stadium)!'"
       },
       {
         id: 'arcade',
         num: 4,
-        title: 'Ch. 3: Surulere National Stadium Race',
+        title: '4. Arcade Run: Costain → National Stadium',
         region: 'nigeria',
+        tabs: ['ALL', 'NIGERIA'],
+        biome: 'city',
         currency: '₦',
-        fareBase: 1900,
-        livery: { body: '#facc15', stripe: '#111827', text: 'LASG • SURULERE STADIUM EXPRESS', roof: 0xfef08a },
-        sky: 0xa78bfa, fog: 0xfdba74, ground: 0x5c8a47,
-        speaker: '🏎️ Tunde "Speed" & Chidi',
-        startLine: "Tunde 'Speed': 'Old man's danfo? Na museum! The National Stadium crowd is mine today!'",
-        midLine: "Chidi: 'Tunde dey behind us! Hold your line and pick the stadium crowd sharp-sharp!'",
-        arrivalLine: "Chidi: 'We beat Tunde to the Stadium! Oga... my mother is sick in the village. Abeg, can we take the Village & North Shuttle?'"
+        fareBase: 1800,
+        livery: { body: '#facc15', stripe: '#111827', text: 'LSD-402YR • TO NATIONAL STADIUM SURULERE', roof: 0xfef08a, flag: 'NG' },
+        sky: 0x93c5fd, fog: 0xfdba74, ground: 0x4d7c3f,
+        speaker: '🏎️ Tunde "Speed" & Mechanic Ifeanyi',
+        midDrop: "Sister Ngozi: 'Driver, drop me by the Stadium gate corner abeg!'",
+        startLine: "Chidi: 'Stadium! Hop and go! Make we go!' Tunde 'Speed': 'Old man's danfo? Na museum! The Stadium crowd is mine today.'",
+        midLine: "Match Marshal: 'Surulere match traffic! Keep your lane steady, driver!' Mechanic Ifeanyi: 'After the match bring this bus come my workshop.'",
+        arrivalLine: "Chidi: 'National Stadium Surulere! Coins ×2 bonus cleared! Next leg: Itire Junction → Yaba Terminus (Tejuosho)!'"
+      },
+      {
+        id: 'yaba',
+        num: 5,
+        title: '5. Ojuelegba-Yaba Run: Itire → Tejuosho → Yaba',
+        region: 'nigeria',
+        tabs: ['ALL', 'NIGERIA'],
+        biome: 'market',
+        currency: '₦',
+        fareBase: 1500,
+        encounter: 'tejuosho_tobi',
+        livery: { body: '#facc15', stripe: '#111827', text: 'LSD-402YR • ITIRE - TEJUOSHO - YABA TECH', roof: 0xfef08a, flag: 'NG' },
+        sky: 0x7dd3fc, fog: 0xc4b5fd, ground: 0x5c8a47,
+        speaker: '🎓 Student Tobi, Shopper Bisi & Chidi',
+        midDrop: "Student Tobi (Tejuosho Stop) & Auntie Shade: 'Sharp! I dey hop down for Tejuosho to buy charger before lecture!'",
+        startLine: "Chidi: 'Yaba! Ojuelegba to Yaba! Make we go!' Student Tobi: 'Conductor, drop me for Tejuosho o. I wan buy charger before lecture.'",
+        midLine: "Shopper Bisi: 'Hold the lane steady through Tejuosho Plaza! My flatscreen TV dey inside!' Hawkers: 'Phone pouch! Charger ₦200! Earpiece ₦150!'",
+        arrivalLine: "Tech Student Tobi: 'We don enter Yaba Tech & UNILAG axis!' Next leg: Village Shuttle (Garin Daji → Kasuwan Daji)!"
       },
       {
         id: 'countryside',
-        num: 5,
-        title: 'Ch. 4: Village, Niger Bridge & Kano Wall',
+        num: 6,
+        title: '6. Village Shuttle: Garin Daji → Kasuwan Daji',
         region: 'nigeria',
+        tabs: ['ALL', 'NIGERIA'],
+        biome: 'country',
         currency: '₦',
-        fareBase: 2200,
-        livery: { body: '#facc15', stripe: '#111827', text: 'NIGER BRIDGE • ONITSHA - KANO', roof: 0xfef08a },
-        sky: 0x93c5fd, fog: 0xfed7aa, ground: 0x9a5b32,
-        speaker: '🏡 Chidi & Chidi\'s Mother',
-        startLine: "Chidi: 'Garin Daji to Kasuwan Daji, over the Niger Bridge and north to Kano Kofar Nassarawa! Drive gently, my mother dey wait.'",
-        midLine: "Chidi: 'Oga, when Alhaji's debt is paid... I want my own bus one day. See Dala Hill ahead!'",
-        arrivalLine: "Chidi's Mother: 'God bless you for bringing my son!' Chidi: 'Bad news from Lagos — Baba Ibile and his Agberos seized the park!'"
+        fareBase: 1500,
+        encounter: 'border_anambra',
+        livery: { body: '#facc15', stripe: '#111827', text: 'LSD-402YR • GARIN DAJI - KASUWAN DAJI', roof: 0xfef08a, flag: 'NG' },
+        sky: 0x93c5fd, fog: 0xfed7aa, ground: 0x8c6239,
+        speaker: '🤰 Madam Nkechi & Chidi\'s Mother',
+        midDrop: "Mama Chi: 'I go drop for the corner. Stop abeg!' (Wait for Fulani herder & zebu cattle crossing!)",
+        startLine: "Chidi: 'Kasuwan Daji! Village people, enter!' Madam Nkechi: 'Abeg, make una give me front seat. My belle no fit squeeze for back.'",
+        midLine: "Chidi's Mother: 'My son! And this is the driver who brought you home? God bless you.' Chidi: 'Wait for the cows to cross, Oga!'",
+        arrivalLine: "Sgt. Chukwuma (Lagos-Anambra Post): 'Papers dey okay. WELCOME TO ANAMBRA STATE — Light of the Nation!'"
       },
       {
-        id: 'finale',
-        num: 6,
-        title: 'Ch. 5: Lagos Finale vs. Baba Ibile',
+        id: 'anambra',
+        num: 7,
+        title: '7. Anambra Run: Asaba Greyhound Park → Ojukwu Gate',
         region: 'nigeria',
+        tabs: ['ALL', 'NIGERIA'],
+        biome: 'private',
         currency: '₦',
-        fareBase: 2800,
-        livery: { body: '#facc15', stripe: '#111827', text: 'OGA DANFO • YELLOW STAR PARK', roof: 0xfef08a },
-        sky: 0x60a5fa, fog: 0xbfdbfe, ground: 0x5c8a47,
-        speaker: '👑 Baba Ibile & Alhaji',
-        startLine: "Baba Ibile: 'This park is mine now!' Chidi: 'One big run, Yaba to Balogun. Everybody we helped is backing us!'",
-        midLine: "Chidi: 'Mama Nkechi's women, the village, even Bello's men cleared the road for us! Keep pushing!'",
-        arrivalLine: "Alhaji: 'My ₦60,000 is complete. The danfo papers are yours!' Chidi: 'You be Oga now! Next stop: Ghana Tro-Tro Run!'"
+        fareBase: 1500,
+        encounter: 'border_kano',
+        livery: { body: '#facc15', stripe: '#111827', text: 'LSD-402YR • NIGER BRIDGE - OGIDI - NNEWI', roof: 0xfef08a, flag: 'NG' },
+        sky: 0x64748b, fog: 0x94a3b8, ground: 0x4f773b,
+        speaker: '👑 Chidi at Don P InterContinental (Ogidi)',
+        midDrop: "Madam at Nnewi Bus Stop: 'Nnewi bus stop! I dey drop here, driver. Thank you, driver! Nnewi, I don reach. Daalu!'",
+        startLine: "Chidi: 'Upper Iweka! Ogidi! Awka! Nnewi! Ngwa ngwa, enter! Niger Bridge ahead — na maximum thirty for this bridge, Oga. Gently!'",
+        midLine: "Chidi: 'See Don P InterContinental! Ogidi big hotel with gold crown sign and black gates. Chai, e fine o! Achebe town — Things Fall Apart!'",
+        arrivalLine: "Chidi: 'Ikemba Ojukwu Gate!' Sgt. Bello (Anambra-Kano Post): 'Everything dey correct. WELCOME TO KANO STATE — Centre of Commerce!'"
+      },
+      {
+        id: 'kano',
+        num: 8,
+        title: '8. Kano Run: Kano Line Park → Gidan Makama → Aflao',
+        region: 'nigeria',
+        tabs: ['ALL', 'NIGERIA'],
+        biome: 'industrial',
+        currency: '₦',
+        fareBase: 1500,
+        encounter: 'border_aflao',
+        livery: { body: '#facc15', stripe: '#111827', text: 'LSD-402YR • KOFAR NASSARAWA - GIDAN MAKAMA', roof: 0xfef08a, flag: 'NG' },
+        sky: 0x93c5fd, fog: 0xfde68a, ground: 0xa16207,
+        speaker: '🕌 Chidi, Alhaji Musa & NIS Officer Amina',
+        midDrop: "Alhaji Musa: 'Driver, I go drop for this corner by Kurmi Market. Stop here. Na gode. I don reach.'",
+        startLine: "Chidi: 'Kano! Kofar Nassarawa, Kurmi, Gidan Makama! Sannu, enter! Gently at Kofar Nassarawa city wall gate — maximum thirty!'",
+        midLine: "Chidi: 'Kofar Mata dye pits! See indigo — no splash am for my passengers! Dala Hill, Central Mosque and Emir Palace ahead!'",
+        arrivalLine: "Officer Amina & Officer Mensah (Aflao ECOWAS Post): 'ECOWAS PASS STAMPED — Akwaaba!' Koffi: 'Akwaaba, chale — Accra dey front!'"
       },
       {
         id: 'ghana',
-        num: 7,
-        title: 'Ch. 6: Ghana Tro-Tro & Aburi Mountain',
+        num: 9,
+        title: '9. Ghana Tro Tro Run: Accra Line → Jamestown Lighthouse',
         region: 'ghana',
-        currency: '₵',
-        fareBase: 180,
-        livery: { body: '#1d4ed8', stripe: '#ffffff', text: 'ACCRA • CIRCLE - ABURI - JAMESTOWN', roof: 0xf8fafc },
+        tabs: ['ALL', 'GHANA'],
+        biome: 'seaside',
+        currency: 'GH₵',
+        fareBase: 15,
+        livery: { body: '#f8fafc', stripe: '#dc2626', text: 'GR 2468-26 • GOD IS KING • TRO TRO - ACCRA', roof: 0xfacc15, flag: 'GH' },
         sky: 0x38bdf8, fog: 0xe0f2fe, ground: 0x3f7a38,
-        speaker: '🇬🇭 Kwesi & Mate Koffi',
-        startLine: "Koffi: 'Circle Circle Circle! Makola! Black Star Square! Then up the Aburi mountain hairpins to Koforidua! Enter, enter, chale!'",
-        midLine: "Koffi: 'Kwesi, gently on the Aburi bends! Look at Black Star Square — Freedom and Justice, my brother!'",
-        arrivalLine: "Kwesi: 'Jamestown Lighthouse & Kotoka Border! Medaase, Koffi. Stamp the visas — we're flying into Atlanta, USA!'"
+        speaker: '🇬🇭 Mate Koffi & Driver Kwesi Mensah',
+        midDrop: "Auntie Ama (Makola Market): 'Mate, bus stop! I am dropping at Makola, eh. Medaase, driver. Makola, I have reached.'",
+        startLine: "Koffi: 'Circle Circle Circle! Makola! Accra Central! Enter, enter, let's go! Under the Circle flyover we go gently — maximum thirty!'",
+        midLine: "Koffi: 'Osu Oxford Street! Black Star Square — Freedom and Justice! See the Independence Arch and pastel shop-houses there!'",
+        arrivalLine: "Koffi: 'Jamestown fishing beach & lighthouse! Last stop. Medaase, everybody!' Next leg: Aburi Mountain Run to Koforidua!"
+      },
+      {
+        id: 'aburi',
+        num: 10,
+        title: '10. Aburi Mountain Climb: Accra → Koforidua Summit',
+        region: 'ghana',
+        tabs: ['ALL', 'GHANA'],
+        biome: 'country',
+        currency: 'GH₵',
+        fareBase: 15,
+        heavyFog: true,
+        livery: { body: '#f8fafc', stripe: '#dc2626', text: 'GR 2468-26 • ABURI MOUNTAIN - KOFORIDUA', roof: 0x16a34a, flag: 'GH' },
+        sky: 0x94a3b8, fog: 0xcbd5e1, ground: 0x2d5a27,
+        speaker: '⛰️ Koffi & Kwesi (Aburi Heavy Fog Climb)',
+        midDrop: "Kojo: 'Mate, I am coming down at the corner by God's Time Chop Bar! Stop small, eh!'",
+        startLine: "Koffi: 'Aburi! Koforidua! Mountain road, hold tight! Kwesi, turn left for Aburi — rock cut on the left, forest drop on the right!'",
+        midLine: "Koffi: 'Heavy mountain fog! Gently gently, Kwesi! Watch the rockfall flagman and Aburi Fresh Fruits & Fufu Chop Bar stalls!'",
+        arrivalLine: "Kwesi: 'Koforidua Summit bay & fuel station reached! Passengers paid GH₵3 each. Now check the brakes for the Koforidua Downhill run!'"
+      },
+      {
+        id: 'koforidua_downhill',
+        num: 11,
+        title: '10b. Koforidua Downhill: Summit → Accra Central',
+        region: 'ghana',
+        tabs: ['ALL', 'GHANA'],
+        biome: 'country',
+        currency: 'GH₵',
+        fareBase: 15,
+        heavyFog: true,
+        livery: { body: '#f8fafc', stripe: '#dc2626', text: 'GR 2468-26 • KOFORIDUA DOWNHILL - ACCRA', roof: 0xfacc15, flag: 'GH' },
+        sky: 0x64748b, fog: 0xcbd5e1, ground: 0x3f7a38,
+        speaker: '🛞 Kwesi & Koffi (Downhill Brake Run)',
+        midDrop: "Auntie Efua: 'Mate, I am coming down at the corner! Oxford Street side!'",
+        startLine: "Koffi: 'Accra! Accra Central! Downhill run, check your brakes! Hold the brake, Kwesi. This hill no joke o!'",
+        midLine: "Kwesi: 'I hold am, Koffi. Low gear coming down.' Koffi: 'We reach the foot! Accra road ahead. Medaase for holding on!'",
+        arrivalLine: "Koffi: 'Accra Central! Follow the west collector road to KOTOKA BORDER TO ATLANTA (HARTSFIELD AIRPORT)!'"
+      },
+      {
+        id: 'kotoka_atlanta',
+        num: 12,
+        title: '11. Kotoka Border → Atlanta (Hartsfield / College Park)',
+        region: 'ghana',
+        tabs: ['ALL', 'GHANA', 'ATLANTA', 'USA'],
+        biome: 'commercial',
+        currency: 'GH₵',
+        fareBase: 15,
+        encounter: 'border_kotoka',
+        livery: { body: '#f8fafc', stripe: '#dc2626', text: 'KOTOKA BORDER • HARTSFIELD-JACKSON ATL', roof: 0x0284c7, flag: 'GH' },
+        sky: 0x60a5fa, fog: 0xdbeafe, ground: 0x3b6e4c,
+        speaker: '✈️ Koffi & Kwesi → Bobo (Bubba) & Ray',
+        midDrop: "Border Plaza: VISA & IMMIGRATION Stamps + Yellow-Fever Card check before Hartsfield-Jackson / College Park!",
+        startLine: "Koffi: 'Atlanta! Hartsfield-Jackson! Papers ready, enter enter! Follow the BORDER CROSSING HERE / KOTOKA / HARTSFIELD signs!'",
+        midLine: "Immigration Plaza: 'VISA and IMMIGRATION stamps + Yellow-Fever Card inspection. Accept GH₵20 fee or let Koffi argue!'",
+        arrivalLine: "Bobo (Bubba) & Ray: 'Hartsfield-Jackson / College Park! Welcome to Atlanta. Crew switched to MARTA bus GA MTA-110 ($)!'"
       },
       {
         id: 'usa',
-        num: 8,
-        title: 'Ch. 7: Atlanta MARTA (Peachtree → Lenox)',
+        num: 13,
+        title: '12. Atlanta MARTA Run: College Park → Lenox & Greenhouse',
         region: 'usa',
+        tabs: ['ALL', 'ATLANTA', 'USA'],
+        biome: 'city',
         currency: '$',
-        fareBase: 120,
-        livery: { body: '#f8fafc', stripe: '#0284c7', text: 'MARTA • PEACHTREE - BUCKHEAD - LENOX', roof: 0xffffff },
+        fareBase: 15,
+        livery: { body: '#f8fafc', stripe: '#0284c7', text: 'GA MTA-110 • marta • PEACHTREE - LENOX', roof: 0xf97316, flag: 'US' },
         sky: 0x60a5fa, fog: 0xdbeafe, ground: 0x3b6e4c,
-        speaker: '🇺🇸 Driver Ray & Bobo (ATL)',
-        startLine: "Ray: 'Morning, y'all. Welcome to Atlanta! College Park station up Peachtree Road to Buckhead and Lenox Mall. Bobo, call 'em!'",
-        midLine: "Bobo: 'Peachtree Road, baby! Ray, you see them Buckhead glass towers? One day I'ma live up there!'",
-        arrivalLine: "Ray: 'Lenox Mall! Good run, Bobo. Next up: I-95 North all the way to Washington D.C.!'"
+        speaker: '🍑 Conductor Bobo (Bubba) & Driver Ray',
+        midDrop: "Keisha (Peachtree Corner Store): 'Driver, can you let me off by the corner store? Thank you, sweetie. Have a blessed day!'",
+        startLine: "Bobo: 'Welcome to Atlanta, y'all! The A-T-L! College Park MARTA station! Y'all hop on, we headed up Peachtree to Buckhead and Lenox!'",
+        midLine: "Bobo: 'Peachtree Road, baby! Half the streets in this city got Peachtree in the name.' Ray: 'Easy now, Bobo. Speed limit's 35 on Peachtree.'",
+        arrivalLine: "Bobo: 'Lenox Mall & the Glass Greenhouse Conservatory stop! Grab your bags! Next up: Lenox Mall to The White House, D.C.!'"
       },
       {
         id: 'usa_dc',
-        num: 9,
-        title: 'Ch. 8: Atlanta → Washington D.C. Finale',
-        region: 'usa',
+        num: 14,
+        title: '13. Atlanta to D.C. Finale: Lenox Mall → The White House',
+        region: 'usa_dc',
+        tabs: ['ALL', 'USA'],
+        biome: 'private',
         currency: '$',
-        fareBase: 220,
-        livery: { body: '#e2e8f0', stripe: '#dc2626', text: 'METRO D.C. • NATIONAL MALL - UNION STN', roof: 0xf8fafc },
-        sky: 0x3b82f6, fog: 0xdbeafe, ground: 0x2f6846,
-        speaker: '🏛️ Ray & Bobo (Washington D.C.)',
+        fareBase: 15,
         dcMonuments: true,
-        startLine: "Bobo: 'From Lagos to Washington D.C.! Look ahead on the National Mall — the Washington Monument and the U.S. Capitol Dome!'",
-        midLine: "Ray: 'Constitution Ave up to Capitol Hill and Union Station. Easy round the monument plaza, y'all!'",
-        arrivalLine: "Bobo: 'Union Station, Washington D.C.! From Agbero in Lagos to the steps of the Capitol — y'all made history today!'"
+        snowyHill: true,
+        livery: { body: '#f8fafc', stripe: '#0284c7', text: 'GA MTA-110 • marta • I-75 N TO WHITE HOUSE', roof: 0xf97316, flag: 'US' },
+        sky: 0x64748b, fog: 0xcbd5e1, ground: 0x2f6846,
+        speaker: '🏛️ Bobo (Bubba) & Ray — White House Finale',
+        midDrop: "Keisha (Tennessee Mountain Overlook): 'Driver, can you let me off at the mountain overlook? Appreciate it. Stay safe on that snowy hill!'",
+        startLine: "Bobo: 'Lenox Mall! All aboard for D.C.! Georgia Arch in the rear-view — Tennessee snowy hill and Mountain View Motel Truck Stop ahead!'",
+        midLine: "Bobo: 'Tennessee! Hold on — that's a snowy hill up ahead. Easy, Ray.' Ray: 'I got it, Bobo. Watch that ice on the grade!' Virginia & Pentagon ahead!",
+        arrivalLine: "Bobo: 'The White House! Look on the red carpet — Trump walking out to greet the bus with Obama, Biden, George W. Bush & Clinton waving!'"
       }
     ];
 
     // =========================================================================
-    // 2. OPTIONAL REGIONAL MUSIC PLAYER (OGG Tracks + Synth Groove Fallback + Auto-Ducking)
+    // 2. CANONICAL CC0 / CC-BY REGIONAL MUSIC MANAGER (Exact Pools from music_manager.gd)
     // =========================================================================
     const MusicPlayer = (() => {
       let enabled = false; // Optional: starts OFF until user clicks "Music: OFF"
       let currentRegion = 'nigeria';
-      const audioEls = {};
-      const TRACK_LABELS = {
-        nigeria: 'Afro House — Alex Morgan',
-        ghana: 'Hot Amapiano — Alex Morgan',
-        usa: 'Glass Window Hip-Hop — Kaino'
+      let currentAudio = null;
+      let currentTrackFile = '';
+      let poolIdx = -1;
+      let activePool = [];
+
+      // Exact pools from C:\Users\USER\DanfoDiaries\scripts\music_manager.gd
+      const POOLS = {
+        nigeria: [
+          { file: 'nigeria_afro_house.ogg',      title: 'Afro House — Alex Morgan (CC BY)' },
+          { file: 'nigeria_wandering_orbit.ogg', title: 'Wandering Orbit — Kaino (CC0)' },
+          { file: 'nigeria_tidal_atlas.ogg',     title: 'Tidal Atlas — Kaino (CC0)' },
+          { file: 'nigeria_silver_prism.ogg',    title: 'Silver Prism — Kaino (CC0, Afrobeat)' }
+        ],
+        ghana: [
+          { file: 'ghana_hot_amapiano.ogg',      title: 'Hot Amapiano Beats — Alex Morgan (CC BY)' },
+          { file: 'ghana_afrobeat.ogg',          title: 'Afrobeat — Alex Morgan (CC BY)' }
+        ],
+        usa: [
+          { file: 'usa_wild_bridge.ogg',         title: 'Wild Bridge — Kaino (CC0, Country)' },
+          { file: 'usa_faded_echo.ogg',          title: 'Faded Echo — Kaino (CC0, Country)' },
+          { file: 'usa_northern_foundry.ogg',    title: 'Northern Foundry — Kaino (CC0, Country)' }
+        ],
+        // Victor's rule: Wild Bridge ONLY, looping, for the whole D.C. run including the drop-off
+        usa_dc: [
+          { file: 'usa_wild_bridge.ogg',         title: 'Wild Bridge — Kaino (CC0, Country • D.C. Loop)' }
+        ]
       };
-      const TRACK_FILES = {
-        nigeria: './music/nigeria.ogg',
-        ghana: './music/ghana.ogg',
-        usa: './music/usa.ogg'
-      };
+
       let synthTimer = 0;
       let duckUntil = 0;
 
-      function getAudioEl(reg) {
-        if (!audioEls[reg]) {
-          const a = new Audio(TRACK_FILES[reg]);
-          a.loop = true;
-          a.volume = 0.42;
-          audioEls[reg] = a;
+      function buildPool(reg) {
+        const raw = (POOLS[reg] || POOLS.nigeria).slice();
+        if ((reg === 'nigeria' || reg === 'ghana') && raw.length > 1) {
+          const opener = raw[0];
+          const rest = raw.slice(1).sort(() => Math.random() - 0.5);
+          return [opener, ...rest];
+        } else if (raw.length > 1) {
+          return raw.sort(() => Math.random() - 0.5);
         }
-        return audioEls[reg];
+        return raw;
       }
 
-      // Lightweight procedural WebAudio Afrobeat/Amapiano/Hip-Hop groove fallback if OGG isn't loaded yet
       function startSynthLoop() {
         stopSynthLoop();
         let step = 0;
         synthTimer = setInterval(() => {
           if (!enabled) return;
-          const duck = performance.now() < duckUntil ? 0.25 : 1.0;
+          const duck = performance.now() < duckUntil ? 0.22 : 1.0;
           const scales = {
             nigeria: [220, 261.63, 293.66, 329.63, 392.0],
             ghana:   [196, 246.94, 293.66, 370.0,  392.0],
-            usa:     [164.81, 196.0, 220.0, 246.94, 329.63]
+            usa:     [146.83, 185.0, 220.0, 246.94, 293.66],
+            usa_dc:  [146.83, 185.0, 220.0, 246.94, 293.66]
           };
           const notes = scales[currentRegion] || scales.nigeria;
           if (step % 2 === 0) {
@@ -391,34 +556,57 @@
         if (synthTimer) { clearInterval(synthTimer); synthTimer = 0; }
       }
 
-      function syncPlayback() {
-        const lbl = document.getElementById('music-lbl');
-        const btn = document.getElementById('btn-music');
-        const nowEl = document.getElementById('music-now');
-        for (const [r, el] of Object.entries(audioEls)) {
-          if (!enabled || r !== currentRegion) {
-            try { el.pause(); } catch {}
-          }
-        }
-        if (!enabled) {
-          stopSynthLoop();
-          lbl.textContent = 'Music: OFF';
-          nowEl.classList.add('hidden');
-          btn.className = 'slab-btn px-2.5 py-1.5 bg-gradient-to-b from-[#fff8ec] to-[#ffe7bd] text-[#14233b] text-xs flex items-center gap-1';
-          return;
-        }
-        lbl.textContent = 'Music: ON';
-        nowEl.textContent = `♪ ${TRACK_LABELS[currentRegion]}`;
-        nowEl.classList.remove('hidden');
-        btn.className = 'slab-btn px-2.5 py-1.5 bg-gradient-to-b from-[#7ff0a8] to-[#46d27a] text-[#08351a] text-xs flex items-center gap-1';
+      function playNextInPool() {
+        if (!enabled) return;
+        if (!activePool.length) activePool = buildPool(currentRegion);
+        poolIdx = (poolIdx + 1) % activePool.length;
+        const entry = activePool[poolIdx];
+        currentTrackFile = entry.file;
 
-        const el = getAudioEl(currentRegion);
-        el.volume = performance.now() < duckUntil ? 0.12 : 0.42;
-        el.play().then(() => {
+        if (currentAudio) {
+          try { currentAudio.pause(); } catch {}
+        }
+        const a = new Audio(`./music/${entry.file}`);
+        // One-track pool (usa_dc: Wild Bridge) loops seamlessly
+        a.loop = activePool.length === 1;
+        a.volume = performance.now() < duckUntil ? 0.11 : 0.42;
+        a.addEventListener('ended', () => {
+          if (enabled && activePool.length > 1) playNextInPool();
+        });
+        currentAudio = a;
+
+        const nowEl = document.getElementById('music-now');
+        if (nowEl) {
+          nowEl.textContent = `♪ ${entry.title}`;
+          nowEl.classList.remove('hidden');
+        }
+
+        a.play().then(() => {
           stopSynthLoop();
         }).catch(() => {
           startSynthLoop();
         });
+      }
+
+      function syncPlayback() {
+        const lbl = document.getElementById('music-lbl');
+        const btn = document.getElementById('btn-music');
+        const nowEl = document.getElementById('music-now');
+        if (!enabled) {
+          stopSynthLoop();
+          if (currentAudio) {
+            try { currentAudio.pause(); } catch {}
+          }
+          lbl.textContent = 'Music: OFF';
+          nowEl.classList.add('hidden');
+          btn.className = 'slab-btn px-2 py-1 bg-gradient-to-b from-[#fff8ec] to-[#ffe7bd] text-[#14233b] text-[11px] flex items-center gap-1';
+          return;
+        }
+        lbl.textContent = 'Music: ON';
+        btn.className = 'slab-btn px-2 py-1 bg-gradient-to-b from-[#7ff0a8] to-[#46d27a] text-[#08351a] text-[11px] flex items-center gap-1';
+        activePool = buildPool(currentRegion);
+        poolIdx = -1;
+        playNextInPool();
       }
 
       return {
@@ -428,18 +616,18 @@
           return enabled;
         },
         setRegion(reg) {
-          if (reg !== currentRegion) {
-            currentRegion = reg;
+          const targetReg = POOLS[reg] ? reg : 'nigeria';
+          if (targetReg !== currentRegion) {
+            currentRegion = targetReg;
             if (enabled) syncPlayback();
           }
         },
-        duck(ms = 2600) {
+        duck(ms = 2800) {
           duckUntil = performance.now() + ms;
-          const el = audioEls[currentRegion];
-          if (el && enabled) {
-            el.volume = 0.14;
+          if (currentAudio && enabled) {
+            currentAudio.volume = 0.11;
             setTimeout(() => {
-              if (enabled && performance.now() >= duckUntil) el.volume = 0.42;
+              if (enabled && currentAudio && performance.now() >= duckUntil) currentAudio.volume = 0.42;
             }, ms + 50);
           }
         }
@@ -641,9 +829,20 @@
     }
 
     const SHOP_NAMES = {
-      nigeria: ['MAMA PUT KITCHEN', 'EKO ELECTRONICS', 'OBALENDE SUYA', 'DANFO SPARES LTD', 'LAGOS POS & PAY', 'YABA TECH CAFE', 'BALOGUN TEXTILES', 'OSHODI MOTORS'],
-      ghana:   ['MAKOLA MARKET', 'OSU OXFORD SHOP', 'ACCRA CHOP BAR', 'KOFIDUA MOTORS', 'CIRCLE MOBILE', 'BLACK STAR CAFE', 'MEDAASE TEXTILES', 'TEMA HARBOUR CO'],
-      usa:     ['PEACHTREE DINER', 'BUCKHEAD PLAZA', 'LENOX BOUTIQUE', 'CAPITOL BOOKS', 'UNION STN CAFE', 'GEORGETOWN DELI', 'METRO TRANSIT', 'POTOMAC MARKET']
+      classic:            ['COUNCIL TICKET ₦200', 'BALOGUN FABRICS', 'YELLOW STAR FUEL', 'MAMA PUT KITCHEN', 'VULCANIZER BAY', 'YABA BUS STOP'],
+      market:             ['OJUELEGBA FLYOVER', 'OYINGBO MARKET', 'BABA SULE STORES', 'MAMA Bisi WARDEN', 'RUSTY ZINC STALL', 'PATCHED TAR MOTORS'],
+      city:               ['PHONES · ACCESSORIES', 'LAPTOPS · REPAIRS', 'DANGOTE REFINERY', 'EKO HOTEL TOWER', 'MTN MAST PLAZA', 'CHARGERS · POWER BANK'],
+      arcade:             ['NATIONAL STADIUM', 'SURULERE SPORTS', 'IFEANYI WORKSHOP', 'COSTAIN ROUNDABOUT', 'GREEN EAGLE FANS', 'STADIUM EXPRESS'],
+      yaba:               ['TEJUOSHO PLAZA', 'YABA TECH CAMPUS', 'CHARGERS · EARPIECE', 'DANFO MOTOR PARK', 'LAGOON WATERFRONT', 'UNILAG HACKATHON'],
+      countryside:        ['GARIN DAJI PARK', 'KASUWAN DAJI', 'ANAMBRA BORDER POST', 'FULANI CATTLE XING', 'VILLAGE CLINIC', 'WATER POT STOP'],
+      anambra:            ['DON P INTERCONTINENTAL', 'ASABA GREYHOUND PARK', 'ONITSHA MAIN MARKET', 'NNEWI SPARE PARTS', 'THINGS FALL APART', 'OJUKWU GATE'],
+      kano:               ['KOFAR NASSARAWA', 'KOFAR MATA DYE PITS', 'KURMI MARKET', 'EMIR PALACE & MOSQUE', 'GIDAN MAKAMA', 'AFLAO ECOWAS POST'],
+      ghana:              ['AKWAABA GHANA', 'KWAME NKRUMAH CIRCLE', 'MAKOLA MARKET', 'OSU OXFORD STREET', 'BLACK STAR SQUARE', 'JAMESTOWN LIGHTHOUSE'],
+      aburi:              ['ABURI FRESH FRUITS', 'GOD\'S TIME CHOP BAR', 'FUFU & LIGHT SOUP', 'VOLTA CARVINGS', 'KOFORIDUA SUMMIT', 'SUMMIT FUEL BAY'],
+      koforidua_downhill: ['KOFORIDUA SUMMIT', 'LOW GEAR BRAKE CHECK', 'ABURI HAIRPIN BEND', 'OXFORD ST CORNER', 'ACCRA CENTRAL BAY', 'KOTOKA WEST ROAD'],
+      kotoka_atlanta:     ['BORDER CROSSING HERE', 'KOTOKA BORDER WEST', 'VISA & IMMIGRATION', 'YELLOW FEVER DESK', 'HARTSFIELD-JACKSON', 'COLLEGE PARK MARTA'],
+      usa:                ['COLLEGE PARK MARTA', 'PEACHTREE ROAD 35MPH', 'BUCKHEAD TOWERS', 'LENOX MALL BAY', 'LENOX GREENHOUSE', 'KEISHA CORNER STORE'],
+      usa_dc:             ['THE WHITE HOUSE', 'MOUNTAIN VIEW MOTEL', 'TENNESSEE SNOW HILL', 'THE PENTAGON', 'NATIONAL MALL', 'VIRGINIA ARCH I-75']
     };
 
     const facadeTextureCache = new Map();
@@ -667,6 +866,7 @@
         g.fillRect(0, y + 8, 256, 5);
       }
 
+      // Real multi-pane upper-floor glass windows with sills & AC units
       for (let row = 0; row < 3; row++) {
         const wy = 32 + row * 110;
         for (let col = 0; col < 3; col++) {
@@ -693,20 +893,40 @@
         }
       }
 
+      // Ground floor storefront with sign band, display windows, and real wooden/glass entrance door with handle
       g.fillStyle = '#0f172a';
       g.fillRect(14, 368, 228, 144);
-      g.fillStyle = '#facc15';
+      g.fillStyle = shopTitle === 'DON P INTERCONTINENTAL' ? '#0f172a' : '#facc15';
       g.fillRect(18, 372, 220, 32);
-      g.fillStyle = '#111827';
-      g.font = '900 16px system-ui, sans-serif';
+      g.fillStyle = shopTitle === 'DON P INTERCONTINENTAL' ? '#fbbf24' : '#111827';
+      g.font = '900 14px system-ui, sans-serif';
       g.textAlign = 'center';
-      g.fillText(shopTitle, 128, 394);
+      g.fillText(shopTitle, 128, 393);
+
+      // Left & Right Shop Display Windows
       const sGrad = g.createLinearGradient(0, 408, 0, 510);
       sGrad.addColorStop(0, '#38bdf8');
       sGrad.addColorStop(1, '#0284c7');
       g.fillStyle = sGrad;
-      g.fillRect(24, 412, 96, 96);
-      g.fillRect(136, 412, 96, 96);
+      g.fillRect(22, 414, 68, 78);
+      g.fillRect(166, 414, 68, 78);
+      g.strokeStyle = '#e2e8f0';
+      g.lineWidth = 2;
+      g.strokeRect(22, 414, 68, 78);
+      g.strokeRect(166, 414, 68, 78);
+
+      // Real Center Entrance Door (frame, wood/glass panels, brass doorknob & threshold step)
+      g.fillStyle = '#f8fafc';
+      g.fillRect(100, 410, 56, 102);
+      g.fillStyle = '#7c2d12';
+      g.fillRect(104, 414, 48, 96);
+      g.fillStyle = '#38bdf8';
+      g.fillRect(110, 420, 16, 38);
+      g.fillRect(130, 420, 16, 38);
+      g.fillStyle = '#fbbf24';
+      g.beginPath();
+      g.arc(144, 466, 3.5, 0, Math.PI * 2);
+      g.fill();
 
       const tex = new THREE.CanvasTexture(c);
       tex.colorSpace = THREE.SRGBColorSpace;
@@ -715,23 +935,49 @@
       return tex;
     }
 
-    // Dynamic Bus Side Livery Texture Generator (Lagos Danfo / Ghana Tro-Tro / Atlanta MARTA / D.C. Metro)
-    function createBusLiveryTexture(bodyHex = '#facc15', stripeHex = '#111827', routeText = 'LASG • YABA - BALOGUN') {
+    // Dynamic Bus Side Livery Texture Generator with Country Flag Decals (NG / GH / US)
+    function createBusLiveryTexture(bodyHex = '#facc15', stripeHex = '#111827', routeText = 'LSD-402YR • NO FOOD FOR LAZY MAN', flagCode = 'NG') {
       const c = document.createElement('canvas');
       c.width = 512; c.height = 256;
       const g = c.getContext('2d');
       g.fillStyle = bodyHex;
       g.fillRect(0, 0, 512, 256);
 
-      g.fillStyle = stripeHex;
-      g.fillRect(0, 134, 512, 30);
-      g.fillRect(0, 174, 512, 14);
-
-      g.fillStyle = stripeHex === '#ffffff' ? '#1e3a8a' : '#ffffff';
-      if (bodyHex === '#facc15') g.fillStyle = '#facc15';
-      g.font = '900 17px system-ui, sans-serif';
-      g.textAlign = 'center';
-      g.fillText(routeText, 256, 155);
+      if (flagCode === 'GH') {
+        // Ghana Tro-Tro Red-Gold-Green Band + Black Star
+        g.fillStyle = '#dc2626'; g.fillRect(0, 126, 512, 18);
+        g.fillStyle = '#facc15'; g.fillRect(0, 144, 512, 22);
+        g.fillStyle = '#15803d'; g.fillRect(0, 166, 512, 18);
+        g.fillStyle = '#111827';
+        g.font = '900 18px system-ui, sans-serif';
+        g.textAlign = 'center';
+        g.fillText('★  ' + routeText + '  ★', 256, 161);
+      } else if (flagCode === 'US') {
+        // USA MARTA Blue Skirt + Orange Stripe + US Flag Decal
+        g.fillStyle = '#0284c7'; g.fillRect(0, 164, 512, 72);
+        g.fillStyle = '#f97316'; g.fillRect(0, 134, 512, 28);
+        g.fillStyle = '#ffffff';
+        g.font = '900 16px system-ui, sans-serif';
+        g.textAlign = 'center';
+        g.fillText(routeText, 256, 154);
+        // US flag decal on side
+        g.fillStyle = '#dc2626'; g.fillRect(36, 74, 54, 32);
+        g.fillStyle = '#ffffff'; g.fillRect(36, 82, 54, 6); g.fillRect(36, 94, 54, 6);
+        g.fillStyle = '#1e3a8a'; g.fillRect(36, 74, 24, 18);
+      } else {
+        // Nigeria Danfo Black Stripe + Nigerian Green-White-Green Flag Decal
+        g.fillStyle = stripeHex;
+        g.fillRect(0, 134, 512, 30);
+        g.fillRect(0, 174, 512, 14);
+        g.fillStyle = '#facc15';
+        g.font = '900 15px system-ui, sans-serif';
+        g.textAlign = 'center';
+        g.fillText(routeText, 256, 155);
+        // Nigeria flag decal
+        g.fillStyle = '#15803d'; g.fillRect(36, 76, 18, 30);
+        g.fillStyle = '#ffffff'; g.fillRect(54, 76, 18, 30);
+        g.fillStyle = '#15803d'; g.fillRect(72, 76, 18, 30);
+      }
 
       g.strokeStyle = 'rgba(15, 23, 42, 0.45)';
       g.lineWidth = 4;
@@ -754,6 +1000,7 @@
       danfoSide: new THREE.MeshStandardMaterial({ map: createBusLiveryTexture(), roughness: 0.28, metalness: 0.15 }),
       danfoRoof: new THREE.MeshStandardMaterial({ color: 0xfef08a, roughness: 0.32, metalness: 0.1 }),
       headlight: new THREE.MeshStandardMaterial({ color: 0xffffff, emissive: 0xfffbeb, emissiveIntensity: 1.4, roughness: 0.1 }),
+      streetLampGlow: new THREE.MeshStandardMaterial({ color: 0xfef08a, emissive: 0xfde047, emissiveIntensity: 1.8, roughness: 0.1 }),
       brakeOn: new THREE.MeshStandardMaterial({ color: 0xff1e1e, emissive: 0xff0000, emissiveIntensity: 1.8, roughness: 0.2 }),
       brakeOff: new THREE.MeshStandardMaterial({ color: 0x7f1d1d, roughness: 0.4 }),
       asphalt: new THREE.MeshStandardMaterial({ color: 0x2d3748, roughness: 0.88, metalness: 0.04 }),
@@ -762,7 +1009,9 @@
       bark: new THREE.MeshStandardMaterial({ color: 0x6b4423, roughness: 0.9 }),
       foliage: new THREE.MeshStandardMaterial({ color: 0x15803d, roughness: 0.65 }),
       skin: new THREE.MeshStandardMaterial({ color: 0x6f4228, roughness: 0.55 }),
-      marble: new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.3, metalness: 0.1 })
+      marble: new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.3, metalness: 0.1 }),
+      redCarpet: new THREE.MeshStandardMaterial({ color: 0xb91c1c, roughness: 0.75 }),
+      goldCrown: new THREE.MeshStandardMaterial({ color: 0xfacc15, emissive: 0xca8a04, emissiveIntensity: 0.4, roughness: 0.25, metalness: 0.8 })
     };
 
     const wheelTireGeom = new THREE.CylinderGeometry(0.38, 0.38, 0.28, 20);
@@ -922,32 +1171,168 @@
 
     const danfoMesh = createDanfoMinibus();
 
-    // Build 3D Washington Monument Obelisk & U.S. Capitol Dome for Chapter 8 (Washington D.C.)
-    function createDCMallLandmarks(cx, cz) {
-      const group = new THREE.Group();
-      // Washington Monument (Tall white marble obelisk + pyramidion tip)
-      const shaft = new THREE.Mesh(new THREE.CylinderGeometry(1.1, 1.8, 34, 4), MAT.marble);
-      shaft.position.set(cx - 12, 17, cz - 10);
-      shaft.rotation.y = Math.PI * 0.25;
-      shaft.castShadow = true;
-      const tip = new THREE.Mesh(new THREE.ConeGeometry(1.1, 3.2, 4), MAT.marble);
-      tip.position.set(cx - 12, 35.6, cz - 10);
-      tip.rotation.y = Math.PI * 0.25;
-      group.add(shaft, tip);
+    // Helper: 3D Floating Sign Banner Texture
+    function createSignBannerMesh(text, bgHex = '#14233b', fgHex = '#facc15', w = 8, h = 1.6) {
+      const c = document.createElement('canvas');
+      c.width = 512; c.height = 96;
+      const g = c.getContext('2d');
+      g.fillStyle = bgHex;
+      g.fillRect(0, 0, 512, 96);
+      g.strokeStyle = fgHex;
+      g.lineWidth = 6;
+      g.strokeRect(4, 4, 504, 88);
+      g.fillStyle = fgHex;
+      g.font = '900 30px system-ui, sans-serif';
+      g.textAlign = 'center';
+      g.textBaseline = 'middle';
+      g.fillText(text, 256, 48);
+      const tex = new THREE.CanvasTexture(c);
+      tex.colorSpace = THREE.SRGBColorSpace;
+      const mat = new THREE.MeshBasicMaterial({ map: tex, side: THREE.DoubleSide });
+      return new THREE.Mesh(new THREE.PlaneGeometry(w, h), mat);
+    }
 
-      // U.S. Capitol Dome Building (Neoclassical wings + rotunda drum + white dome + lantern)
-      const base = new THREE.Mesh(createRoundedBox(26, 7.5, 14, 0.2, 2), MAT.marble);
-      base.position.set(cx + 8, 3.8, cz + 10);
-      base.castShadow = true;
-      const drum = new THREE.Mesh(new THREE.CylinderGeometry(5.2, 5.6, 5.5, 20), MAT.marble);
-      drum.position.set(cx + 8, 9.8, cz + 10);
-      drum.castShadow = true;
-      const dome = new THREE.Mesh(new THREE.SphereGeometry(5.1, 20, 14, 0, Math.PI * 2, 0, Math.PI * 0.52), MAT.marble);
-      dome.position.set(cx + 8, 12.4, cz + 10);
-      dome.castShadow = true;
-      const lantern = new THREE.Mesh(new THREE.CylinderGeometry(0.7, 0.9, 2.4, 12), MAT.chrome);
-      lantern.position.set(cx + 8, 18.0, cz + 10);
-      group.add(base, drum, dome, lantern);
+    // 3D Street Light Along Roads (Victor's Look Rule: street lights along the roads)
+    function createStreetLightMesh(armDir = -1) {
+      const g = new THREE.Group();
+      const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.11, 5.4, 8), MAT.darkSteel);
+      pole.position.y = 2.7;
+      const arm = new THREE.Mesh(new THREE.BoxGeometry(1.3, 0.08, 0.08), MAT.darkSteel);
+      arm.position.set(armDir * 0.6, 5.35, 0);
+      const bulb = new THREE.Mesh(new THREE.BoxGeometry(0.42, 0.12, 0.24), MAT.streetLampGlow);
+      bulb.position.set(armDir * 1.12, 5.26, 0);
+      g.add(pole, arm, bulb);
+      return g;
+    }
+
+    // Track animated White House Presidents (Trump walking on the red carpet + 5 waving Presidents)
+    const activePresidentPerformers = [];
+
+    // Build 3D White House with Red Carpet & 5 Waving Presidents (TRUMP, OBAMA, BIDEN, GEORGE W. BUSH, CLINTON)
+    // + Washington Monument, Pentagon, Don P InterContinental, Dangote Refinery, Kofar Nassarawa, Jamestown Lighthouse
+    function createRouteLandmark3D(ch, cx, cz, x0, x1, z0, z1) {
+      const group = new THREE.Group();
+
+      if (ch.id === 'usa_dc') {
+        // 1. THE WHITE HOUSE Mansion + Portico Columns + Red Carpet + 5 Waving U.S. Presidents
+        const whX = x0 + 14, whZ = cz;
+        const mansion = new THREE.Mesh(createRoundedBox(16, 9.2, 26, 0.2, 2), MAT.marble);
+        mansion.position.set(whX, 4.8, whZ);
+        mansion.castShadow = true;
+        group.add(mansion);
+
+        // Neoclassical front portico columns facing the road
+        for (let pz = -5; pz <= 5; pz += 2.5) {
+          const col = new THREE.Mesh(new THREE.CylinderGeometry(0.35, 0.38, 8.2, 12), MAT.marble);
+          col.position.set(whX - 8.8, 4.3, whZ + pz);
+          group.add(col);
+        }
+        const signWH = createSignBannerMesh('THE WHITE HOUSE • WASHINGTON D.C.', '#0f172a', '#f8fafc', 12, 1.8);
+        signWH.position.set(whX - 8.9, 10.6, whZ);
+        signWH.rotation.y = -Math.PI * 0.5;
+        group.add(signWH);
+
+        // Red Carpet rolled out from the White House portico toward the street kerb
+        const carpet = new THREE.Mesh(new THREE.BoxGeometry(11.5, 0.08, 3.4), MAT.redCarpet);
+        carpet.position.set(x0 + 5.8, 0.27, whZ);
+        group.add(carpet);
+
+        // 5 Waving Presidents with Name Signs: TRUMP, OBAMA, BIDEN, GEORGE W. BUSH, CLINTON
+        const presSpecs = [
+          { name: 'TRUMP',          suit: 0x1e3a8a, hair: 0xfacc15, zOff:  0.0, walksCarpet: true },
+          { name: 'OBAMA',          suit: 0x1e293b, hair: 0x111827, zOff: -4.2, walksCarpet: false },
+          { name: 'BIDEN',          suit: 0x1e3a8a, hair: 0xf8fafc, zOff: -2.1, walksCarpet: false },
+          { name: 'GEORGE W. BUSH', suit: 0x334155, hair: 0xcbd5e1, zOff:  2.1, walksCarpet: false },
+          { name: 'CLINTON',        suit: 0x1e293b, hair: 0xf1f5f9, zOff:  4.2, walksCarpet: false }
+        ];
+        presSpecs.forEach((p, idx) => {
+          const hm = createHuman3D(p.suit, p.hair, false);
+          const lbl = createSignBannerMesh(p.name, '#14233b', '#facc15', 2.4, 0.52);
+          lbl.position.set(0, 2.25, 0);
+          lbl.rotation.y = -Math.PI * 0.5;
+          hm.root.add(lbl);
+          group.add(hm.root);
+          activePresidentPerformers.push({
+            mesh: hm,
+            baseX: x0 + (p.walksCarpet ? 4.5 : 6.8),
+            baseZ: whZ + p.zOff,
+            walksCarpet: p.walksCarpet,
+            phase: idx * 1.1
+          });
+        });
+
+        // 2. Washington Monument Obelisk & Pentagon on the opposite side of the block
+        const shaft = new THREE.Mesh(new THREE.CylinderGeometry(1.1, 1.8, 34, 4), MAT.marble);
+        shaft.position.set(cx + 12, 17, cz - 10);
+        shaft.rotation.y = Math.PI * 0.25;
+        shaft.castShadow = true;
+        const tip = new THREE.Mesh(new THREE.ConeGeometry(1.1, 3.2, 4), MAT.marble);
+        tip.position.set(cx + 12, 35.6, cz - 10);
+        tip.rotation.y = Math.PI * 0.25;
+        const pentagon = new THREE.Mesh(new THREE.CylinderGeometry(11, 11, 5.5, 5), new THREE.MeshStandardMaterial({ color: 0xd6d3d1, roughness: 0.5 }));
+        pentagon.position.set(cx + 10, 3.0, cz + 12);
+        group.add(shaft, tip, pentagon);
+      } else if (ch.id === 'anambra') {
+        // DON P INTERCONTINENTAL (Ogidi): Gold-on-navy crown sign, brick pillars, ornate black gates, security tower
+        const dpX = x0 + 13, dpZ = cz;
+        const hotel = new THREE.Mesh(createRoundedBox(15, 16, 22, 0.2, 2), new THREE.MeshStandardMaterial({ color: 0xfef3c7, roughness: 0.35 }));
+        hotel.position.set(dpX, 8.2, dpZ);
+        hotel.castShadow = true;
+        const crownSign = createSignBannerMesh('👑 DON P INTERCONTINENTAL • OGIDI', '#0f172a', '#facc15', 13, 2.0);
+        crownSign.position.set(dpX - 7.6, 17.4, dpZ);
+        crownSign.rotation.y = -Math.PI * 0.5;
+        // Brick entrance pillars & ornate black gate
+        const brickMat = new THREE.MeshStandardMaterial({ color: 0x991b1b, roughness: 0.7 });
+        for (const gz of [-5.5, 5.5]) {
+          const pillar = new THREE.Mesh(new THREE.BoxGeometry(1.4, 3.8, 1.4), brickMat);
+          pillar.position.set(x0 + 2.8, 2.1, dpZ + gz);
+          group.add(pillar);
+        }
+        const blackGate = new THREE.Mesh(new THREE.BoxGeometry(0.25, 2.8, 9.6), MAT.tire);
+        blackGate.position.set(x0 + 2.8, 1.6, dpZ);
+        const secTower = new THREE.Mesh(new THREE.BoxGeometry(2.8, 6.2, 2.8), brickMat);
+        secTower.position.set(x0 + 3.6, 3.3, dpZ + 8.5);
+        group.add(hotel, crownSign, blackGate, secTower);
+      } else if (ch.id === 'city') {
+        // DANGOTE REFINERY white tanks + EKO HOTEL tower + MTN yellow billboard & red/white mast
+        const tank1 = new THREE.Mesh(new THREE.CylinderGeometry(5.5, 5.5, 7.5, 18), MAT.marble);
+        tank1.position.set(cx + 10, 4.0, cz - 10);
+        const mtnMast = new THREE.Mesh(new THREE.CylinderGeometry(0.25, 0.85, 26, 8), new THREE.MeshStandardMaterial({ color: 0xdc2626 }));
+        mtnMast.position.set(x0 + 8, 13.2, cz);
+        const mtnSign = createSignBannerMesh('MTN • EVERYWHERE YOU GO • OBALENDE TECH', '#facc15', '#111827', 10, 1.8);
+        mtnSign.position.set(x0 + 3.5, 6.5, cz);
+        mtnSign.rotation.y = -Math.PI * 0.5;
+        group.add(tank1, mtnMast, mtnSign);
+      } else if (ch.id === 'kano') {
+        // KOFAR NASSARAWA Ancient City Wall Gate + Zanko Horns
+        const mudMat = new THREE.MeshStandardMaterial({ color: 0xb45309, roughness: 0.85 });
+        const wall = new THREE.Mesh(new THREE.BoxGeometry(14, 9.5, 22), mudMat);
+        wall.position.set(x0 + 11, 5.0, cz);
+        const signKano = createSignBannerMesh('KOFAR NASSARAWA • ANCIENT KANO WALL', '#78350f', '#fde047', 11, 1.7);
+        signKano.position.set(x0 + 3.9, 10.6, cz);
+        signKano.rotation.y = -Math.PI * 0.5;
+        group.add(wall, signKano);
+      } else if (ch.id === 'ghana') {
+        // JAMESTOWN RED/WHITE LIGHTHOUSE & BLACK STAR ARCH
+        const lh = new THREE.Mesh(new THREE.CylinderGeometry(1.6, 2.6, 24, 16), new THREE.MeshStandardMaterial({ color: 0xdc2626 }));
+        lh.position.set(x0 + 10, 12.2, cz);
+        const lhTop = new THREE.Mesh(new THREE.CylinderGeometry(1.8, 1.8, 2.6, 16), MAT.streetLampGlow);
+        lhTop.position.set(x0 + 10, 25.2, cz);
+        const signGH = createSignBannerMesh('★ AKWAABA • BLACK STAR SQUARE & JAMESTOWN ★', '#15803d', '#facc15', 12, 1.8);
+        signGH.position.set(x0 + 4.2, 6.8, cz);
+        signGH.rotation.y = -Math.PI * 0.5;
+        group.add(lh, lhTop, signGH);
+      } else if (ch.id === 'usa') {
+        // LENOX GLASS GREENHOUSE CONSERVATORY STOP (Planned Item #1!)
+        const ghGlassMat = new THREE.MeshStandardMaterial({ color: 0x38bdf8, transparent: true, opacity: 0.55, roughness: 0.1, metalness: 0.8 });
+        const ghBase = new THREE.Mesh(createRoundedBox(10, 5.5, 16, 0.2, 2), ghGlassMat);
+        ghBase.position.set(x0 + 8, 3.0, cz);
+        const ghSign = createSignBannerMesh('🌿 LENOX GLASS GREENHOUSE CONSERVATORY STOP', '#064e3b', '#a7f3d0', 11, 1.6);
+        ghSign.position.set(x0 + 2.9, 6.4, cz);
+        ghSign.rotation.y = -Math.PI * 0.5;
+        group.add(ghBase, ghSign);
+      }
+
       return group;
     }
 
@@ -1155,6 +1540,7 @@
         scene.remove(entry.group);
       }
       blockGroups.clear();
+      activePresidentPerformers.length = 0;
     }
 
     function ensureCityBlock(qx, qz) {
@@ -1191,16 +1577,26 @@
         group.add(dNS, dEW);
       }
 
-      // If Washington D.C. route, place the Washington Monument & U.S. Capitol Dome on alternating National Mall blocks!
-      if (ch.dcMonuments && ((qx + qz) & 1) === 0) {
-        group.add(createDCMallLandmarks(cx, cz));
+      // Street lights along the roads on every block (Victor's Look Rule)
+      for (const lz of [z0 + 8, cz, z1 - 8]) {
+        const lampL = createStreetLightMesh(-1);
+        lampL.position.set(x0 + 0.6, 0.2, lz);
+        const lampR = createStreetLightMesh(1);
+        lampR.position.set(x1 - 0.6, 0.2, lz);
+        group.add(lampL, lampR);
+      }
+
+      // Route-specific 3D Landmarks (White House + 5 Presidents, Don P InterContinental, Dangote/MTN, Kofar Nassarawa, Jamestown Lighthouse, Lenox Greenhouse)
+      const hasLandmark = ['usa_dc', 'anambra', 'city', 'kano', 'ghana', 'usa'].includes(ch.id) && ((qx + qz) & 1) === 0;
+      if (hasLandmark) {
+        group.add(createRouteLandmark3D(ch, cx, cz, x0, x1, z0, z1));
       }
 
       let fuelStation = null;
-      if (((qx * 3 + qz * 5) & 3) === 0 && !ch.dcMonuments) {
+      if (((qx * 3 + qz * 5) & 3) === 0 && !hasLandmark) {
         const fx = x0 + 6.5, fz = cz;
         fuelStation = { x: fx, z: fz, pumpX: x0 + 1.2, pumpZ: fz };
-        const canopyMat = new THREE.MeshStandardMaterial({ color: 0x10b981, roughness: 0.3 });
+        const canopyMat = new THREE.MeshStandardMaterial({ color: ch.id === 'classic' ? 0xfacc15 : 0x10b981, roughness: 0.3 });
         const canopy = new THREE.Mesh(createRoundedBox(8.2, 0.75, 13.5, 0.12, 3), canopyMat);
         canopy.position.set(fx, 4.2, fz);
         canopy.castShadow = true;
@@ -1222,21 +1618,25 @@
         [cx, z0 + 11.5],    [cx, z1 - 11.5],
         [x0 + 11.5, cz],    [x1 - 11.5, cz]
       ];
-      const shops = SHOP_NAMES[ch.region] || SHOP_NAMES.nigeria;
+      const shops = SHOP_NAMES[ch.id] || SHOP_NAMES.classic;
 
       slots.forEach(([bx, bz], idx) => {
         if (fuelStation && Math.hypot(bx - fuelStation.x, bz - fuelStation.z) < 16) return;
-        if (ch.dcMonuments && ((qx + qz) & 1) === 0 && idx >= 4) return;
+        if (hasLandmark && (idx >= 4 || bx < cx)) return;
         const r1 = hash2(qx, qz, idx * 7 + 1);
         const r2 = hash2(qx, qz, idx * 7 + 2);
         const r3 = hash2(qx, qz, idx * 7 + 3);
         const w = 11.5 + r1 * 6.5;
         const d = 11.5 + r2 * 6.5;
-        const isTower = ch.region === 'usa' && !ch.dcMonuments;
+        const isTower = ch.id === 'usa' || ch.id === 'city';
         const floors = (isTower ? 4 : 2) + Math.floor(r3 * (isTower ? 4 : 3));
         const h = floors * 3.6;
 
-        const wallHex = ch.dcMonuments ? '#f1f5f9' : isTower ? '#93c5fd' : WALL_PALETTE[Math.floor(r1 * WALL_PALETTE.length)];
+        const wallHex = ch.id === 'usa_dc' ? '#f8fafc'
+          : ch.id === 'market' ? '#b08968'
+          : ch.id === 'kano' ? '#d97706'
+          : isTower ? '#93c5fd'
+          : WALL_PALETTE[Math.floor(r1 * WALL_PALETTE.length)];
         const shopName = shops[(Math.abs(qx * 5 + qz * 3) + idx) % shops.length];
         const bMat = new THREE.MeshStandardMaterial({
           map: getBuildingTexture(wallHex, shopName),
@@ -1278,7 +1678,7 @@
     }
 
     // =========================================================================
-    // 6. CAMPAIGN STATE, ALHAJI DEBT, SERGEANT BELLO CHOICE & STOPS
+    // 6. CAMPAIGN STATE, ALHAJI DEBT, AUNTY RONKE ₦700 CHANGE & BORDER MODALS
     // =========================================================================
     const stick = createStick();
     let autoDriveEnabled = true;
@@ -1301,7 +1701,7 @@
         speedMax: 46 + upgrades.engine.level * 7,
         accelMax: 24 + upgrades.engine.level * 5,
         brakeMax: 54,
-        capacity: 6 + upgrades.seats.level * 2,
+        capacity: 5 + upgrades.seats.level * 2,
         fuelMax: 100 + upgrades.tank.level * 35,
         turnRMin: 5.5 - upgrades.steer.level * 0.7
       };
@@ -1335,11 +1735,176 @@
     const mateText = document.getElementById('mate-text');
     const mateSpeaker = document.getElementById('mate-speaker');
     const mateRegion = document.getElementById('mate-region');
+    const matePortraitCanvas = document.getElementById('mate-portrait');
+    const matePortraitCtx = matePortraitCanvas.getContext('2d');
+
+    // Stylized Character Portrait Drawer (Ported from C:\Users\USER\DanfoDiaries\scripts\chidi_portrait.gd)
+    const PORTRAIT_LOOKS = {
+      chidi:  { hat: '#24305c', shirt: '#ffb82e', mouth: 'smile', badge: false, strap: true,  gele: false, hair: null },
+      police: { hat: '#12141c', shirt: '#213873', mouth: 'flat',  badge: true,  strap: false, gele: false, hair: null },
+      rs:     { hat: '#ebebdf', shirt: '#ff751a', mouth: 'smile', badge: false, strap: false, gele: false, hiVis: true },
+      ticket: { hat: '#1a703d', shirt: '#e0d9bd', mouth: 'flat',  badge: false, strap: false, gele: false, lanyard: true },
+      koffi:  { hat: '#cc1f1f', shirt: '#1a8040', mouth: 'smile', badge: false, strap: true,  gele: false, hair: null },
+      bobo:   { hat: '#0554a8', shirt: '#ff850d', mouth: 'smile', badge: false, strap: false, gele: false, hair: null },
+      agbero: { hat: '#db2424', shirt: '#f5f5f0', mouth: 'smirk', badge: false, strap: false, gele: false, chain: true },
+      ronke:  { hat: '#dc2626', shirt: '#9333ea', mouth: 'flat',  badge: false, strap: false, gele: true,  hair: null },
+      trump:  { hat: '#facc15', shirt: '#1e3a8a', mouth: 'smile', badge: false, strap: false, gele: false, tie: '#dc2626' }
+    };
+
+    function drawCharacterPortrait(g, cx, cy, scale, kind = 'chidi') {
+      const look = PORTRAIT_LOOKS[kind] || PORTRAIT_LOOKS.chidi;
+      g.save();
+      g.translate(cx, cy);
+      g.scale(scale, scale);
+
+      // Torso & shoulders
+      g.fillStyle = look.shirt;
+      g.strokeStyle = '#14141f';
+      g.lineWidth = 2.4;
+      g.beginPath();
+      g.moveTo(-22, 28);
+      g.lineTo(-19, 8);
+      g.lineTo(-8, 3);
+      g.lineTo(12, 3);
+      g.lineTo(21, 9);
+      g.lineTo(24, 28);
+      g.closePath();
+      g.fill();
+      g.stroke();
+
+      // Role accessories (Chidi leather fare pouch, Police gold badge & shoulder flashes, Road Safety hi-vis, Clerk lanyard, Agbero gold chain, President red tie)
+      if (look.strap) {
+        g.strokeStyle = '#6b4021';
+        g.lineWidth = 4.5;
+        g.beginPath(); g.moveTo(-13, 5); g.lineTo(16, 26); g.stroke();
+        g.fillStyle = '#61381c';
+        g.fillRect(3, 14, 14, 10);
+        g.strokeStyle = '#14141f'; g.lineWidth = 1.5; g.strokeRect(3, 14, 14, 10);
+        g.fillStyle = '#f2c738';
+        g.beginPath(); g.arc(10, 19, 2, 0, Math.PI * 2); g.fill();
+      }
+      if (look.badge) {
+        g.fillStyle = '#eb738';
+        g.fillStyle = '#f5d142';
+        g.fillRect(-17, 6, 8, 3);
+        g.fillRect(10, 6, 8, 3);
+        g.beginPath(); g.arc(9, 15, 3.5, 0, Math.PI * 2); g.fill();
+      }
+      if (look.hiVis) {
+        g.fillStyle = '#e2e8f0';
+        g.fillRect(-18, 13, 36, 3);
+        g.fillRect(-20, 20, 40, 3);
+      }
+      if (look.lanyard) {
+        g.strokeStyle = '#1a703d'; g.lineWidth = 2;
+        g.beginPath(); g.moveTo(-5, 5); g.lineTo(0, 15); g.lineTo(6, 5); g.stroke();
+        g.fillStyle = '#ffffff'; g.fillRect(-4, 15, 8, 7);
+      }
+      if (look.chain) {
+        g.strokeStyle = '#f5cc38'; g.lineWidth = 2.6;
+        g.beginPath(); g.arc(0, 7, 9, 0.2, Math.PI - 0.2); g.stroke();
+      }
+      if (look.tie) {
+        g.fillStyle = '#ffffff';
+        g.fillRect(-4, 4, 8, 22);
+        g.fillStyle = look.tie;
+        g.beginPath(); g.moveTo(-2, 5); g.lineTo(2, 5); g.lineTo(3, 24); g.lineTo(0, 27); g.lineTo(-3, 24); g.closePath(); g.fill();
+      }
+
+      // Neck & Head
+      const skin = kind === 'trump' ? '#f5cba7' : '#855230';
+      const skinLight = kind === 'trump' ? '#fdebd0' : '#99613d';
+      g.fillStyle = skin;
+      g.fillRect(-5, -4, 10, 9);
+      g.beginPath();
+      g.arc(0, -10, 14.5, 0, Math.PI * 2);
+      g.fill();
+      g.strokeStyle = '#14141f';
+      g.lineWidth = 2.2;
+      g.stroke();
+
+      g.fillStyle = skinLight;
+      g.beginPath();
+      g.arc(-2, -10, 11, 0, Math.PI * 2);
+      g.fill();
+
+      // Headwear (Police peaked cap with gold badge, Gele headwrap, Agbero bandana, or Conductor visor cap)
+      g.fillStyle = look.hat;
+      if (look.gele) {
+        g.beginPath();
+        g.ellipse(0, -21, 18, 9, 0, 0, Math.PI * 2);
+        g.fill();
+        g.stroke();
+      } else {
+        g.beginPath();
+        g.arc(0, -12, 15, Math.PI, Math.PI * 2);
+        g.closePath();
+        g.fill();
+        g.stroke();
+        if (kind === 'police') {
+          g.fillRect(-16, -26, 32, 6);
+          g.strokeRect(-16, -26, 32, 6);
+          g.fillStyle = '#f5d142';
+          g.beginPath(); g.arc(0, -22, 2.8, 0, Math.PI * 2); g.fill();
+          g.fillStyle = '#090a0f';
+          g.fillRect(-18, -14, 22, 3.5);
+        } else if (kind !== 'trump') {
+          g.fillStyle = look.hat;
+          g.beginPath();
+          g.moveTo(-14, -12); g.lineTo(-23, -10); g.lineTo(-20, -14); g.lineTo(-6, -16);
+          g.closePath();
+          g.fill();
+          g.stroke();
+        }
+      }
+
+      // Eyes with white sclera & catchlights
+      for (const ex of [-5.5, 4.5]) {
+        g.fillStyle = '#ffffff';
+        g.beginPath(); g.arc(ex, -9.5, 2.4, 0, Math.PI * 2); g.fill();
+        g.fillStyle = '#14141f';
+        g.beginPath(); g.arc(ex - 0.3, -9.5, 1.3, 0, Math.PI * 2); g.fill();
+      }
+
+      // Mouth
+      g.strokeStyle = '#14141f';
+      g.lineWidth = 2.2;
+      if (look.mouth === 'smile') {
+        g.fillStyle = '#ffffff';
+        g.beginPath();
+        g.arc(-0.5, -4.2, 5.5, 0, Math.PI);
+        g.closePath();
+        g.fill();
+        g.stroke();
+      } else if (look.mouth === 'smirk') {
+        g.beginPath(); g.moveTo(-5, -3); g.lineTo(5, -5); g.stroke();
+      } else {
+        g.beginPath(); g.moveTo(-5, -3.5); g.lineTo(4.5, -3.5); g.stroke();
+      }
+
+      g.restore();
+    }
+
+    function pickPortraitKind(speakerText, msgText) {
+      const s = (speakerText + ' ' + msgText).toLowerCase();
+      if (s.includes('bello') || s.includes('police') || s.includes('adewale') || s.includes('chukwuma') || s.includes('amina') || s.includes('mensah') || s.includes('officer')) return 'police';
+      if (s.includes('ronke') || s.includes('nkechi') || s.includes('bisi') || s.includes('ama') || s.includes('keisha') || s.includes('madam')) return 'ronke';
+      if (s.includes('ife') || s.includes('ticket')) return 'ticket';
+      if (s.includes('kunle') || s.includes('agbero') || s.includes('speed') || s.includes('ibile')) return 'agbero';
+      if (s.includes('safety') || s.includes('marshal') || s.includes('flagman')) return 'rs';
+      if (s.includes('trump') || s.includes('white house') || s.includes('president')) return 'trump';
+      if (s.includes('koffi') || s.includes('kwesi') || s.includes('chale')) return 'koffi';
+      if (s.includes('bobo') || s.includes('bubba') || s.includes('ray')) return 'bobo';
+      return 'chidi';
+    }
 
     function storySay(speaker, msg, reg = 'NIGERIA') {
       mateSpeaker.textContent = speaker;
       mateRegion.textContent = reg.toUpperCase();
       mateText.textContent = msg;
+      matePortraitCtx.fillStyle = '#fef3c7';
+      matePortraitCtx.fillRect(0, 0, 54, 64);
+      drawCharacterPortrait(matePortraitCtx, 27, 36, 1.0, pickPortraitKind(speaker, msg));
       mateBox.classList.remove('mate-pop');
       void mateBox.offsetWidth;
       mateBox.classList.add('mate-pop');
@@ -1355,10 +1920,10 @@
       toastSub.textContent = sub;
       fareToast.classList.remove('hidden');
       clearTimeout(toastTimer);
-      toastTimer = setTimeout(() => fareToast.classList.add('hidden'), 2600);
+      toastTimer = setTimeout(() => fareToast.classList.add('hidden'), 2800);
     }
 
-    // Apply Chapter Look, Bus Livery, Music Region & Opening Story Beat
+    // Apply Chapter Look, Bus Livery, Flag Decal, Fog Density, Music Pool & Opening Story Beat
     function applyChapter(idx) {
       currentChapterIdx = (idx + STORY_CHAPTERS.length) % STORY_CHAPTERS.length;
       const ch = STORY_CHAPTERS[currentChapterIdx];
@@ -1366,35 +1931,381 @@
       campaign.midSpoken = false;
       campaign.checkpointShown = false;
 
-      // Update Bus Livery & Colors
-      MAT.danfoSide.map = createBusLiveryTexture(ch.livery.body, ch.livery.stripe, ch.livery.text);
+      // Update Bus Livery, Plate & Country Flag Decal
+      MAT.danfoSide.map = createBusLiveryTexture(ch.livery.body, ch.livery.stripe, ch.livery.text, ch.livery.flag);
       MAT.danfoSide.needsUpdate = true;
       MAT.danfoUpper.color.set(ch.livery.body);
       MAT.danfoRoof.color.setHex(ch.livery.roof);
 
-      // Update Sky, Fog & Ground Colors
+      // Update Sky, Fog (Heavy Mountain Fog on Aburi!) & Ground Colors
       scene.background.setHex(ch.sky);
       scene.fog.color.setHex(ch.fog);
+      scene.fog.near = ch.heavyFog ? 18 : 55;
+      scene.fog.far = ch.heavyFog ? 78 : 165;
       MAT.grass.color.setHex(ch.ground);
 
       clearCityBlocks();
       MusicPlayer.setRegion(ch.region);
 
-      document.getElementById('chapter-badge').textContent = `Ch.${ch.num}/${STORY_CHAPTERS.length} • ${ch.title}`;
+      document.getElementById('chapter-badge').textContent = `Leg ${ch.num}/${STORY_CHAPTERS.length} • ${ch.title}`;
       storySay(ch.speaker, ch.startLine, ch.region);
     }
 
-    // Sergeant Bello Checkpoint Modal Wiring
+    // =========================================================================
+    // ILLUSTRATED EVENT SCENE RENDERER FOR ALL 14 ROUTES (Police, Ronke, Borders, White House)
+    // =========================================================================
     const cpModal = document.getElementById('checkpoint-modal');
-    document.getElementById('btn-cp-clean').addEventListener('click', () => {
+    const cpTitle = document.getElementById('cp-title');
+    const cpBody = document.getElementById('cp-body');
+    const cpBadge = document.getElementById('cp-badge');
+    const cpSceneCanvas = document.getElementById('cp-scene-canvas');
+    const cpSceneCtx = cpSceneCanvas.getContext('2d');
+    const btnCpClean = document.getElementById('btn-cp-clean');
+    const btnCpSettle = document.getElementById('btn-cp-settle');
+    const btnCpThird = document.getElementById('btn-cp-third');
+
+    const EVENT_SPECS = {
+      classic: {
+        badge: 'LAGOS FARE STOP & POLICE CHECKPOINT',
+        title: '🎟️ COUNCIL TICKET (₦200), AUNTY RONKE (₦700) & OFFICER ADEWALE',
+        body: 'Clerk Ife: "Council route ticket: ₦200." Aunty Ronke: "My change be ₦700!" Officer Adewale: "Driver, your papers — or 5 push-ups & 5 frog jumps!"',
+        btn1: "Use Chidi's Change (0s)",
+        btn2: 'Ask Passengers (+10s)',
+        btn3: 'Kiosk Change (+15s)',
+        scene: 'ronke_ticket'
+      },
+      market: {
+        badge: 'OJUELEGBA UNDER-BRIDGE HOLD-UP',
+        title: '🚧 WARDEN MAMA BISI, AGBERO KUNLE & ELDER BABA SULE',
+        body: 'Agbero Kunle: "Ojuelegba under-bridge! Na hold-up, driver, wait your turn!" Mama Bisi: "Ojuelegba junction no be free, my sister. Rub my hand!"',
+        btn1: 'Wait Turn Patiently (Respect +1)',
+        btn2: 'Settle Mama Bisi ₦100',
+        btn3: null,
+        scene: 'ojuelegba_market'
+      },
+      city: {
+        badge: 'POLICE STOP & SEARCH • TECH CORRIDOR',
+        title: '👮 SERGEANT BELLO POLICE CHECKPOINT (OBALENDE → CMS)',
+        body: 'Sergeant Bello: "Driver, your papers! Park well by the laptop umbrellas!" Chidi: "Oga, documents dey? Keep papers clean or settle ₦200?"',
+        btn1: 'Show Clean Papers (Respect +1)',
+        btn2: 'Request Supervisor (20s)',
+        btn3: 'Settle ₦200 (Fast Pass)',
+        scene: 'police_bello'
+      },
+      arcade: {
+        badge: 'SURULERE NATIONAL STADIUM INSPECT',
+        title: '🦺 ROAD SAFETY INSPECTION & RIVAL TUNDE "SPEED"',
+        body: 'Road Safety Marshal: "Check tyres, headlamps & 5-seat capacity!" Tunde \'Speed\': "Old man\'s danfo? The Stadium crowd is mine today!"',
+        btn1: 'Pass Full Safety Check (+₦300 Bonus)',
+        btn2: 'Sprint Stadium Express Lane',
+        btn3: null,
+        scene: 'stadium_rs'
+      },
+      yaba: {
+        badge: 'TEJUOSHO MARKET DROP-OFF & HAWKERS',
+        title: '🎓 STUDENT TOBI DROP-OFF & TEJUOSHO ELECTRONICS',
+        body: 'Student Tobi: "Drop me for Tejuosho o! I wan buy charger (₦200) before lecture!" Shopper Bisi: "Hold lane steady — my flatscreen TV dey inside!"',
+        btn1: 'Drop Tobi at Tejuosho & Buy Charger (₦200)',
+        btn2: 'Drop Tobi & Continue to Yaba Tech',
+        btn3: null,
+        scene: 'tejuosho_tobi'
+      },
+      countryside: {
+        badge: 'CATTLE CROSSING & ANAMBRA STATE BORDER',
+        title: '🐄 FULANI CATTLE CROSSING & SGT. CHUKWUMA BORDER POST',
+        body: 'Chidi: "Wait for the cows to cross, Oga!" Sgt. Chukwuma (Lagos-Anambra Post): "Papers dey okay. WELCOME TO ANAMBRA STATE — Light of the Nation!"',
+        btn1: 'Wait for Cattle & Stamp Anambra Pass',
+        btn2: 'Greet Chidi\'s Mother in the Village',
+        btn3: null,
+        scene: 'cattle_anambra'
+      },
+      anambra: {
+        badge: 'OGIDI LANDMARK & NNEWI BUS STOP',
+        title: '👑 DON P INTERCONTINENTAL, NNEWI MADAM & KANO BORDER',
+        body: 'Chidi: "See Don P InterContinental in Ogidi! Gold crown sign & black gates — e fine o!" Nnewi Madam: "Thank you, driver! Daalu!"',
+        btn1: 'Stop at Nnewi & Cross to Kano State',
+        btn2: 'Salute Don P InterContinental Gate',
+        btn3: null,
+        scene: 'donp_anambra'
+      },
+      kano: {
+        badge: 'ECOWAS INTERNATIONAL BORDER POST',
+        title: '🛂 KOFAR NASSARAWA & AFLAO ECOWAS BORDER (NIGERIA → GHANA)',
+        body: 'NIS Officer Amina: "ECOWAS PASS ISSUED." Ghana Immigration Officer Mensah: "ECOWAS PASS STAMPED — Akwaaba! Handing over to Koffi & Kwesi!"',
+        btn1: 'Stamp ECOWAS Pass (Akwaaba to Ghana!)',
+        btn2: 'Switch to Ghana Tro Tro (GH₵)',
+        btn3: null,
+        scene: 'aflao_ecowas'
+      },
+      ghana: {
+        badge: 'ACCRA MAKOLA MARKET & JAMESTOWN',
+        title: '🇬🇭 AUNTIE AMA MAKOLA DROP & JAMESTOWN LIGHTHOUSE',
+        body: 'Auntie Ama: "Mate, bus stop! I am dropping at Makola, eh. Medaase, driver!" Koffi: "Black Star Square and Jamestown Lighthouse ahead, chale!"',
+        btn1: 'Drop Auntie Ama (+GH₵3.00)',
+        btn2: 'Cruise Past Black Star Gate',
+        btn3: null,
+        scene: 'ghana_makola'
+      },
+      aburi: {
+        badge: 'ABURI MOUNTAIN HEAVY FOG & ROCKFALL',
+        title: '⛰️ ABURI HEAVY FOG, ROCKFALL FLAGMAN & CHOP BAR',
+        body: 'Koffi: "Kwesi, gently gently! Heavy mountain fog & rockfall flagman ahead! Rock cut on the left, forest drop on the right!"',
+        btn1: 'Engage Low Gear Past Flagman',
+        btn2: 'Stop at God\'s Time Chop Bar (Fufu)',
+        btn3: null,
+        scene: 'aburi_fog'
+      },
+      koforidua_downhill: {
+        badge: 'KOFORIDUA DOWNHILL BRAKE CHECK',
+        title: '🛞 KOFORIDUA DOWNHILL RUN & AUNTIE EFUA OXFORD ST DROP',
+        body: 'Koffi: "Hold the brake, Kwesi! This downhill no joke o!" Kwesi: "I hold am, Koffi — low gear coming down to Accra Central & Kotoka West Road!"',
+        btn1: 'Low Gear Engine Brake to Accra',
+        btn2: 'Drop Auntie Efua at Oxford St',
+        btn3: null,
+        scene: 'aburi_fog'
+      },
+      kotoka_atlanta: {
+        badge: 'KOTOKA / HARTSFIELD INTERNATIONAL PLAZA',
+        title: '✈️ VISA, IMMIGRATION & YELLOW-FEVER CARD CHECK (GHANA → USA)',
+        body: 'Border Officer: "VISA and IMMIGRATION stamps + Yellow-Fever Card inspection before Hartsfield-Jackson / College Park!"',
+        btn1: 'Show Yellow-Fever Card & Let Koffi Argue',
+        btn2: 'Pay GH₵20 Express Visa Stamp',
+        btn3: null,
+        scene: 'kotoka_visa'
+      },
+      usa: {
+        badge: 'PEACHTREE ROAD & LENOX GREENHOUSE',
+        title: '🍑 KEISHA CORNER STORE DROP & LENOX GLASS GREENHOUSE',
+        body: 'Keisha: "Driver, can you let me off by the corner store? Thank you, sweetie!" Bobo: "Buckhead glass towers and Lenox Glass Greenhouse ahead!"',
+        btn1: 'Drop Keisha & Stop at Lenox Greenhouse (+$15)',
+        btn2: 'Head North on I-75 to Washington D.C.',
+        btn3: null,
+        scene: 'atlanta_lenox'
+      },
+      usa_dc: {
+        badge: 'WASHINGTON D.C. • THE WHITE HOUSE FINALE',
+        title: '🏛️ SNOWY TENNESSEE HILL & THE WHITE HOUSE (5 PRESIDENTS)',
+        body: 'Bobo: "The White House! Look on the red carpet — Trump walking out to greet our MARTA bus with Obama, Biden, George W. Bush & Clinton waving!"',
+        btn1: 'Greet All 5 Presidents on Red Carpet!',
+        btn2: 'Celebrate Lagos-to-White-House Victory!',
+        btn3: null,
+        scene: 'white_house'
+      }
+    };
+
+    function drawEventSceneIllustration(sceneKey) {
+      const g = cpSceneCtx;
+      const W = 352, H = 138;
+      g.clearRect(0, 0, W, H);
+
+      // Sky & Road Backdrop
+      const skyGrad = g.createLinearGradient(0, 0, 0, H);
+      if (sceneKey === 'aburi_fog') {
+        skyGrad.addColorStop(0, '#64748b'); skyGrad.addColorStop(1, '#cbd5e1');
+      } else if (sceneKey === 'white_house') {
+        skyGrad.addColorStop(0, '#1e3a8a'); skyGrad.addColorStop(1, '#93c5fd');
+      } else {
+        skyGrad.addColorStop(0, '#0284c7'); skyGrad.addColorStop(1, '#bae6fd');
+      }
+      g.fillStyle = skyGrad;
+      g.fillRect(0, 0, W, H);
+
+      // Ground & Asphalt Road
+      g.fillStyle = '#3f6212';
+      g.fillRect(0, 88, W, 50);
+      g.fillStyle = '#334155';
+      g.fillRect(0, 98, W, 40);
+      g.fillStyle = '#facc15';
+      for (let x = 12; x < W; x += 36) g.fillRect(x, 116, 20, 4);
+
+      if (sceneKey === 'police_bello') {
+        // MTN Yellow Mast & Eko Hotel Tower in background
+        g.fillStyle = '#0f172a'; g.fillRect(250, 22, 38, 68);
+        g.fillStyle = '#38bdf8';
+        for (let wy = 28; wy < 82; wy += 10) g.fillRect(255, wy, 28, 6);
+        g.fillStyle = '#facc15'; g.fillRect(195, 36, 48, 22);
+        g.fillStyle = '#111827'; g.font = '900 10px sans-serif'; g.fillText('MTN 5G', 202, 50);
+
+        // Yellow Danfo Bus on left
+        g.fillStyle = '#facc15'; g.fillRect(16, 56, 86, 46);
+        g.fillStyle = '#111827'; g.fillRect(16, 78, 86, 9);
+        g.fillStyle = '#0f172a'; g.fillRect(72, 61, 26, 15);
+        g.fillStyle = '#ffffff'; g.font = '800 8px sans-serif'; g.fillText('LSD-402YR', 24, 85);
+
+        // Red/White Police Checkpoint Barrier & Cone
+        g.fillStyle = '#dc2626'; g.fillRect(114, 82, 48, 7);
+        g.fillStyle = '#ffffff'; g.fillRect(126, 82, 12, 7); g.fillRect(148, 82, 10, 7);
+        g.fillStyle = '#ea580c';
+        g.beginPath(); g.moveTo(118, 108); g.lineTo(125, 86); g.lineTo(132, 108); g.closePath(); g.fill();
+
+        // Portraits: Sergeant Bello (Police), Supervisor, and Conductor Chidi
+        drawCharacterPortrait(g, 192, 82, 1.15, 'police');
+        drawCharacterPortrait(g, 245, 86, 0.95, 'police');
+        drawCharacterPortrait(g, 305, 84, 1.05, 'chidi');
+      } else if (sceneKey === 'ronke_ticket') {
+        // Green Council Route Ticket Booth (₦200)
+        g.fillStyle = '#15803d'; g.fillRect(18, 36, 78, 58);
+        g.strokeStyle = '#14233b'; g.lineWidth = 2; g.strokeRect(18, 36, 78, 58);
+        g.fillStyle = '#facc15'; g.fillRect(22, 40, 70, 16);
+        g.fillStyle = '#111827'; g.font = '900 9px sans-serif'; g.fillText('TICKET ₦200', 28, 51);
+
+        // ₦1,000 Note & Change Owed ₦700 Banner
+        g.fillStyle = '#fef08a'; g.fillRect(112, 26, 118, 22);
+        g.strokeRect(112, 26, 118, 22);
+        g.fillStyle = '#14233b'; g.font = '900 10px sans-serif'; g.fillText('PAID ₦1,000 • CHANGE ₦700', 117, 40);
+
+        drawCharacterPortrait(g, 62, 86, 0.95, 'ticket');
+        drawCharacterPortrait(g, 165, 84, 1.15, 'ronke');
+        drawCharacterPortrait(g, 235, 84, 1.1, 'chidi');
+        drawCharacterPortrait(g, 306, 84, 1.05, 'police');
+      } else if (sceneKey === 'ojuelegba_market') {
+        // Ojuelegba Flyover Concrete Bridge & Rusty Zinc Stalls
+        g.fillStyle = '#64748b'; g.fillRect(0, 26, W, 16);
+        g.fillStyle = '#475569'; g.fillRect(50, 42, 16, 48); g.fillRect(260, 42, 16, 48);
+        g.fillStyle = '#f8fafc'; g.font = '900 10px sans-serif'; g.fillText('OJUELEGBA FLYOVER • UNDER-BRIDGE HOLD-UP', 54, 37);
+        drawCharacterPortrait(g, 115, 84, 1.1, 'ronke');  // Mama Bisi
+        drawCharacterPortrait(g, 198, 84, 1.15, 'agbero'); // Agbero Kunle
+        drawCharacterPortrait(g, 288, 84, 1.05, 'chidi');
+      } else if (sceneKey === 'stadium_rs') {
+        // Surulere National Stadium Green-White-Green Arch
+        g.fillStyle = '#15803d'; g.fillRect(24, 24, 120, 16);
+        g.fillStyle = '#ffffff'; g.filltext;
+        g.font = '900 10px sans-serif'; g.fillText('NATIONAL STADIUM SURULERE', 28, 35);
+        drawCharacterPortrait(g, 110, 84, 1.15, 'rs');     // Road Safety Officer
+        drawCharacterPortrait(g, 200, 84, 1.1, 'agbero');  // Rival Tunde 'Speed'
+        drawCharacterPortrait(g, 290, 84, 1.05, 'chidi');
+      } else if (sceneKey === 'tejuosho_tobi') {
+        // Magenta Tejuosho Market Arch & Electronics Table
+        g.fillStyle = '#be185d'; g.fillRect(16, 28, 155, 22);
+        g.fillStyle = '#ffffff'; g.font = '900 10px sans-serif'; g.fillText('TEJUOSHO PLAZA • ELECTRONICS', 22, 42);
+        drawCharacterPortrait(g, 110, 84, 1.1, 'bobo');   // Student Tobi
+        drawCharacterPortrait(g, 198, 84, 1.1, 'ronke');  // Shopper Bisi
+        drawCharacterPortrait(g, 288, 84, 1.05, 'chidi');
+      } else if (sceneKey === 'cattle_anambra') {
+        // Welcome to Anambra Arch & White Zebu Cows Crossing
+        g.fillStyle = '#1e3a8a'; g.fillRect(14, 24, 175, 20);
+        g.fillStyle = '#facc15'; g.font = '900 9px sans-serif'; g.fillText('WELCOME TO ANAMBRA • LIGHT OF THE NATION', 18, 37);
+        // Stylised White Zebu Cow on road
+        g.fillStyle = '#f8fafc'; g.fillRect(72, 72, 42, 22); g.fillRect(106, 64, 16, 16);
+        g.strokeStyle = '#14233b'; g.strokeRect(72, 72, 42, 22);
+        drawCharacterPortrait(g, 178, 84, 1.1, 'ronke');  // Madam Nkechi
+        drawCharacterPortrait(g, 245, 84, 1.1, 'police'); // Sgt. Chukwuma
+        drawCharacterPortrait(g, 308, 84, 1.0, 'chidi');
+      } else if (sceneKey === 'donp_anambra') {
+        // DON P INTERCONTINENTAL Hotel (Navy & Gold Crown Sign + Brick Pillars + Black Gate)
+        g.fillStyle = '#fef3c7'; g.fillRect(18, 22, 145, 68);
+        g.fillStyle = '#0f172a'; g.fillRect(18, 22, 145, 22);
+        g.fillStyle = '#facc15'; g.font = '900 10px sans-serif'; g.fillText('👑 DON P INTERCONTINENTAL', 24, 36);
+        g.fillStyle = '#991b1b'; g.fillRect(22, 52, 12, 40); g.fillRect(145, 52, 12, 40);
+        g.fillStyle = '#111827'; g.fillRect(34, 58, 111, 32);
+        drawCharacterPortrait(g, 210, 84, 1.1, 'ronke');  // Nnewi Madam
+        drawCharacterPortrait(g, 290, 84, 1.1, 'chidi');
+      } else if (sceneKey === 'aflao_ecowas') {
+        // Aflao ECOWAS Border Post (Nigeria -> Ghana)
+        g.fillStyle = '#15803d'; g.fillRect(14, 24, 150, 22);
+        g.fillStyle = '#ffffff'; g.font = '900 10px sans-serif'; g.fillText('AFLAO ECOWAS BORDER • AKWAABA', 20, 38);
+        drawCharacterPortrait(g, 105, 84, 1.1, 'police'); // NIS Officer Amina
+        drawCharacterPortrait(g, 195, 84, 1.1, 'police'); // Ghana Officer Mensah
+        drawCharacterPortrait(g, 285, 84, 1.15, 'koffi'); // Mate Koffi
+      } else if (sceneKey === 'ghana_makola') {
+        // Jamestown Red/White Lighthouse & Ghana Tro-Tro
+        g.fillStyle = '#dc2626'; g.fillRect(36, 16, 22, 74);
+        g.fillStyle = '#ffffff'; g.fillRect(36, 36, 22, 14); g.fillRect(36, 64, 22, 14);
+        g.fillStyle = '#facc15'; g.fillRect(34, 10, 26, 8);
+        drawCharacterPortrait(g, 135, 84, 1.15, 'ronke'); // Auntie Ama
+        drawCharacterPortrait(g, 245, 84, 1.15, 'koffi'); // Mate Koffi
+      } else if (sceneKey === 'aburi_fog') {
+        // Aburi Mountain Fog, Rockfall Cones & Flagman + Chop Bar Sign
+        g.fillStyle = '#0f172a'; g.fillRect(16, 26, 155, 22);
+        g.fillStyle = '#facc15'; g.font = '900 9px sans-serif'; g.fillText("GOD'S TIME CHOP BAR • FUFU", 22, 40);
+        g.fillStyle = '#ea580c';
+        for (const cx of [70, 96, 122]) {
+          g.beginPath(); g.moveTo(cx, 106); g.lineTo(cx + 7, 84); g.lineTo(cx + 14, 106); g.closePath(); g.fill();
+        }
+        drawCharacterPortrait(g, 195, 84, 1.15, 'rs');    // Flagman
+        drawCharacterPortrait(g, 285, 84, 1.15, 'koffi'); // Koffi
+      } else if (sceneKey === 'kotoka_visa') {
+        // Kotoka / Hartsfield Visa & Yellow-Fever Card Booth
+        g.fillStyle = '#1e3a8a'; g.fillRect(16, 24, 175, 24);
+        g.fillStyle = '#facc15'; g.font = '900 10px sans-serif'; g.fillText('VISA & IMMIGRATION • YELLOW FEVER', 22, 39);
+        drawCharacterPortrait(g, 105, 84, 1.1, 'koffi');
+        drawCharacterPortrait(g, 198, 84, 1.1, 'police');
+        drawCharacterPortrait(g, 288, 84, 1.15, 'bobo');
+      } else if (sceneKey === 'atlanta_lenox') {
+        // Lenox Glass Greenhouse Conservatory & MARTA Bus
+        g.fillStyle = 'rgba(56, 189, 248, 0.55)';
+        g.fillRect(18, 28, 130, 62);
+        g.strokeStyle = '#f8fafc'; g.lineWidth = 2; g.strokeRect(18, 28, 130, 62);
+        g.fillStyle = '#0f172a'; g.font = '900 9px sans-serif'; g.fillText('LENOX GLASS GREENHOUSE', 26, 44);
+        drawCharacterPortrait(g, 195, 84, 1.15, 'ronke'); // Keisha
+        drawCharacterPortrait(g, 285, 84, 1.15, 'bobo');  // Bobo
+      } else if (sceneKey === 'white_house') {
+        // The White House Portico + Red Carpet + 5 Waving Presidents (TRUMP, OBAMA, BIDEN, BUSH, CLINTON)
+        g.fillStyle = '#f8fafc'; g.fillRect(14, 20, 125, 70);
+        g.strokeStyle = '#14233b'; g.strokeRect(14, 20, 125, 70);
+        g.fillStyle = '#0f172a'; g.font = '900 9px sans-serif'; g.fillText('THE WHITE HOUSE • D.C.', 24, 34);
+        // Red Carpet
+        g.fillStyle = '#b91c1c'; g.fillRect(55, 88, 285, 16);
+        const pNames = ['TRUMP', 'OBAMA', 'BIDEN', 'BUSH', 'CLINTON'];
+        pNames.forEach((nm, idx) => {
+          const px = 115 + idx * 48;
+          drawCharacterPortrait(g, px, 86, 0.82, idx === 0 ? 'trump' : 'police');
+          g.fillStyle = '#14233b'; g.fillRect(px - 19, 34, 38, 12);
+          g.fillStyle = '#facc15'; g.font = '900 7px sans-serif'; g.fillText(nm, px - 15, 43);
+        });
+      }
+    }
+
+    function openEncounterModal(routeId) {
+      const ch = STORY_CHAPTERS[currentChapterIdx];
+      const key = EVENT_SPECS[routeId] ? routeId : ch.id;
+      const spec = EVENT_SPECS[key] || EVENT_SPECS.city;
+
+      cpBadge.textContent = spec.badge;
+      cpTitle.textContent = spec.title;
+      cpBody.textContent = spec.body;
+      btnCpClean.textContent = spec.btn1;
+      btnCpSettle.textContent = spec.btn2;
+      if (spec.btn3) {
+        btnCpThird.textContent = spec.btn3;
+        btnCpThird.classList.remove('hidden');
+      } else {
+        btnCpThird.classList.add('hidden');
+      }
+      drawEventSceneIllustration(spec.scene);
+      cpModal.classList.remove('hidden');
+    }
+
+    function resolveEncounter(choice) {
+      const ch = STORY_CHAPTERS[currentChapterIdx];
       cpModal.classList.add('hidden');
-      campaign.respect++;
-      storySay('🧢 Conductor Chidi', 'Papers clean, no settlement! Sergeant Bello vexed, but the passengers respect you (+1 Respect).', STORY_CHAPTERS[currentChapterIdx].region);
-    });
-    document.getElementById('btn-cp-settle').addEventListener('click', () => {
-      cpModal.classList.add('hidden');
-      bus.cash = Math.max(0, bus.cash - 500);
-      storySay('🧢 Conductor Chidi', 'We settled Bello ₦500. The road opens fast, but passengers saw it.', STORY_CHAPTERS[currentChapterIdx].region);
+      if (ch.id === 'classic') {
+        bus.cash = Math.max(0, bus.cash - 200); // Council route ticket ₦200 (charged on classic only!)
+        storySay('🌶️ Aunty Ronke & Chidi', 'Aunty Ronke: "My change day complete." Council route ticket (₦200) paid to Clerk Ife!', ch.region);
+      } else if (ch.id === 'city') {
+        if (choice === 1 || choice === 2) {
+          campaign.respect++;
+          storySay('🧢 Conductor Chidi', 'Papers clean, no settlement! Sergeant Bello vexed, but the passengers respect you (+1 Respect).', ch.region);
+        } else {
+          bus.cash = Math.max(0, bus.cash - 200);
+          storySay('🧢 Conductor Chidi', 'We settled Bello ₦200. The road opens, but the passengers saw it. Them no too happy.', ch.region);
+        }
+      } else if (ch.id === 'kano') {
+        storySay('🇬🇭 Mate Koffi', 'ECOWAS PASS STAMPED — Akwaaba, chale! Accra dey front! Bus switched to Tro Tro (GH₵).', 'ghana');
+      } else if (ch.id === 'kotoka_atlanta') {
+        storySay('🇺🇸 Bobo (Bubba) & Ray', 'VISA & IMMIGRATION STAMPED! Hartsfield-Jackson / College Park! Welcome to Atlanta on MARTA ($)!', 'usa');
+      } else if (ch.id === 'usa_dc') {
+        storySay('🏛️ President Trump & Bobo', 'Trump walked out on the White House red carpet with Obama, Biden, Bush & Clinton waving! From Lagos to the White House!', 'usa');
+      } else {
+        campaign.respect++;
+        storySay(ch.speaker, ch.midDrop || ch.midLine, ch.region);
+      }
+    }
+    btnCpClean.addEventListener('click', () => resolveEncounter(1));
+    btnCpSettle.addEventListener('click', () => resolveEncounter(2));
+    btnCpThird.addEventListener('click', () => resolveEncounter(3));
+    document.getElementById('btn-event').addEventListener('click', () => {
+      openEncounterModal(STORY_CHAPTERS[currentChapterIdx].id);
     });
 
     const stopZoneGroup = new THREE.Group();
@@ -1766,13 +2677,13 @@
         const dAlong = dx * fx + dz * fz;
         const dLat = Math.abs(dx * rx + dz * rz);
 
-        // Mid-route Story Beat & Sergeant Bello Checkpoint trigger
-        if (activeStop.kind === 'dropoff' && !campaign.midSpoken && dAlong < 65) {
+        // Mid-route Story Beat & Illustrated Route Event Scene Trigger (All 14 Routes!)
+        if (activeStop.kind === 'dropoff' && !campaign.midSpoken && dAlong < 68) {
           campaign.midSpoken = true;
           storySay(ch.speaker, ch.midLine, ch.region);
-          if (ch.checkpoint && !campaign.checkpointShown) {
+          if (!campaign.checkpointShown) {
             campaign.checkpointShown = true;
-            cpModal.classList.remove('hidden');
+            openEncounterModal(ch.id);
           }
         }
 
@@ -2102,24 +3013,41 @@
         : 'slab-btn px-2.5 py-1.5 bg-gradient-to-b from-[#fff8ec] to-[#ffe7bd] text-[#14233b] text-xs flex items-center gap-1';
     });
 
-    // Story / Route Selector Modal (Lagos -> Ghana -> Atlanta -> Washington D.C.)
+    // Motor Park & Route Selector Modal (ALL ROUTES / NIGERIA / GHANA / ATLANTA / USA)
     const routesModal = document.getElementById('routes-modal');
     const routesListEl = document.getElementById('routes-list');
+    const routeTabsEl = document.getElementById('route-tabs');
+    let activeRouteTab = 'ALL';
+
     function renderRoutesModal() {
+      if (routeTabsEl) {
+        routeTabsEl.querySelectorAll('button[data-tab]').forEach(tb => {
+          const isTab = tb.dataset.tab === activeRouteTab;
+          tb.className = `slab-btn px-2.5 py-1 text-[11px] ${isTab ? 'bg-[#14233b] text-white' : 'bg-[#fff8ec] text-[#14233b]'}`;
+        });
+      }
       routesListEl.innerHTML = '';
       STORY_CHAPTERS.forEach((ch, idx) => {
+        if (activeRouteTab !== 'ALL' && !(ch.tabs || []).includes(activeRouteTab)) return;
         const active = idx === currentChapterIdx;
         const row = document.createElement('div');
         row.className = `flex items-center justify-between gap-2 p-2 rounded-xl border-2 border-[#14233b] ${active ? 'bg-amber-200' : 'bg-[#fff8ec]'}`;
         row.innerHTML = `
           <div class="min-w-0 flex-1">
             <div class="font-black text-[#14233b] truncate">${ch.title}</div>
-            <div class="text-[11px] opacity-80 truncate">${ch.speaker} • Fare: ${ch.currency}${ch.fareBase}</div>
+            <div class="text-[11px] opacity-85 truncate">${ch.speaker} • 5×Fare: ${ch.currency}${ch.fareBase}</div>
+            <div class="text-[10px] text-amber-900 font-bold truncate">${ch.midDrop || ''}</div>
           </div>
-          <button type="button" data-ch="${idx}"
-            class="slab-btn px-2.5 py-1 text-xs ${active ? 'bg-[#14233b] text-white' : 'bg-[#46d27a] text-[#08351a]'}">
-            ${active ? 'DRIVING' : 'DRIVE'}
-          </button>
+          <div class="flex items-center gap-1 shrink-0">
+            <button type="button" data-ev="${ch.id}" data-ch-ev="${idx}" title="View Illustrated Event Scene"
+              class="slab-btn px-2 py-1 text-[11px] bg-[#fde047] text-[#14233b]">
+              👮 Event
+            </button>
+            <button type="button" data-ch="${idx}"
+              class="slab-btn px-2.5 py-1 text-xs ${active ? 'bg-[#14233b] text-white' : 'bg-[#46d27a] text-[#08351a]'}">
+              ${active ? 'DRIVING' : 'DRIVE'}
+            </button>
+          </div>
         `;
         routesListEl.appendChild(row);
       });
@@ -2130,6 +3058,24 @@
           spawnMissionStop('pickup');
           routesModal.classList.add('hidden');
           routesModal.classList.remove('flex');
+        });
+      });
+      routesListEl.querySelectorAll('button[data-ev]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const idx = Number(btn.dataset.chEv);
+          applyChapter(idx);
+          spawnMissionStop('pickup');
+          routesModal.classList.add('hidden');
+          routesModal.classList.remove('flex');
+          openEncounterModal(btn.dataset.ev);
+        });
+      });
+    }
+    if (routeTabsEl) {
+      routeTabsEl.querySelectorAll('button[data-tab]').forEach(tb => {
+        tb.addEventListener('click', () => {
+          activeRouteTab = tb.dataset.tab;
+          renderRoutesModal();
         });
       });
     }
@@ -2311,6 +3257,12 @@
       for (const p of pedestrians) {
         const pYaw = p.axis === 'z' ? (p.dir > 0 ? Math.PI : 0) : (p.dir > 0 ? -Math.PI * 0.5 : Math.PI * 0.5);
         animateHuman3D(p.mesh, p.x, p.z, pYaw, p.phase, now, p.speed, false);
+      }
+
+      // Animate the 5 White House Presidents on the Red Carpet (Trump walks out to greet the bus!)
+      for (const pr of activePresidentPerformers) {
+        const walkOffset = pr.walksCarpet ? Math.sin(now * 0.0022) * 2.4 : 0;
+        animateHuman3D(pr.mesh, pr.baseX + walkOffset, pr.baseZ, -Math.PI * 0.5, pr.phase, now, pr.walksCarpet ? 1.8 : 0.4, true);
       }
 
       for (const tc of traffic) {

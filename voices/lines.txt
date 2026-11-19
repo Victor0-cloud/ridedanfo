@@ -1,0 +1,367 @@
+002518f53000	Passenger	Driver! We don enter wahala!
+01814e3d84e0	Chidi	Abeg, take ₦300. Na market we dey go.
+02391a0a4bd0	Chidi	CMS! Make una ready! Make we go!
+0539c8e2f0a0	Bobo	Tire's fixed. Let's roll!
+06e557b779ac	Chidi	Bad news from Lagos: Baba Ibile and his Agberos have taken over the park.
+07b35682f29f	Chidi	Fuel don enter. Make we go!
+0827bd1a70e9	Chidi	One long run, Yaba to Balogun. Earn enough and Alhaji's debt is finished.
+09d133809be2	Chidi	Obalende to CMS. If Sergeant Bello stops us, the choice is yours: settle, or keep the papers clean.
+0b247fd2a944	Koffi	Who can help us push?
+0b2944c88e70	Chidi	Driver, small small! You hear wetin madam talk.
+0ba50146fa51	Chidi	Half way, Oga. Danfo park ahead. Those drivers dey pull out anyhow.
+0ebb98081189	Chidi	Yaba! You stop well for the bay. Yaba people go remember this danfo.
+0f6ef1bc476d	Koffi	Medaase, driver!
+1055b0a57da2	Tunde	Abeg, make we speak with your supervisor.
+126b33410746	Koffi	Circle Circle Circle! Accra, Accra! Ete sen, enter, enter!
+132e079d6860	Passenger	Abeg, we don late for market!
+1367446dc6e4	Chidi	Kano! Kano! Kofar Nassarawa, Kurmi, Gidan Makama! Sannu, enter! Make we go!
+13f7cb720f4d	Bobo	Driver! We're in trouble now!
+1780c4da5787	Koffi	Me pa wo kyew, calm down.
+199cdc6dadf6	Passenger	Thank you, driver!
+1af8e79436b0	Bobo	Y'all, stay calm.
+1e678feefcf6	Chidi	Yaba! Ojuelegba to Yaba! Make we go!
+1fea9f52c3eb	Chidi	Balogun! First day done. Alhaji go hear say we dey work.
+21019f6a178b	Koffi	Kwesi, the corner! We turn left for Aburi, not right for the roundabout, eh!
+23efc1b8380e	Chidi	This thing no correct!
+2767bf96aa4b	Chidi	Garin Daji to Kasuwan Daji. Cattle, mud, floods. Drive gently, my mother dey wait.
+2800e18e73cb	Koffi	Road is clear. Let's go!
+2af395b380ed	Bobo	Fares, y'all! Have your money ready, please.
+2f0c267a2a35	Chidi	Anambra today, Oga. Niger Bridge, Onitsha, then Ogidi for Don P InterContinental. Long road, so we buy extra fuel for park.
+2f243d3304b4	Passenger	Na here we go sleep?
+308dcbf86430	Officer	Your papers complete. But wetin you bring for us?
+31b88664d0d7	Chidi	Na Achebe town be this. Things Fall Apart, but this danfo no go fall apart.
+37655951922e	Koffi	Jamestown lighthouse! Last stop. Medaase, everybody. Safe journey!
+379676097b04	Bobo	Are we gonna be stuck here all day?
+391881600ca3	Koffi	Chale, stop for the fare stop! We collect the fares first, eh.
+3bf25e742dac	Chidi	Kofar Nassarawa! Kano city gate. Gently, Oga, na maximum thirty for gate.
+3c9e094b90e6	Chidi	We settled Bello. The road opens, but the passengers saw it. Them no too happy.
+3d3ef33b26c3	Koffi	Kwesi, gently on the bends. See the drop!
+3d4d2387514c	Chidi	Stadium! Hop and go! Make we go!
+3eeed2cccf91	Koffi	Driver! Ei, we are in trouble!
+3f4a834964c2	Koffi	Hold on! I am coming with my cart.
+3ff3472e027b	Chidi	Upper Iweka! Ogidi! Awka! Nnewi! Ngwa ngwa, enter! Make we go!
+4307f550d885	Alhaji	My ₦60,000 is complete. The danfo papers are yours. Well done.
+43cd570dd6b8	Officer	Driver, your papers.
+442cb7e707ba	Chidi	Dala Hill dey there. Na where Kano start, long before any danfo.
+452f62bf2d59	Chidi	Onitsha Main Market. Nwanne, shift small make another person siddon.
+4538c2603a21	Chidi	Police ahead, Agbero after. Keep your papers ready and your change counted.
+48798f65b566	Koffi	Kwesi, gently! You heard what Auntie said.
+48f4fc878ece	Chidi	See Don P InterContinental! Ogidi big hotel. Chai, e fine o!
+499026870b78	Bobo	Ray! We picked up a nail in the tire!
+4a6273c90dc1	Kojo	Driver, take it easy, chale. We are not in a hurry.
+4a6387fc9fcb	Mama Nkechi	So you be the new driver? My pepper must reach Oyingbo fresh, no rough driving.
+4a6d714d5605	Koffi	Fare, fare! Me pa wo kyew, bring your money.
+4aeda5ff789b	Passenger	Oya, make we help. We no fit stay here all day.
+4e49a6c32246	Koffi	Chale, see Black Star Square. Freedom and justice, my brother.
+50efc3d9ec13	Chidi	Slow down for this hill. Na maximum thirty here.
+51432fa4598f	Chidi	Road clear! Make we go.
+522aa5bff3e8	Bobo	Peachtree Road, baby! Half the streets in this city got Peachtree in the name.
+525281258447	Koffi	Fitter is fixing the tyre...
+52f5a04a6ba1	Koffi	Koforidua! Last stop. Medaase, everybody. We made it!
+53b474e27eb8	Chidi	Change no dey! Abeg, who get change?
+5626db631005	Bobo	Lenox Mall! Last stop, y'all. Grab your bags and mind the step!
+565bfb0deaad	Officer	Your tyre flat. Go fix am for the vulcanizer.
+568322d97320	Bobo	Ray, you see them Buckhead towers? One day I'ma live up there.
+57325cd53a6c	Chidi	Aburi! Koforidua! Mountain road, hold tight! Enter, enter!
+5756f1b416e2	Koffi	Okay, let's help. We can't stay here all day.
+5817599ea321	Vulcanizer	Hold on! I dey come with my cart.
+58a8b9524907	Herder	Easy... make we pass.
+58d4e6b3f8a1	Koffi	Me pa wo kyew, calm down. We are fixing it!
+59841f594198	Bobo	That's my change, all good. Thank you.
+5c2b8672caec	Chidi	CMS! The office crowd pays well.
+5cc5470d3ba7	Chidi	City run next. Sergeant Bello works that road. Him hand no dey rest.
+5e725b224d73	Chidi	Kano today, Oga! Through Kofar Nassarawa, Kurmi Market, Dala Hill, then Gidan Makama. Sannu da zuwa!
+5e78964fd948	Koffi	Circle Circle Circle! Makola! Accra Central! Enter, enter, let's go!
+5e8e6b28372f	Chidi	Checkpoint soon. Remember: whatever you do today, Bello remembers tomorrow.
+5f9bee5e880c	Alhaji	The money is complete. The danfo is yours.
+5fc7c7e137a0	Chidi	Oga... my mother is sick in the village. Abeg, can we take the Village Shuttle?
+60a0950f5456	Officer	These papers no correct. You no fit pass.
+63df61c6ec8a	Bobo	Y'all, stay calm. We're fixing it!
+64f1a86f157f	Bobo	Road's clear. Let's roll!
+6566db18e256	Chidi	Yaba Bus Stop! Make una check your belongings!
+67424f452942	Chidi	CMS! Make una ready!
+675b77a3adaf	Chidi	Lenox Mall! Last stop, y'all. Watch your step and have a blessed day!
+684ba52f5ad5	Chidi	Stadium! We beat Tunde to the crowd.
+68a6393dab33	Chidi	Driver! Tyre don catch nail!
+6952c94421d0	Bobo	Tire guy is fixing the tire...
+6a2cad97671e	Chidi	Oga, na every stop we go pay?
+6a71377db9f0	Bobo	Tire guy is on his way with his cart...
+6a9f431205d7	Chidi	Who fit help us push?
+6b65bc21e1a6	Keisha	Driver, can you let me off by the corner store? Thank you, sweetie.
+6c0a46c35454	Chidi	Ojuelegba to Yaba today. Tejuosho, the lagoon, that muddy hill. Long road, so we buy extra fuel for park.
+6d181f915fbb	Ray	Lenox Mall. Good run, Bobo. Y'all have a blessed day now!
+6d68c179718b	Alhaji	Day 30 don pass and my money never complete. I give you 7 more days, but now na ₦75,000.
+6dfe5f1a5fed	Chidi	Madam don comot. Oya, make we go!
+6e48c23d9bf6	Bobo	Thank you, driver. That's better.
+6e84eee585d2	Auntie Ama	Mate, bus stop! I am dropping at Makola, eh.
+6f5087e1dd16	Chidi	This Brave Heart mud deep o. Gently, gently.
+6f7f8fb9295b	Chidi	Ogidi! Don P InterContinental na the big landmark here. Achebe town.
+705d44765cc1	Bobo	Driver, you didn't see that pothole?
+70d901b7c41e	Agbero	You wan teach us work?
+71d299bd26a1	Chidi	Oga! You be Oga now. Free play: every route is open.
+71d3a411c978	Chidi	Oga, wetin be the offence? You go give us receipt?
+7246b5f550a3	Bobo	Hang tight! I'm coming with my cart.
+745b75e7df3a	Chidi	Canal Road short, but the bumps go shake everybody.
+7540aab897c1	Supervisor	Their papers correct. Let them go.
+754d055d39cb	Agbero	Okay, bring am.
+7840e0856cca	Bobo	Let's roll!
+7b61e25a998d	Koffi	No change o! Who has small change?
+7b833979bc34	Chidi	Oga, your uncle's danfo is all he left you. Alhaji wants ₦60,000 in 30 days or he takes it back.
+7ba6fd96287d	Chidi	₦500? Abeg, help us reduce am.
+7c07c81ef2fc	Officer	Conductor, calm down.
+7d3d908af2d2	Passenger	My change be ₦700.
+7f03d601783d	Chidi	Kasuwan Daji! Village people, enter! Make we go!
+7f8f5b82e9ca	Banana seller	Fine banana!
+7fa3fc6d4a85	Koffi	Let's go, chale!
+8045eba41990	Passenger	Chidi, abeg!
+819f6d0d9c0a	Bobo	Driver! I'm pregnant, take it easy on this road, please!
+85c22819e331	Bobo	Can anybody help us push?
+8641ae4640ec	Chidi	Koforidua! Last stop! Medaase, check your things, eh!
+8684ea9f5253	Chidi	Nnewi bus stop dey front! Madam go drop there. Oga, stop for the bus stop.
+890841b092f4	Koffi	Osu! Oxford Street! Chale, the night life here is too much.
+8a10e706c663	Chidi	Oga, stop for the fare stop! We must collect fares before we move on.
+8a83bb914b4b	Koffi	Jamestown! Last stop! Medaase, check your things, eh!
+8ab65906c984	Pregnant passenger	Driver! You don pass my bus stop o!
+8b588e50bbec	Officer	Everything correct. You fit go.
+8bbcda6dcf06	Bobo	College Park! MARTA station! Y'all hop on, we headed up to Lenox!
+8bc76fe8b8ea	Gala seller	Gala! Gala!
+8c7bb3bd4f44	Koffi	Boss, your tyre is ready!
+90a6bcfc576f	Chidi	Oyingbo! Market people, enter!
+92a2cbac6eab	Alhaji	Extension finished. We start this chapter again from day 1. Keep your savings and your upgrades.
+9392c124c8db	Tunde	Chidi, pay them. Make we go.
+93c8470b8e21	Chidi	Next: the market women at Ojuelegba. If Mama Nkechi trusts you, the whole market follows.
+941c6617bf0a	Bobo	Boss, your tire's ready!
+9477a689c998	Bobo	College Park! Peachtree! Buckhead! Lenox Mall! Come on, y'all, hop on!
+956781ea3b1b	Koffi	Tyre is fixed. Let's go, chale!
+96844e1bb6db	Chidi	Gidan Makama! Sauka, everybody! Na gode, check your load!
+96a012854876	Officer	Oya, una fit go.
+972825fbcb53	Chidi	Abeg, make una calm down. We dey fix am!
+97b3cdb20749	Passenger	Abeg! I don late for market!
+9a8af61f206a	Chidi	Ojukwu Gate! Oya come down! Biko check your belongings!
+9aae9123ca10	Agbero	Oya, bring am. Make we push.
+9b5c1f5aaa3b	Kwesi	Jamestown lighthouse. Medaase, Koffi. Good run, chale!
+9d6fe845bf96	Chidi	Kasuwan Daji! Make una check your belongings!
+9ff6c35a0c12	Agbero	Forget that one! Rub my hand small.
+a14982c7daee	Ticket officer	Council route ticket: ₦200. Here is your permit, driver.
+a21565d5eb25	Bobo	Welcome to Atlanta, y'all! The A-T-L! Hold on to something.
+a387b0d126a6	Chidi	Oga driver, which route we dey run today?
+a5a2ec182fdb	Koffi	Aburi! Koforidua! Mountain road, hold tight!
+a7528eb5f961	Plantain chips seller	Plantain chips!
+a95e13adfa4b	Bobo	I need seven dollars back, sir.
+aade54eee247	Koffi	Medaase, driver. That's it.
+ab5230a5f17e	Chidi	See Dala Hill. Old Kano start from there. Kai, this city old pass Lagos.
+ab696c566a98	Officer	One light no dey work. Park for the maintenance bay.
+ac7757cceb9e	Koffi	Ete sen, my people! Kwame Nkrumah Circle. Anybody dropping at Circle?
+ac7b8291878c	Chidi	Oga, when this debt is paid... I want my own bus one day.
+ace0ba340173	Passenger	Chidi, abeg, settle am!
+acfcf0686973	Ray	Morning, y'all. I'm Ray, I'll be your driver. College Park up to Lenox. Bobo, call 'em!
+ad5348b81ea5	Chidi	Oga, we pass police! Dem dey wave us down. Stop make dem check us here.
+ae722dd7f9a9	Chidi	Na passengers we carry. Abeg, take ₦100.
+b1220446c9e8	Koffi	Circle Circle Circle! Chale, under the flyover we go gently. Maximum thirty.
+b18c2a63c815	Tyler	Man, traffic's light today. Must be my lucky day.
+b1d18825c477	Bobo	Buckhead! Look at them towers. Fancy, fancy.
+b1d451d5b956	Bobo	Whoa, we passed the fare stop! Swing back around, I gotta collect fares first.
+b202cac366e3	Chidi	Sorry ma! Oga, next time stop for the bus stop.
+b2058936d11b	Pregnant passenger	Thank you, driver! Nnewi, I don reach. Daalu!
+b34962b94843	Passenger	My change day complete.
+b50acb0a1e88	Chidi	Balogun! Balogun! Bole! Make una check your belongings!
+b66154fafa44	Baba Ibile	This park is mine now. Every danfo pays me, or it doesn't move.
+b6ce16a05843	Chidi	I was your uncle's conductor. I no dey go anywhere. Make we start with Yaba to Balogun.
+b7ad1cba682d	Chidi	Stadium! Make una check your belongings!
+b8999c842643	Bobo	Ray, easy! You heard the lady.
+baf718b49fb2	Chidi	Oyingbo! Market people, enter! Make we go!
+bcc9946c4614	Chidi	Oga, our papers correct. Which payment be this?
+bcdfb2013fc5	Agbero	Oga, we fit push am. Na ₦500.
+bfe31aba6e51	Chidi	Oya, Balogun Market! Make we go!
+c01a44a33e4f	Pure water seller	Cold pure water!
+c09b44926f95	Chidi	Tunde dey behind us! Collect the bonuses, keep the passengers happy.
+c10858e109a2	Kwesi	Today we climb Aburi, up to Koforidua. Steep road, chale. Koffi, call them!
+c26b5c5ad848	Chidi	Kurmi Market! Sannu sannu, mai gida. Who dey drop for market?
+c42a85a91ccb	Pregnant passenger	Driver! You wan kill my unborn pikin? Abeg, softly pass this road o!
+c66ac081a29e	Officer	Driver, make we check your vehicle.
+c6f1e3ec015e	Chidi	Match day at the Stadium next. Tunde 'Speed' will try to steal our passengers.
+c843d11f7f31	Officer	You carry pass your capacity. You no fit go like this.
+cc13f39b6fa7	Chidi	Everybody we helped is watching: the market women, the village, even Bello's men.
+cc37c4fef1b5	Chidi	Ogbunike Cave road rough o. Biko, slow down.
+ccd9c54ac699	Koffi	My change is complete. Medaase.
+cd9cc4c2f4ce	Officer	Tyres, lights, passenger capacity. Make everything correct.
+ce5d2c8876ea	Koffi	Aburi road! Chale, hold tight. This hill is steep o.
+cf1c6661803e	Chidi	Oga, fuel don low. Make we enter filling station.
+d00fa01ff759	Chidi	Upper Iweka! Ogidi! Awka! Enter quick quick!
+d0b3e5d7fb74	Chidi	Oga, we don pass the fare stop! Turn back and stop there make I collect fare first.
+d111c420793e	Pregnant passenger	Thank you, driver. Na so.
+d5baa1998234	Chidi	Oga, na vehicle papers you dey check or exercise?
+d68e8b7ac2b9	Koffi	Driver, you didn't see that hole?
+d6dca4bf0d11	Chidi	Cattle crossing! Make we hold on, herder dey come.
+d72054ed3a97	Koffi	Kwesi, gently gently! See the drop there, eh!
+d79c80b5ff90	Bobo	Easy, driver!
+d8b497f981de	Chidi	Oga, documents dey?
+d8fb51d9f097	Chidi	Oga, careful! That danfo dey pull out. Keep left!
+dbccd204c3d8	Koffi	Chale, my change is seven cedis.
+dc4f25b9e329	Vulcanizer	Oga, your tyre don ready!
+dce58cd15710	Chidi	Papers clean, no settlement. Bello vexed, but the passengers respect you.
+ddb8a93eb959	Officer	Oya, carry your motor go.
+de6a7acf7259	Chidi	Oga, we dey go market.
+df712b5f0865	Koffi	Black Star Square! Freedom and justice. See the Independence Arch there.
+e0a57a7fde93	Chidi	Gidan Makama! Last stop. Yauwa, na gode, everybody sauka.
+e1de78e8d652	Kwesi	I see it, Koffi. Low gear, small small.
+e1e19847c97f	Bobo	Anybody buying? Hold on to your change!
+e3013d6ef5ab	Chidi	Ikemba gate, Nnewi! Ka anyi ga. Anambra people go remember this danfo.
+e379cef44512	Chidi	Kofar Mata dye pits! See indigo. Haba, no splash am for my passengers.
+e39ba34f5fba	Bobo	Ray, we're running low on gas. Let's hit the gas station.
+e39bbd909fef	Bobo	Ray, pull up at the fare stop! Gotta collect fares before we roll.
+e5ef7f2372f9	Bobo	I'm all out of change! Anybody got small bills?
+e64ae302d31a	Koffi	Driver! Wei, you want to kill my unborn baby? Gently on this road!
+e6b5c6284c6f	Bobo	Tank's full. Let's roll!
+e74e8f19e6ba	Koffi	Ei! Kwesi, the tyre has caught a nail!
+ea045893a3e4	Chidi	Gidan Makama! Na gode, mai gida. Kano people go remember this danfo.
+eafee703f953	Ray	Easy now, Bobo. Speed limit's thirty-five on Peachtree.
+ec8296e36156	Koffi	Driver, gently, gently!
+ef58215037ce	Koffi	Kwesi, fuel is low o. Let's branch at the filling station.
+ef79d60495af	Bobo	Alright, let's help. We can't stay here all day.
+ef82c50be7d6	Koffi	Accra Central! Kantamanto, Makola, all of them. Medaase for riding.
+f02c5a872eb2	Koffi	Who wants to buy? Hold your change, eh!
+f1a3bc05ab45	Koffi	Fitter is coming with his cart...
+f1bd580cf727	Chidi	Make we go!
+f21b321b10c1	Chidi	Owo da! Abeg, make una bring your money.
+f3256b4334a2	Officer	Driver! Conductor! Come down. Five push-ups and five frog jumps!
+f4bf843a3574	Koffi	Makola! Makola! Auntie, hold your goods well, eh.
+f77c476fdfa5	Koffi	Are we going to sleep here?
+f7d6730d8427	Koffi	Tank is full. Let's go, chale!
+f87f9df77498	Chidi	Emir palace and the big mosque. Kai, Kano ta Dabo! Slow small, respect.
+f9a81fc5b282	Officer	Oya, move.
+f9c0df0d4dd0	Bobo	Thanks, driver!
+fab9c659b492	Chidi	Abeg, make una calm down.
+fb3991eaab08	Mama Nkechi	You do well. From today my women ride with you.
+fbedac43ff97	Chidi	Niger Bridge! Na maximum thirty for this bridge, Oga. Gently, gently.
+fc52b520c9a7	Kwesi	Accra run today. I am Kwesi, your trotro driver. Koffi, call them!
+fc610bd29319	Chidi	Why una block road? Who send una?
+fd08fe5efacd	Kwesi	Koforidua. We made it up, Koffi. Medaase, chale!
+fd45c9e250e8	Chidi	Go-slow ahead. Hawkers everywhere. Patience is money on this road.
+fd668b7121fb	Chidi	Who wan buy? Abeg, hold your change!
+ff4b09f99ff9	Koffi	Ei, we passed the fare stop! Turn back, chale, let me collect the fares first.
+fffc9ba72403	Chidi	Wait for the cows to cross, Oga. Stop for the line.
+f04fcf9e5320	Koffi	Go straight, chale — follow the road.
+9d7aca9e6c65	Koffi	Turn left here!
+72b0984a99f2	Koffi	Turn right here!
+376737ea4237	Koffi	Turn left at the roundabout, chale!
+4ec5033e48f5	Koffi	Keep west for the Kotoka border, chale — do not loop Jamestown.
+0a5d37443c77	Chidi	Everybody dey go stadium. Wait make the lane clear.
+1ad706f9c93a	Koffi	Hartsfield-Jackson / College Park! Welcome to Atlanta. Safe travels!
+1f47ece43c18	Mechanic Ifeanyi	Driver, dribble that hole, abeg!
+23a0840576ad	Mr Emeka	Pothole! You wan spoil my meeting?
+256b0acbec3d	Shoe seller	Sneakers, Tejuosho price!
+28ea86bf9dc8	Student Tobi	Easy, driver! My laptop dey this bag o!
+2eb3fec12b58	Baba Sule	God go bless you. Oyingbo, I dey come.
+312e14dccc12	Chidi	Road free. We dey waka now!
+314654b55afe	Chidi	Sorry, Baba. Driver, take am softly for Baba.
+39986f849a7b	Chidi	Danfo don break down for front. Small time e go move.
+3a31a2b887a4	Chidi	CMS na straight. Make we shift!
+3a94e45e567b	Student Tobi	Ah! My phone don fall for floor!
+3db804fd1b33	Tejuosho trader	Phone pouch! Charger! Earpiece! Cheap cheap!
+3e55118c5802	Aunty Ronke	You no see that hole?
+42d2ae45f573	Mr Emeka	Driver, my suit go squeeze! Take am easy.
+4df83770cd54	Madam Nkechi	Ah, this dirt road go wound us!
+4ee6e183d35f	Student Tobi	Na gutter you dey find? Watch that hole!
+52a5dff19a82	Chidi	Sorry, Aunty. Driver, ease am for the pepper.
+54a3448bbcf3	Baba Sule	My waist! Driver, this road no be racing track.
+597dbb3e6d12	Chidi	Oya, Yaba dey wait. We move!
+5cbd62a86c9a	Koffi	Accra! Accra Central! Downhill run, check your brakes! Enter, enter!
+5d3315878a86	Chidi	Sorry, oga. We no go rush am again.
+5eae99b71157	Mechanic Ifeanyi	Driver, I fit hear your shock absorber dey cry! Ease am!
+5f38d8b8c335	Mechanic Ifeanyi	Better. Your suspension go thank you.
+68d3e86e3e12	Mr Emeka	Driver, this shirt na white o, mind am!
+68f81304111f	Chidi	No delay, we dey go!
+6c019de8c6da	Mr Emeka	Okay, we dey move. I go still reach the meeting.
+6da688676695	Chidi	Stadium dey call. Hop on, we go!
+8c815f91bbdf	Chidi	Yaba Terminus! Make una check your belongings!
+946054966c99	Baba Sule	My son, hold my walking stick small, make I sit down well.
+94dde39bf3a3	Baba Sule	That hole fit swallow goat o!
+9a9579c3694c	Madam Nkechi	Driver, see hole for road, mind am!
+9b5d720c38ce	Match marshal	Surulere match traffic! Keep your lane steady, driver!
+acd4f4faf7ed	Student Tobi	Thank you, driver. Laptop still dey alive.
+acde94b29bb7	Agbero Kunle	Ojuelegba under-bridge! Na hold-up, driver, wait your turn!
+b25323d1bce7	Chidi	Tejuosho market people dey your window. Buy sharp sharp!
+b57b2597911d	Mr Emeka	Better. Thank you, driver.
+b77a9c78fefd	Chidi	Sorry, my guy. We go ease am.
+b847834fc815	Madam Nkechi	Abeg, make una give me front seat. My belle no fit squeeze for back.
+baba973372a1	Baba Sule	Ehn! Driver, my old knees!
+bb8a1255d429	Baba Sule	Ehen. My old bones thank you.
+be0528c4818d	Aunty Ronke	Driver! My pepper basket go pour for floor. Softly!
+c24abc7f9397	Madam Nkechi	Thank you, my pikin. This seat better.
+c4c871518e25	Chidi	Oya, Oyingbo! We dey move!
+c5e10f923c33	Mechanic Ifeanyi	Wahala! Na match we dey go, no be crash!
+cbee0f505527	Chidi	Driver, carry go!
+cc039a74e409	Aunty Ronke	Driver, small small!
+d3f700597047	Koffi	Atlanta! Hartsfield-Jackson! Papers ready, enter enter!
+d81488efa159	Koffi	Accra Central! Full loop complete. Medaase, everybody — safe journey!
+db72d35be3f7	Student Tobi	Conductor, drop me for Tejuosho o. I wan buy charger before lecture.
+e3c8aa116bbb	Chidi	Oya, we move!
+ed85a5692656	Mechanic Ifeanyi	Chidi, after the match bring this bus come my workshop. That engine dey knock.
+f070ce692214	Koffi	Accra Central! Safe arrival from the mountain! Medaase!
+f2d980e574a8	Chidi	Oga mechanic don talk. Driver, softly.
+f4edf02b1778	Koffi	Aburi! Koforidua! Then Accra Central! Full mountain loop, enter enter!
+f651d7e40623	Student Tobi	Sharp! I go hop down for Tejuosho.
+f942faf33125	Mechanic Ifeanyi	I go check am free. But na match first!
+fa3214f719da	Aunty Ronke	Na so. My pepper still dey basket.
+fb090b26186d	Mr Emeka	Conductor, I get meeting for CMS by nine. Abeg make this bus move.
+60375c93f182	Trader Mama Bisi	Bale of lace and ankara! Hold the road, carrier dey cross!
+851a5ed9d07c	Cart pusher	Clear road o! Wholesale cartons for Oyingbo depot!
+b07daf8cfc7b	Jersey vendor	Super Eagles scarf and flag! Match day hold-up ahead!
+2beb3903b323	Chidi	Oga, next stop: Yaba Bus Stop! Get ready.
+d70c9b1b6f6c	Chidi	Oga, next stop: Ojuelegba! Get ready.
+033e421ac19a	Chidi	Oga, next stop: Obalende! Get ready.
+61ca6af525d1	Chidi	Oga, next stop: Costain! Get ready.
+bff8b5d8c318	Chidi	Oga, next stop: Itire Junction! Get ready.
+015f1cfe6c8b	Chidi	Oga, next stop: Garin Daji! Get ready.
+aa21a403f340	Chidi	Oga, next stop: Fare Stop! Get ready.
+e07354bf9c5f	Chidi	Oga, next stop: Balogun Market! Get ready.
+10346045b8f1	Chidi	Oga, next stop: Oyingbo Market! Get ready.
+412b6859909e	Chidi	Oga, next stop: CMS! Get ready.
+eaaea145f824	Chidi	Oga, next stop: National Stadium! Get ready.
+c3baaa733d27	Chidi	Oga, next stop: Kasuwan Daji! Get ready.
+0bda34378e63	Chidi	Oga, next stop: Yaba Terminus! Get ready.
+256408f5d16e	Chidi	Oga, next stop: Ojukwu Gate! Get ready.
+1c17547aefa6	Chidi	Oga, next stop: Gidan Makama! Get ready.
+d1789d5d2d3d	Koffi	Chale, next stop: Accra Line! Get ready.
+ab0eaed5e7f2	Koffi	Chale, next stop: Kotoka! Get ready.
+4147e7eb6e5e	Koffi	Chale, next stop: Jamestown! Get ready.
+b158d01ba35f	Koffi	Chale, next stop: Accra Central! Get ready.
+22acc2a7994f	Koffi	Chale, next stop: Koforidua! Get ready.
+891f98cead6f	Koffi	Chale, next stop: Hartsfield! Get ready.
+af90a1908517	Bobo	Next stop: College Park! Get ready.
+cbe895fa648a	Bobo	Next stop: Lenox Mall! Get ready.
+334f45b5d10f	Chidi	Oga, we don pass the stop! Reverse back into the bay!
+078d90bceaa0	Koffi	Chale, we have passed the stop! Reverse back into the bay!
+e67f997752e0	Bobo	We passed the stop! Reverse back into the bay!
+c6d09e2b6172	Chidi	Oga, last chance o! One more and this trip don fail!
+c180150e69cc	Koffi	Chale, last chance! One more and this trip is finished!
+4849de09a743	Bobo	Last chance! One more and this trip is over!
+0dfb29281364	Chidi	Trip failed! We start this leg again from the pickup.
+addce7702894	Koffi	Chale, trip failed! We start this leg again from the pickup.
+03ec67893e02	Bobo	Trip failed! Starting this leg again from the pickup.
+6dc90b109135	Chidi	Next bus stop coming up.
+e82546b5b5bd	Chidi	Border ahead.
+2ce50798e1aa	Chidi	Our last bus stop is coming up.
+9b881171917c	Koffi	Next bus stop coming up, chale.
+af40e4904cca	Koffi	Border ahead, chale.
+d981c124ae48	Koffi	Our last bus stop is coming up, chale.
+53eed1c714a5	Bobo	Next bus stop coming up, y'all.
+eeda647db025	Bobo	Border ahead, y'all.
+0bbb8f37ffdd	Bobo	Our last bus stop is coming up, y'all.
+8682e7038b1c	Chidi	Oya, go straight. Follow the road.
+ffcf09128309	Chidi	Turn left for the junction.
+2fff42a294c9	Chidi	Turn right here.
+4ed2ed3b7b8e	Chidi	Turn left at the roundabout.
+7429a3220efd	Bobo	Go straight ahead — stay on this road.
+c8200d859876	Bobo	Turn left at the intersection.
+39726b010ca1	Bobo	Turn right here, y'all.
+8faaf48d9a83	Bobo	Turn left at the roundabout, y'all.
+cc55dac5fb8c	Bobo	Lenox Mall! All aboard for D.C.! White House, last stop!
+2d12549fad22	Bobo	Georgia, y'all! Peach State in the rear-view, we headed north.
+93673dbd7506	Bobo	Tennessee! Hold on — that's a snowy hill up ahead. Easy, Ray.
+0bafe6f0f519	Bobo	Virginia! Almost to the capital. Sit tight.
+1249526c833d	Bobo	Washington, D.C.! White House on the left, last stop, y'all!
+634dd944bf2e	Bobo	Tennessee snow on the hill, Ray. Pretty as a postcard, slippery as a banana.
+c564752cf471	Bobo	The White House! Last stop, Washington D.C. Watch your step, y'all!
+fbbab5b7f005	Bobo	Alright folks, sit tight. We're moving.

@@ -70,6 +70,7 @@
       </div>
       <div class="flex items-center gap-2 font-mono tabular-nums text-[11px] text-slate-300">
         <span id="music-now" class="text-emerald-400 font-semibold hidden">♪ Afro House</span>
+        <span>Dist: <b id="hud-miles" class="text-amber-300">0.0 mi</b></span>
         <span class="hidden md:inline">Steer: <b id="t-steer" class="text-white">0.00</b></span>
         <span class="hidden sm:inline">Mode: <b id="t-zone" class="text-white">READY</b></span>
       </div>
@@ -1323,24 +1324,30 @@
       group.add(mSign);
     }
 
-    // Helper: 3D Floating Sign Banner Texture
+    // Helper: 3D Floating Sign Banner Texture (Cached to avoid GPU/Canvas stalls while driving)
+    const SIGN_MAT_CACHE = new Map();
     function createSignBannerMesh(text, bgHex = '#14233b', fgHex = '#facc15', w = 8, h = 1.6) {
-      const c = document.createElement('canvas');
-      c.width = 512; c.height = 96;
-      const g = c.getContext('2d');
-      g.fillStyle = bgHex;
-      g.fillRect(0, 0, 512, 96);
-      g.strokeStyle = fgHex;
-      g.lineWidth = 6;
-      g.strokeRect(4, 4, 504, 88);
-      g.fillStyle = fgHex;
-      g.font = '900 30px system-ui, sans-serif';
-      g.textAlign = 'center';
-      g.textBaseline = 'middle';
-      g.fillText(text, 256, 48);
-      const tex = new THREE.CanvasTexture(c);
-      tex.colorSpace = THREE.SRGBColorSpace;
-      const mat = new THREE.MeshBasicMaterial({ map: tex, side: THREE.DoubleSide });
+      const key = `${text}|${bgHex}|${fgHex}`;
+      let mat = SIGN_MAT_CACHE.get(key);
+      if (!mat) {
+        const c = document.createElement('canvas');
+        c.width = 512; c.height = 96;
+        const g = c.getContext('2d');
+        g.fillStyle = bgHex;
+        g.fillRect(0, 0, 512, 96);
+        g.strokeStyle = fgHex;
+        g.lineWidth = 6;
+        g.strokeRect(4, 4, 504, 88);
+        g.fillStyle = fgHex;
+        g.font = '900 30px system-ui, sans-serif';
+        g.textAlign = 'center';
+        g.textBaseline = 'middle';
+        g.fillText(text, 256, 48);
+        const tex = new THREE.CanvasTexture(c);
+        tex.colorSpace = THREE.SRGBColorSpace;
+        mat = new THREE.MeshBasicMaterial({ map: tex, side: THREE.DoubleSide });
+        SIGN_MAT_CACHE.set(key, mat);
+      }
       return new THREE.Mesh(new THREE.PlaneGeometry(w, h), mat);
     }
 
@@ -2030,6 +2037,15 @@
     const blockGroups = new Map();
     const servicePads = [];
 
+    const DASH_MAT = new THREE.MeshBasicMaterial({ color: 0xfacc15 });
+    const ROOF_MAT_CACHE = new Map();
+    function getRoofMat(hex) {
+      if (!ROOF_MAT_CACHE.has(hex)) {
+        ROOF_MAT_CACHE.set(hex, new THREE.MeshStandardMaterial({ color: hex, roughness: 0.6 }));
+      }
+      return ROOF_MAT_CACHE.get(hex);
+    }
+
     function clearCityBlocks() {
       for (const entry of blockGroups.values()) {
         scene.remove(entry.group);
@@ -2037,6 +2053,43 @@
       blockGroups.clear();
       servicePads.length = 0;
       activePresidentPerformers.length = 0;
+    }
+
+    function streamCityBlocks(gxCenter, gzCenter) {
+      // Prune far-behind blocks (> 3 cells away) so memory & draw calls stay constant over 200+ miles
+      for (const [key, entry] of blockGroups.entries()) {
+        const coords = key.split(':')[1];
+        if (!coords) continue;
+        const [bx, bz] = coords.split(',').map(Number);
+        if (Math.abs(bx - gxCenter) > 3 || Math.abs(bz - gzCenter) > 3) {
+          scene.remove(entry.group);
+          entry.group.traverse(obj => {
+            if (obj.geometry && !obj.geometry.userData?.shared) obj.geometry.dispose();
+          });
+          blockGroups.delete(key);
+        }
+      }
+      for (let i = servicePads.length - 1; i >= 0; i--) {
+        if (Math.hypot(servicePads[i].x - bus.x, servicePads[i].z - bus.z) > 320) {
+          servicePads.splice(i, 1);
+        }
+      }
+      // Collect missing blocks in a 2-cell lookahead window & build at most 1 per frame (zero hitch!)
+      const ch = STORY_CHAPTERS[currentChapterIdx];
+      const missing = [];
+      for (let qx = gxCenter - 2; qx <= gxCenter + 2; qx++) {
+        for (let qz = gzCenter - 2; qz <= gzCenter + 2; qz++) {
+          const k = `${ch.id}:${qx},${qz}`;
+          if (!blockGroups.has(k)) {
+            const dist = Math.hypot((qx + 0.5) * CELL - bus.x, (qz + 0.5) * CELL - bus.z);
+            missing.push({ qx, qz, dist });
+          }
+        }
+      }
+      if (missing.length) {
+        missing.sort((a, b) => a.dist - b.dist);
+        ensureCityBlock(missing[0].qx, missing[0].qz);
+      }
     }
 
     function ensureCityBlock(qx, qz) {
@@ -2062,7 +2115,7 @@
       lawn.receiveShadow = true;
       group.add(lawn);
 
-      const dashMat = new THREE.MeshBasicMaterial({ color: 0xfacc15 });
+      const dashMat = DASH_MAT;
       for (let s = -34; s <= 34; s += 12) {
         const dNS = new THREE.Mesh(new THREE.PlaneGeometry(0.28, 5.2), dashMat);
         dNS.rotation.x = -Math.PI * 0.5;
@@ -2192,10 +2245,7 @@
         bMesh.receiveShadow = true;
         group.add(bMesh);
 
-        const roofMat = new THREE.MeshStandardMaterial({
-          color: ROOF_PALETTE[Math.floor(r2 * ROOF_PALETTE.length)],
-          roughness: 0.6
-        });
+        const roofMat = getRoofMat(ROOF_PALETTE[Math.floor(r2 * ROOF_PALETTE.length)]);
         const roof = new THREE.Mesh(createRoundedBox(w + 0.8, 0.65, d + 0.8, 0.1, 2), roofMat);
         roof.position.set(bx, h + 0.52, bz);
         roof.castShadow = true;
@@ -2438,6 +2488,7 @@
       kerbBias: 0,
       cash: 5000,
       fuel: 100,
+      miles: 0,
       riders: [],
       stopHoldT: 0
     };
@@ -3108,6 +3159,12 @@
       WeatherSystem.syncChapter(ch);
 
       clearCityBlocks();
+      const gx0 = Math.round(bus.x / CELL), gz0 = Math.round(bus.z / CELL);
+      for (let qx = gx0 - 1; qx <= gx0 + 1; qx++) {
+        for (let qz = gz0 - 1; qz <= gz0 + 1; qz++) {
+          ensureCityBlock(qx, qz);
+        }
+      }
       MusicPlayer.setRegion(ch.region);
 
       const evBtn = document.getElementById('btn-event');
@@ -4368,11 +4425,10 @@
 
       const gxCenter = Math.round(bus.x / CELL);
       const gzCenter = Math.round(bus.z / CELL);
-      for (let qx = gxCenter - 2; qx <= gxCenter + 1; qx++) {
-        for (let qz = gzCenter - 2; qz <= gzCenter + 1; qz++) {
-          ensureCityBlock(qx, qz);
-        }
-      }
+      streamCityBlocks(gxCenter, gzCenter);
+      bus.miles += Math.abs(bus.speed) * dt * 0.045;
+      const milesEl = document.getElementById('hud-miles');
+      if (milesEl) milesEl.textContent = `${bus.miles.toFixed(1)} mi`;
       groundPlane.position.set(bus.x, 0, bus.z);
 
       danfoMesh.root.position.set(bus.x, bus.hopY, bus.z);

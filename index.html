@@ -72,7 +72,7 @@
     </div>
 
     <!-- Main 3D WebGL2 Viewport + HUD Overlay -->
-    <div id="viewport-wrap" class="relative w-full rounded-2xl overflow-hidden border-2 border-[#14233b] shadow-lg" style="height: calc(100vh - 110px); min-height: 440px; background: #8ec5fc;">
+    <div id="viewport-wrap" class="relative w-full rounded-2xl overflow-hidden border-2 border-[#14233b] shadow-lg" style="height: 392px; background: #8ec5fc;">
       <canvas id="webgl-canvas" class="block w-full h-full cursor-grab active:cursor-grabbing" style="touch-action: none;"></canvas>
       <canvas id="hud-canvas" class="absolute inset-0 block w-full h-full pointer-events-none"></canvas>
 
@@ -94,6 +94,10 @@
 
       <!-- Top-Right Action Bar: Optional Music Toggle, Routes/Story Selector, Event Card, Auto-Drive, Garage & Horn -->
       <div class="absolute top-2.5 right-2.5 max-w-[calc(100%-130px)] flex flex-wrap items-center justify-end gap-1 pointer-events-auto">
+        <button id="btn-weather" type="button" title="Cycle Weather: Auto / Rain / Snow / Fog / Dust / Breeze / Clear (V)"
+          class="slab-btn px-2 py-1 bg-gradient-to-b from-[#e0f2fe] to-[#bae6fd] text-[#0c4a6e] text-[11px] flex items-center gap-1">
+          <span id="weather-ico">🌦️</span><span id="weather-lbl">Auto</span>
+        </button>
         <button id="btn-music" type="button" title="Toggle Optional Regional Music (Nigeria / Ghana / USA)"
           class="slab-btn px-2 py-1 bg-gradient-to-b from-[#fff8ec] to-[#ffe7bd] text-[#14233b] text-[11px] flex items-center gap-1">
           <span>🎵</span><span id="music-lbl">Music: OFF</span>
@@ -2518,7 +2522,195 @@
       };
     })();
 
-    // Apply Chapter Look, Bus Livery, Flag Decal, Fog Density, Music Pool & Opening Story Beat
+    // =========================================================================
+    // 3D WEATHER SYSTEM: RAIN, SNOW, FOG, HARMATTAN DUST, BREEZE & CLEAR
+    // =========================================================================
+    const WeatherSystem = (() => {
+      const MODES = ['auto', 'rain', 'snow', 'fog', 'dust', 'breeze', 'clear'];
+      const META = {
+        auto:   { ico: '🌦️', lbl: 'Auto' },
+        rain:   { ico: '🌧️', lbl: 'Rain' },
+        snow:   { ico: '❄️', lbl: 'Snow' },
+        fog:    { ico: '🌫️', lbl: 'Fog' },
+        dust:   { ico: '🌪️', lbl: 'Dust' },
+        breeze: { ico: '🍃', lbl: 'Breeze' },
+        clear:  { ico: '☀️', lbl: 'Clear' }
+      };
+      let userMode = 'auto';
+      let activeKind = 'clear';
+
+      const COUNT = 700;
+      const BOX_W = 54, BOX_H = 26, BOX_D = 54;
+      const positions = new Float32Array(COUNT * 3);
+      const seeds = new Float32Array(COUNT);
+      for (let i = 0; i < COUNT; i++) {
+        positions[i * 3]     = (Math.random() - 0.5) * BOX_W;
+        positions[i * 3 + 1] = Math.random() * BOX_H;
+        positions[i * 3 + 2] = (Math.random() - 0.5) * BOX_D;
+        seeds[i] = Math.random() * Math.PI * 2;
+      }
+
+      const ptGeom = new THREE.BufferGeometry();
+      ptGeom.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+      const ptMat = new THREE.PointsMaterial({
+        color: 0xffffff,
+        size: 0.35,
+        transparent: true,
+        opacity: 0.78,
+        depthWrite: false
+      });
+      const points = new THREE.Points(ptGeom, ptMat);
+      points.frustumCulled = false;
+      scene.add(points);
+
+      // Slanted Rain Streak Lines for crisp 3D rainfall
+      const RAIN_COUNT = 420;
+      const rainPos = new Float32Array(RAIN_COUNT * 6);
+      const rainGeom = new THREE.BufferGeometry();
+      rainGeom.setAttribute('position', new THREE.BufferAttribute(rainPos, 3));
+      const rainMat = new THREE.LineBasicMaterial({ color: 0xcbe7ff, transparent: true, opacity: 0.65 });
+      const rainLines = new THREE.LineSegments(rainGeom, rainMat);
+      rainLines.frustumCulled = false;
+      scene.add(rainLines);
+
+      function routeDefaultWeather(ch) {
+        if (ch.id === 'anambra') return 'rain';
+        if (ch.id === 'usa_dc') return 'snow';
+        if (ch.id === 'aburi' || ch.id === 'koforidua_downhill') return 'fog';
+        if (ch.id === 'kano' || ch.id === 'countryside') return 'dust';
+        if (ch.id === 'ghana' || ch.id === 'usa' || ch.id === 'city') return 'breeze';
+        return 'breeze';
+      }
+
+      function applyAtmosphere(ch) {
+        activeKind = userMode === 'auto' ? routeDefaultWeather(ch) : userMode;
+        const icoEl = document.getElementById('weather-ico');
+        const lblEl = document.getElementById('weather-lbl');
+        if (icoEl && lblEl) {
+          const m = META[userMode] || META.auto;
+          icoEl.textContent = m.ico;
+          lblEl.textContent = userMode === 'auto' ? `Auto (${META[activeKind].lbl})` : m.lbl;
+        }
+
+        if (activeKind === 'rain') {
+          scene.background.setHex(0x64748b);
+          scene.fog.color.setHex(0x94a3b8);
+          scene.fog.density = 0.015;
+          points.visible = false;
+          rainLines.visible = true;
+        } else if (activeKind === 'snow') {
+          scene.background.setHex(0x94a3b8);
+          scene.fog.color.setHex(0xdbeafe);
+          scene.fog.density = 0.013;
+          ptMat.color.setHex(0xffffff);
+          ptMat.size = 0.42;
+          ptMat.opacity = 0.9;
+          points.visible = true;
+          rainLines.visible = false;
+        } else if (activeKind === 'fog') {
+          scene.background.setHex(0xcbd5e1);
+          scene.fog.color.setHex(0xe2e8f0);
+          scene.fog.density = 0.036;
+          ptMat.color.setHex(0xf1f5f9);
+          ptMat.size = 0.65;
+          ptMat.opacity = 0.38;
+          points.visible = true;
+          rainLines.visible = false;
+        } else if (activeKind === 'dust') {
+          scene.background.setHex(0xd6a360);
+          scene.fog.color.setHex(0xe7c288);
+          scene.fog.density = 0.023;
+          ptMat.color.setHex(0xfde68a);
+          ptMat.size = 0.34;
+          ptMat.opacity = 0.72;
+          points.visible = true;
+          rainLines.visible = false;
+        } else if (activeKind === 'breeze') {
+          scene.background.setHex(ch.sky);
+          scene.fog.color.setHex(ch.fog);
+          scene.fog.density = 0.0068;
+          ptMat.color.setHex(0x86efac);
+          ptMat.size = 0.28;
+          ptMat.opacity = 0.65;
+          points.visible = true;
+          rainLines.visible = false;
+        } else {
+          scene.background.setHex(ch.sky);
+          scene.fog.color.setHex(ch.fog);
+          scene.fog.density = 0.0052;
+          points.visible = false;
+          rainLines.visible = false;
+        }
+      }
+
+      return {
+        get kind() { return activeKind; },
+        cycle(ch) {
+          const i = MODES.indexOf(userMode);
+          userMode = MODES[(i + 1) % MODES.length];
+          applyAtmosphere(ch);
+          return userMode;
+        },
+        syncChapter(ch) {
+          applyAtmosphere(ch);
+        },
+        update(now, dt, bx, bz) {
+          if (activeKind === 'clear') return;
+          const t = now * 0.001;
+
+          if (activeKind === 'rain') {
+            rainLines.position.set(bx, 0, bz);
+            for (let i = 0; i < RAIN_COUNT; i++) {
+              const s = seeds[i];
+              let x = ((positions[i * 3] + t * 5.0) % BOX_W + BOX_W) % BOX_W - BOX_W * 0.5;
+              let y = ((positions[i * 3 + 1] - t * 28.0) % BOX_H + BOX_H) % BOX_H;
+              let z = positions[i * 3 + 2];
+              const idx = i * 6;
+              rainPos[idx]     = x;
+              rainPos[idx + 1] = y;
+              rainPos[idx + 2] = z;
+              rainPos[idx + 3] = x + 0.35;
+              rainPos[idx + 4] = y - 1.55;
+              rainPos[idx + 5] = z + 0.12 * Math.sin(s);
+            }
+            rainGeom.attributes.position.needsUpdate = true;
+            return;
+          }
+
+          points.position.set(bx, 0, bz);
+          const posArr = ptGeom.attributes.position.array;
+          for (let i = 0; i < COUNT; i++) {
+            const k = i * 3;
+            const s = seeds[i];
+            if (activeKind === 'snow') {
+              posArr[k]     += Math.sin(t * 1.4 + s) * 1.8 * dt;
+              posArr[k + 1] -= (3.2 + (s % 1.5)) * dt;
+              posArr[k + 2] += Math.cos(t * 1.1 + s) * 1.4 * dt;
+            } else if (activeKind === 'fog') {
+              posArr[k]     += (2.2 + Math.sin(s)) * dt;
+              posArr[k + 1] += Math.sin(t * 0.7 + s) * 0.4 * dt;
+            } else if (activeKind === 'dust') {
+              posArr[k]     += (9.5 + (s % 3)) * dt;
+              posArr[k + 1] += Math.sin(t * 2.5 + s) * 1.2 * dt;
+              posArr[k + 2] += 2.8 * dt;
+            } else if (activeKind === 'breeze') {
+              posArr[k]     += (12.0 + (s % 4)) * dt;
+              posArr[k + 1] += Math.sin(t * 3.2 + s) * 1.6 * dt;
+              posArr[k + 2] += Math.cos(t * 2.0 + s) * 3.0 * dt;
+            }
+            if (posArr[k] > BOX_W * 0.5) posArr[k] -= BOX_W;
+            if (posArr[k] < -BOX_W * 0.5) posArr[k] += BOX_W;
+            if (posArr[k + 1] < 0) posArr[k + 1] += BOX_H;
+            if (posArr[k + 1] > BOX_H) posArr[k + 1] -= BOX_H;
+            if (posArr[k + 2] > BOX_D * 0.5) posArr[k + 2] -= BOX_D;
+            if (posArr[k + 2] < -BOX_D * 0.5) posArr[k + 2] += BOX_D;
+          }
+          ptGeom.attributes.position.needsUpdate = true;
+        }
+      };
+    })();
+
+    // Apply Chapter Look, Bus Livery, Flag Decal, Weather Atmosphere, Music Pool & Opening Story Beat
     function applyChapter(idx) {
       currentChapterIdx = (idx + STORY_CHAPTERS.length) % STORY_CHAPTERS.length;
       const ch = STORY_CHAPTERS[currentChapterIdx];
@@ -2531,11 +2723,8 @@
       MAT.danfoUpper.color.set(ch.livery.body);
       MAT.danfoRoof.color.setHex(ch.livery.roof);
 
-      scene.background.setHex(ch.sky);
-      scene.fog.color.setHex(ch.fog);
-      scene.fog.near = ch.heavyFog ? 18 : 55;
-      scene.fog.far = ch.heavyFog ? 78 : 165;
       MAT.grass.color.setHex(ch.ground);
+      WeatherSystem.syncChapter(ch);
 
       clearCityBlocks();
       MusicPlayer.setRegion(ch.region);
@@ -3463,6 +3652,11 @@
       AudioFx.honk();
     });
 
+    // Weather Cycle Toggle (Auto / Rain / Snow / Fog / Dust / Breeze / Clear)
+    document.getElementById('btn-weather').addEventListener('click', () => {
+      WeatherSystem.cycle(STORY_CHAPTERS[currentChapterIdx]);
+    });
+
     // Optional Music Toggle
     document.getElementById('btn-music').addEventListener('click', () => {
       MusicPlayer.toggle();
@@ -3611,6 +3805,7 @@
       if (k === 'r' && !e.repeat) uturnRequestedAt = performance.now();
       if (k === 'h' && !e.repeat) AudioFx.honk();
       if (k === 'm' && !e.repeat) MusicPlayer.toggle();
+      if (k === 'v' && !e.repeat) WeatherSystem.cycle(STORY_CHAPTERS[currentChapterIdx]);
     });
     window.addEventListener('keyup', e => {
       const k = e.key.toLowerCase();
@@ -3730,8 +3925,9 @@
         animateHuman3D(pr.mesh, pr.baseX + walkOffset, pr.baseZ, -Math.PI * 0.5, pr.phase, now, pr.walksCarpet ? 1.8 : 0.4, true);
       }
 
-      // Animate Physical 3D Road Checkpoint / Border Stage (Barrier gate, Officer in lane, Supervisor, Tunde & Chidi 3D push-ups & frog jumps, Cattle)
+      // Animate Physical 3D Road Checkpoint / Border Stage & 3D Weather (Rain, Snow, Fog, Dust, Breeze)
       physicalStage.update(now, dt);
+      WeatherSystem.update(now, dt, bus.x, bus.z);
 
       for (const tc of traffic) {
         tc.mesh.group.position.set(tc.x, 0, tc.z);

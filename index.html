@@ -510,6 +510,7 @@
           { file: 'ghana_afrobeat.ogg',          title: 'Afrobeat — Alex Morgan (CC BY)' }
         ],
         usa: [
+          { file: 'usa.ogg',                      title: 'Georgia Country — Danfo Country' },
           { file: 'usa_wild_bridge.ogg',         title: 'Wild Bridge — Kaino (CC0, Country)' },
           { file: 'usa_faded_echo.ogg',          title: 'Faded Echo — Kaino (CC0, Country)' },
           { file: 'usa_northern_foundry.ogg',    title: 'Northern Foundry — Kaino (CC0, Country)' }
@@ -2303,7 +2304,13 @@
       return 'chidi';
     }
 
+    let lastSpokenMsg = '';
+    let lastSpokenAt = 0;
     function storySay(speaker, msg, reg = 'NIGERIA') {
+      const nowMs = performance.now();
+      if (msg === lastSpokenMsg && nowMs - lastSpokenAt < 12000) return;
+      lastSpokenMsg = msg;
+      lastSpokenAt = nowMs;
       mateSpeaker.textContent = speaker;
       mateRegion.textContent = reg.toUpperCase();
       mateText.textContent = msg;
@@ -3045,7 +3052,7 @@
           MAT.danfoUpper.color.set('#f8fafc');
           MAT.danfoRoof.color.setHex(0xf97316);
           MusicPlayer.setRegion('usa');
-          storySay('🇺🇸 Bobo (Bubba) & Ray', 'Peachtree Road, baby! Half the streets in this city got Peachtree in the name.', 'usa');
+          storySay('🇺🇸 Bobo (Bubba) & Ray', 'Welcome to Atlanta, y\'all! Next stop: College Park MARTA Station!', 'usa');
         } else if (ch.id === 'usa_dc') {
           storySay('🏛️ President Trump & Bobo', 'Lenox Mall. Good run, Bobo. Y\'all have a blessed day now!', 'usa');
         } else {

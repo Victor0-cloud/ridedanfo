@@ -121,9 +121,9 @@
         </button>
       </div>
 
-      <!-- Compact Left-Middle Speech Card with Chidi Peeking (never blocks top Auto-Drive bar!) -->
-      <div id="mate-box" class="absolute left-2.5 top-1/2 -translate-y-1/2 max-w-[185px] sm:max-w-[205px] slab-panel px-1.5 py-1 text-[9.5px] leading-tight pointer-events-none mate-pop flex items-center gap-1.5 opacity-95">
-        <div class="min-w-0 flex-1">
+      <!-- Bottom-Right Peeking / Spying Character & Speech Bubble (hidden when idle, pops out only when needed!) -->
+      <div id="mate-box" class="absolute bottom-16 right-0 flex items-end gap-0.5 pointer-events-none transition-all duration-300 ease-out translate-x-[120%] opacity-0 z-10">
+        <div class="relative max-w-[175px] sm:max-w-[195px] slab-panel px-2 py-1 text-[9.5px] leading-tight mb-1.5">
           <div class="flex items-center justify-between gap-1 font-extrabold text-amber-800 text-[8.5px] uppercase tracking-wide mb-0.5">
             <span id="mate-speaker" class="truncate">🧢 Chidi</span>
             <span id="mate-region" class="text-[8px] px-1 rounded bg-amber-500/20 shrink-0">NG</span>
@@ -131,8 +131,9 @@
           <div id="mate-text" class="font-bold text-[#14233b] line-clamp-2">
             Oga, your uncle's danfo is all he left you. Make we start Yaba to Balogun!
           </div>
+          <div class="absolute -right-1.5 bottom-2.5 w-2.5 h-2.5 bg-[#fff8ec] border-r-2 border-t-2 border-[#14233b] rotate-45"></div>
         </div>
-        <canvas id="mate-portrait" width="54" height="64" class="w-[28px] h-[34px] rounded-md border border-[#14233b] bg-[#fef3c7] shrink-0"></canvas>
+        <canvas id="mate-portrait" width="54" height="64" class="w-[46px] h-[56px] -rotate-12 -mr-1 shrink-0 drop-shadow-[0_3px_4px_rgba(0,0,0,0.45)]"></canvas>
       </div>
 
       <!-- Center Fare / Chapter Milestone Toast -->
@@ -2306,6 +2307,7 @@
 
     let lastSpokenMsg = '';
     let lastSpokenAt = 0;
+    let mateHideTimer = 0;
     function storySay(speaker, msg, reg = 'NIGERIA') {
       const nowMs = performance.now();
       if (msg === lastSpokenMsg && nowMs - lastSpokenAt < 12000) return;
@@ -2314,12 +2316,15 @@
       mateSpeaker.textContent = speaker;
       mateRegion.textContent = reg.toUpperCase();
       mateText.textContent = msg;
-      matePortraitCtx.fillStyle = '#fef3c7';
-      matePortraitCtx.fillRect(0, 0, 54, 64);
-      drawCharacterPortrait(matePortraitCtx, 27, 36, 1.0, pickPortraitKind(speaker, msg));
-      mateBox.classList.remove('mate-pop');
+      matePortraitCtx.clearRect(0, 0, 54, 64);
+      drawCharacterPortrait(matePortraitCtx, 27, 38, 1.05, pickPortraitKind(speaker, msg));
+      mateBox.classList.remove('translate-x-[120%]', 'opacity-0', 'mate-pop');
       void mateBox.offsetWidth;
       mateBox.classList.add('mate-pop');
+      clearTimeout(mateHideTimer);
+      mateHideTimer = setTimeout(() => {
+        mateBox.classList.add('translate-x-[120%]', 'opacity-0');
+      }, 4800);
       MusicPlayer.duck(3000);
       VoicePlayer.speak(speaker, msg, reg);
     }

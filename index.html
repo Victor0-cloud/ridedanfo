@@ -121,18 +121,18 @@
         </button>
       </div>
 
-      <!-- Story / Conductor Speech Bubble with Live Character Portrait (chidi_portrait.gd) -->
-      <div id="mate-box" class="absolute top-14 right-2.5 max-w-[295px] slab-panel px-2.5 py-2 text-xs leading-snug pointer-events-none mate-pop flex items-center gap-2">
-        <canvas id="mate-portrait" width="54" height="64" class="w-[54px] h-[64px] rounded-lg border-2 border-[#14233b] bg-[#fef3c7] shrink-0"></canvas>
+      <!-- Compact Corner Speech Card with Chidi Peeking from the Right Edge -->
+      <div id="mate-box" class="absolute top-11 right-1.5 max-w-[185px] sm:max-w-[205px] slab-panel px-1.5 py-1 text-[9.5px] leading-tight pointer-events-none mate-pop flex items-center gap-1.5 opacity-95">
         <div class="min-w-0 flex-1">
-          <div class="flex items-center justify-between gap-1 font-extrabold text-amber-800 text-[11px] uppercase tracking-wider mb-0.5">
-            <span id="mate-speaker" class="truncate">🧢 Conductor Chidi</span>
-            <span id="mate-region" class="text-[10px] px-1.5 py-0.2 rounded bg-amber-500/20 shrink-0">NIGERIA</span>
+          <div class="flex items-center justify-between gap-1 font-extrabold text-amber-800 text-[8.5px] uppercase tracking-wide mb-0.5">
+            <span id="mate-speaker" class="truncate">🧢 Chidi</span>
+            <span id="mate-region" class="text-[8px] px-1 rounded bg-amber-500/20 shrink-0">NG</span>
           </div>
-          <div id="mate-text" class="font-bold text-[#14233b]">
-            Oga, your uncle's danfo is all he left you. Alhaji wants ₦60,000 in 30 days or he takes it back. Make we start Yaba to Balogun!
+          <div id="mate-text" class="font-bold text-[#14233b] line-clamp-2">
+            Oga, your uncle's danfo is all he left you. Make we start Yaba to Balogun!
           </div>
         </div>
+        <canvas id="mate-portrait" width="54" height="64" class="w-[28px] h-[34px] rounded-md border border-[#14233b] bg-[#fef3c7] shrink-0"></canvas>
       </div>
 
       <!-- Center Fare / Chapter Milestone Toast -->
@@ -1984,7 +1984,12 @@
         ['peachtree road, baby', '522aa5bff3e8'],
         ['buckhead towers', '568322d97320'],
         ['let me off by the corner store', '6b65bc21e1a6'],
-        ['lenox mall! last stop', '5626db631005']
+        ['lenox mall! last stop', '5626db631005'],
+        ['hold your change well, balogun', '14fd1eaaa172'],
+        ['my change be ₦700. road clear', '158807960770'],
+        ['pass the mtn mast, dangote refinery', 'f39a24be1cca'],
+        ['road clear! make we go to cms marina', '78bb44932e66'],
+        ['see mtn mast, dangote refinery and eko hotel', '9b82de6eb4e7']
       ];
 
       // Load full 368-clip index from ./voices/voices_meta.txt
@@ -2022,18 +2027,19 @@
           const isFemale = sLow.includes('ronke') || sLow.includes('nkechi') || sLow.includes('bisi') || sLow.includes('ama') || sLow.includes('keisha') || sLow.includes('madam') || sLow.includes('amina');
           const isUS = reg === 'usa' || reg === 'usa_dc' || sLow.includes('bobo') || sLow.includes('ray') || sLow.includes('trump');
 
-          // Prefer Microsoft Natural Online voices (Abeo, Ezinne, Guy, Christopher, Aria)
+          // Only use real Microsoft Natural / Nigerian / Hausa neural voices (never robotic SAPI fallback!)
           let chosen = null;
           if (!isUS) {
             chosen = voices.find(v => v.name.includes('Microsoft') && v.name.includes(isFemale ? 'Ezinne' : 'Abeo'))
-                  || voices.find(v => v.lang === 'en-NG')
+                  || voices.find(v => v.lang === 'ha-NG' || v.lang === 'en-NG')
                   || voices.find(v => v.name.includes('Microsoft') && v.name.includes('Natural'));
           } else {
             chosen = voices.find(v => v.name.includes('Microsoft') && v.name.includes(isFemale ? 'Aria' : (sLow.includes('ray') ? 'Christopher' : 'Guy')))
                   || voices.find(v => v.name.includes('Microsoft') && v.name.includes('Natural') && v.lang.startsWith('en-US'))
                   || voices.find(v => v.name.includes('Microsoft') && v.name.includes('Natural'));
           }
-          if (chosen) utt.voice = chosen;
+          if (!chosen) return; // Never fall back to a robotic system voice
+          utt.voice = chosen;
           utt.rate = 1.04;
           utt.pitch = sLow.includes('koffi') ? 1.12 : sLow.includes('bello') || sLow.includes('officer') ? 0.92 : 1.02;
           utt.volume = 0.85;
@@ -2053,7 +2059,14 @@
             a.volume = 0.92;
             currentVoiceAudio = a;
             a.play().catch(() => {
-              speakWithMicrosoftNaturalTTS(speaker, text, reg);
+              // Retry once after first user gesture instead of falling back to robotic speechSynthesis
+              const resume = () => {
+                if (currentVoiceAudio === a) a.play().catch(() => {});
+                window.removeEventListener('pointerdown', resume);
+                window.removeEventListener('keydown', resume);
+              };
+              window.addEventListener('pointerdown', resume, { once: true });
+              window.addEventListener('keydown', resume, { once: true });
             });
           } else {
             speakWithMicrosoftNaturalTTS(speaker, text, reg);

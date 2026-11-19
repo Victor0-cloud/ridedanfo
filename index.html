@@ -1690,15 +1690,36 @@
       const roofMat = new THREE.MeshStandardMaterial({ color: spec.roof, roughness: 0.3, metalness: 0.25 });
 
       if (spec.kind === 'truck') {
-        const cab = new THREE.Mesh(createRoundedBox(2.15, 1.85, 1.85, 0.14, 3), paintMat);
-        cab.position.set(0, 1.22, -1.75);
+        // Realistic Truck: Chassis, cab with grille/bumper/mirrors/exhaust, & ribbed cargo box
+        const chassis = new THREE.Mesh(createRoundedBox(2.05, 0.32, 6.2, 0.06, 2), MAT.darkSteel);
+        chassis.position.set(0, 0.48, 0.25);
+        const cab = new THREE.Mesh(createRoundedBox(2.16, 1.78, 1.95, 0.14, 3), paintMat);
+        cab.position.set(0, 1.38, -1.78);
         cab.castShadow = true;
-        const wind = new THREE.Mesh(createRoundedBox(1.92, 0.65, 0.1, 0.04, 2), MAT.glass);
-        wind.position.set(0, 1.55, -2.66);
-        const box = new THREE.Mesh(createRoundedBox(2.32, 2.45, 3.85, 0.08, 2), roofMat);
-        box.position.set(0, 1.62, 1.15);
+        const wind = new THREE.Mesh(createRoundedBox(1.94, 0.68, 0.12, 0.04, 2), MAT.glass);
+        wind.position.set(0, 1.72, -2.74);
+        const grille = new THREE.Mesh(createRoundedBox(1.25, 0.56, 0.1, 0.03, 2), MAT.chrome);
+        grille.position.set(0, 1.02, -2.74);
+        const bumper = new THREE.Mesh(createRoundedBox(2.26, 0.24, 0.22, 0.05, 2), MAT.chrome);
+        bumper.position.set(0, 0.54, -2.78);
+        const exhaust = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.07, 2.35, 8), MAT.chrome);
+        exhaust.position.set(1.06, 1.75, -0.78);
+        const box = new THREE.Mesh(createRoundedBox(2.34, 2.48, 3.95, 0.08, 2), roofMat);
+        box.position.set(0, 1.78, 1.25);
         box.castShadow = true;
-        group.add(cab, wind, box);
+        for (const rz of [-0.2, 0.8, 1.8, 2.8]) {
+          const rib = new THREE.Mesh(new THREE.BoxGeometry(2.38, 2.42, 0.08), MAT.darkSteel);
+          rib.position.set(0, 1.78, rz);
+          group.add(rib);
+        }
+        for (const sx of [-1.14, 1.14]) {
+          const mirror = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.28, 0.14), MAT.darkSteel);
+          mirror.position.set(sx, 1.65, -2.35);
+          const hl = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.2, 0.08), MAT.headlight);
+          hl.position.set(sx * 0.72, 0.88, -2.76);
+          group.add(mirror, hl);
+        }
+        group.add(chassis, cab, wind, grille, bumper, exhaust, box);
       } else if (spec.kind === 'korope') {
         const body = new THREE.Mesh(createRoundedBox(1.88, 1.52, 3.95, 0.18, 4), paintMat);
         body.position.set(0, 1.05, 0);
@@ -1707,7 +1728,14 @@
         stripe.position.set(0, 0.92, 0);
         const glass = new THREE.Mesh(createRoundedBox(1.90, 0.48, 3.45, 0.06, 2), MAT.glass);
         glass.position.set(0, 1.42, 0);
-        group.add(body, stripe, glass);
+        const bumper = new THREE.Mesh(createRoundedBox(1.92, 0.2, 0.18, 0.04, 2), MAT.darkSteel);
+        bumper.position.set(0, 0.42, -1.96);
+        for (const sx of [-0.68, 0.68]) {
+          const hl = new THREE.Mesh(new THREE.BoxGeometry(0.28, 0.16, 0.08), MAT.headlight);
+          hl.position.set(sx, 0.76, -1.97);
+          group.add(hl);
+        }
+        group.add(body, stripe, glass, bumper);
       } else {
         const lower = new THREE.Mesh(createRoundedBox(1.86, 0.68, 4.15, 0.14, 4), paintMat);
         lower.position.set(0, 0.64, 0);
@@ -1717,7 +1745,18 @@
         upper.castShadow = true;
         const glass = new THREE.Mesh(createRoundedBox(1.66, 0.44, 2.22, 0.10, 3), MAT.glass);
         glass.position.set(0, 1.18, 0.12);
-        group.add(lower, upper, glass);
+        const grille = new THREE.Mesh(createRoundedBox(0.92, 0.24, 0.08, 0.03, 2), MAT.chrome);
+        grille.position.set(0, 0.62, -2.07);
+        const bumper = new THREE.Mesh(createRoundedBox(1.88, 0.18, 0.18, 0.04, 2), MAT.darkSteel);
+        bumper.position.set(0, 0.38, -2.06);
+        for (const sx of [-0.66, 0.66]) {
+          const hl = new THREE.Mesh(new THREE.BoxGeometry(0.28, 0.15, 0.08), MAT.headlight);
+          hl.position.set(sx, 0.68, -2.07);
+          const mirror = new THREE.Mesh(new THREE.BoxGeometry(0.14, 0.12, 0.16), paintMat);
+          mirror.position.set(sx * 1.44, 1.02, -0.58);
+          group.add(hl, mirror);
+        }
+        group.add(lower, upper, glass, grille, bumper);
         if (spec.kind === 'taxi') {
           const sign = new THREE.Mesh(createRoundedBox(0.55, 0.18, 0.24, 0.04, 2), MAT.headlight);
           sign.position.set(0, 1.54, 0.05);
@@ -3724,7 +3763,26 @@
         const toBusX = bus.x - tc.x, toBusZ = bus.z - tc.z;
         const busAhead = toBusX * tfx + toBusZ * tfz;
         const busLat = Math.abs(toBusX * trx + toBusZ * trz);
-        tc.braking = busAhead > -2 && busAhead < 12 && busLat < 2.6;
+        let mustBrake = busAhead > -2 && busAhead < 12 && busLat < 2.6;
+
+        // Prevent traffic vehicles from merging/jointing into each other
+        for (const other of traffic) {
+          if (other === tc) continue;
+          const odx = other.x - tc.x, odz = other.z - tc.z;
+          const oDist = Math.hypot(odx, odz);
+          if (oDist > 0.001 && oDist < 5.6) {
+            const push = (5.6 - oDist) * 0.5;
+            tc.x -= (odx / oDist) * push;
+            tc.z -= (odz / oDist) * push;
+          }
+          const oAhead = odx * tfx + odz * tfz;
+          const oLat = Math.abs(odx * trx + odz * trz);
+          if (oAhead > 0 && oAhead < 13 && oLat < 2.5) {
+            mustBrake = true;
+          }
+        }
+
+        tc.braking = mustBrake;
         const spd = tc.braking ? 0 : tc.speed;
         tc.curSpeed += (spd - tc.curSpeed) * Math.min(1, 6 * dt);
         tc.x += tfx * tc.curSpeed * dt;
@@ -3738,8 +3796,15 @@
           const nrx = Math.cos(tc.heading), nrz = Math.sin(tc.heading);
           const ngx = Math.round(bus.x / CELL) + Math.round(Math.sin(bus.heading));
           const ngz = Math.round(bus.z / CELL) + Math.round(-Math.cos(bus.heading));
-          tc.x = ngx * CELL + nrx * (ROAD_HALF * 0.48) - nfx * 25;
-          tc.z = ngz * CELL + nrz * (ROAD_HALF * 0.48) - nfz * 25;
+          for (let attempt = 0; attempt < 5; attempt++) {
+            const candX = ngx * CELL + nrx * (ROAD_HALF * 0.48) - nfx * (25 + attempt * 18);
+            const candZ = ngz * CELL + nrz * (ROAD_HALF * 0.48) - nfz * (25 + attempt * 18);
+            if (!traffic.some(o => o !== tc && Math.hypot(o.x - candX, o.z - candZ) < 16)) {
+              tc.x = candX;
+              tc.z = candZ;
+              break;
+            }
+          }
         }
       }
 

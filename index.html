@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
-  <title>Danfo Rush 3D — Premium WebGL2 Edition</title>
+  <title>Danfo Diaries 3D — From Lagos to Washington D.C.</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="./three.min.js"></script>
   <style>
@@ -53,18 +53,21 @@
 </head>
 <body class="bg-[#0d1522] text-slate-100 antialiased p-2 m-0 select-none overflow-hidden">
   <div class="py-1.5 space-y-1.5">
-    <!-- Top Status & Telemetry Bar -->
+    <!-- Top Status, Campaign Chapter & Telemetry Bar -->
     <div class="flex flex-wrap items-center justify-between gap-2 pb-1.5 border-b border-[var(--card-border)] text-xs">
       <div class="flex items-center gap-2">
-        <span class="font-bold tracking-tight">🚐 Danfo Rush 3D</span>
-        <span id="district-tag" class="px-2 py-0.5 rounded-full bg-[var(--card)] border border-[var(--card-border)] font-semibold text-[11px]">
-          Lagos Island • Marina
+        <span class="font-bold tracking-tight">🚐 Danfo Diaries 3D</span>
+        <span id="chapter-badge" class="px-2 py-0.5 rounded-full bg-amber-400/20 border border-amber-500/40 font-bold text-[11px]">
+          Ch.1/9 • Lagos: Yaba → Balogun
+        </span>
+        <span id="debt-badge" class="px-2 py-0.5 rounded-full bg-[var(--card)] border border-[var(--card-border)] font-mono text-[11px]">
+          Alhaji Debt: ₦55,000 left (Day 1/30)
         </span>
       </div>
-      <div class="flex items-center gap-3 font-mono tabular-nums text-[11px] text-[var(--muted-foreground)]">
+      <div class="flex items-center gap-2.5 font-mono tabular-nums text-[11px] text-[var(--muted-foreground)]">
+        <span id="music-now" class="text-emerald-500 font-semibold hidden">♪ Afro House</span>
         <span>Steer: <b id="t-steer" class="text-[var(--foreground)]">0.00</b></span>
         <span>Mode: <b id="t-zone" class="text-[var(--foreground)]">READY</b></span>
-        <span>Homing: <b id="t-home" class="text-[var(--foreground)]">IDLE</b></span>
       </div>
     </div>
 
@@ -73,11 +76,11 @@
       <canvas id="webgl-canvas" class="block w-full h-full cursor-grab active:cursor-grabbing" style="touch-action: none;"></canvas>
       <canvas id="hud-canvas" class="absolute inset-0 block w-full h-full pointer-events-none"></canvas>
 
-      <!-- Top-Left HUD: Money, Fuel & Passenger Seats -->
+      <!-- Top-Left HUD: Money, Fuel, Seats & Reputation -->
       <div class="absolute top-2.5 left-2.5 flex flex-col gap-1.5 pointer-events-none">
         <div id="money-panel" class="slab-panel px-3 py-1 flex items-center gap-2 text-sm tabular-nums">
           <span>💰</span>
-          <span id="hud-cash" class="text-base">₦500</span>
+          <span id="hud-cash" class="text-base">₦5,000</span>
         </div>
         <div id="fuel-panel" class="slab-panel px-3 py-1 flex items-center gap-2 text-xs tabular-nums">
           <span>⛽</span>
@@ -85,37 +88,62 @@
           <span class="opacity-60">L</span>
           <span class="mx-0.5 opacity-30">|</span>
           <span>🪑</span>
-          <span id="hud-seats" class="text-sm">0/8</span>
+          <span id="hud-seats" class="text-sm">0/6</span>
         </div>
       </div>
 
-      <!-- Top-Right Action Ladder: Auto-Drive Watch Mode, Garage Upgrades & Horn -->
-      <div class="absolute top-2.5 right-2.5 flex items-center gap-1.5 pointer-events-auto">
+      <!-- Top-Right Action Bar: Optional Music Toggle, Routes/Story Selector, Auto-Drive, Garage & Horn -->
+      <div class="absolute top-2.5 right-2.5 flex flex-wrap items-center justify-end gap-1.5 pointer-events-auto">
+        <button id="btn-music" type="button" title="Toggle Optional Regional Music (Nigeria / Ghana / USA)"
+          class="slab-btn px-2.5 py-1.5 bg-gradient-to-b from-[#fff8ec] to-[#ffe7bd] text-[#14233b] text-xs flex items-center gap-1">
+          <span>🎵</span><span id="music-lbl">Music: OFF</span>
+        </button>
+        <button id="btn-routes" type="button" title="Switch Story Chapter & Route (Lagos → Ghana → Atlanta → Washington D.C.)"
+          class="slab-btn px-2.5 py-1.5 bg-gradient-to-b from-[#c3cfe4] to-[#94a6c6] text-[#14233b] text-xs flex items-center gap-1">
+          <span>🗺️</span><span>Story / Routes</span>
+        </button>
         <button id="btn-autodrive" type="button" class="slab-btn px-2.5 py-1.5 bg-gradient-to-b from-[#7ff0a8] to-[#46d27a] text-[#08351a] text-xs flex items-center gap-1">
           <span>🎬</span><span id="autodrive-lbl">Auto-Drive: ON</span>
         </button>
         <button id="btn-shop" type="button" class="slab-btn px-2.5 py-1.5 bg-gradient-to-b from-[#ffd27a] to-[#ffb347] text-[#2a1800] text-xs flex items-center gap-1">
           <span>🔧</span><span>Garage</span>
         </button>
-        <button id="btn-horn" type="button" title="Honk Danfo Horn (H)" class="slab-btn w-9 h-9 bg-gradient-to-b from-[#fff8ec] to-[#ffe7bd] text-[#14233b] text-base flex items-center justify-center">
+        <button id="btn-horn" type="button" title="Honk Horn (H)" class="slab-btn w-8 h-8 bg-gradient-to-b from-[#fff8ec] to-[#ffe7bd] text-[#14233b] text-sm flex items-center justify-center">
           📯
         </button>
       </div>
 
-      <!-- Conductor Chidi Speech Bubble -->
-      <div id="mate-box" class="absolute top-14 right-2.5 max-w-[240px] slab-panel px-3 py-2 text-xs leading-snug pointer-events-none mate-pop">
-        <div class="flex items-center gap-1.5 font-extrabold text-amber-800 text-[11px] uppercase tracking-wider mb-0.5">
-          <span>🧢 Conductor Chidi</span>
+      <!-- Story / Conductor Speech Bubble -->
+      <div id="mate-box" class="absolute top-14 right-2.5 max-w-[265px] slab-panel px-3 py-2 text-xs leading-snug pointer-events-none mate-pop">
+        <div class="flex items-center justify-between gap-1.5 font-extrabold text-amber-800 text-[11px] uppercase tracking-wider mb-0.5">
+          <span id="mate-speaker">🧢 Conductor Chidi</span>
+          <span id="mate-region" class="text-[10px] px-1.5 py-0.2 rounded bg-amber-500/20">NIGERIA</span>
         </div>
         <div id="mate-text" class="font-bold text-[#14233b]">
-          Oya Boss! Hold road &amp; slide thumb to steer. Green bumper LEDs mean junction turn dey!
+          Oga, your uncle's danfo is all he left you. Alhaji wants ₦60,000 in 30 days or he takes it back. Make we start Yaba to Balogun!
         </div>
       </div>
 
-      <!-- Center Fare / Milestone Toast -->
-      <div id="fare-toast" class="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 slab-panel px-4 py-2 text-center pointer-events-none hidden">
-        <div id="toast-title" class="text-lg font-black text-emerald-700">+₦400</div>
-        <div id="toast-sub" class="text-xs font-bold text-[#14233b]">Obalende Drop-Off Complete!</div>
+      <!-- Center Fare / Chapter Milestone Toast -->
+      <div id="fare-toast" class="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 slab-panel px-4 py-2.5 text-center pointer-events-none hidden z-10">
+        <div id="toast-title" class="text-lg font-black text-emerald-700">+₦2,400</div>
+        <div id="toast-sub" class="text-xs font-bold text-[#14233b]">Balogun Market Arrival!</div>
+      </div>
+
+      <!-- Sergeant Bello / Border Checkpoint Choice Card -->
+      <div id="checkpoint-modal" class="absolute inset-x-0 top-16 mx-auto w-full max-w-xs slab-panel p-3 z-20 hidden pointer-events-auto">
+        <div id="cp-title" class="text-xs font-black uppercase text-amber-900">👮 Sergeant Bello Checkpoint</div>
+        <div id="cp-body" class="text-xs font-bold text-[#14233b] mt-1">
+          "Park well! Wetin you carry for roof? Settle ₦500 or make we check your papers!"
+        </div>
+        <div class="flex items-center gap-2 mt-2.5">
+          <button id="btn-cp-clean" type="button" class="slab-btn flex-1 py-1.5 bg-[#46d27a] text-[#08351a] text-xs">
+            Show Clean Papers (Respect +1)
+          </button>
+          <button id="btn-cp-settle" type="button" class="slab-btn flex-1 py-1.5 bg-[#ffd27a] text-[#2a1800] text-xs">
+            Settle ₦500 (Fast Pass)
+          </button>
+        </div>
       </div>
 
       <!-- Bottom-Left Instrument Stack: Speedometer directly over Route Minimap -->
@@ -141,13 +169,27 @@
         </button>
       </div>
 
+      <!-- Story Campaign & Route Selector Modal (Lagos -> Ghana -> Atlanta -> Washington D.C.) -->
+      <div id="routes-modal" class="absolute inset-0 bg-[#0a1526]/80 z-30 hidden items-center justify-center p-3">
+        <div class="slab-panel w-full max-w-md p-3.5 space-y-2 pointer-events-auto max-h-[370px] flex flex-col">
+          <div class="flex items-center justify-between border-b-2 border-[#14233b]/15 pb-1.5">
+            <div>
+              <div class="text-sm font-black">🗺️ Story Campaign: From Lagos to Washington D.C.</div>
+              <div class="text-[11px] font-semibold opacity-75">Jump to any chapter or drive through the full campaign</div>
+            </div>
+            <button id="btn-routes-close" type="button" class="slab-btn w-7 h-7 bg-[#fff8ec] text-xs flex items-center justify-center">✕</button>
+          </div>
+          <div id="routes-list" class="space-y-1.5 overflow-y-auto pr-1 text-xs flex-1"></div>
+        </div>
+      </div>
+
       <!-- Garage / Upgrade Modal Overlay -->
-      <div id="shop-modal" class="absolute inset-0 bg-[#0a1526]/75 z-20 hidden items-center justify-center p-4">
+      <div id="shop-modal" class="absolute inset-0 bg-[#0a1526]/75 z-30 hidden items-center justify-center p-4">
         <div class="slab-panel w-full max-w-sm p-3.5 space-y-2.5 pointer-events-auto">
           <div class="flex items-center justify-between border-b-2 border-[#14233b]/15 pb-2">
             <div>
-              <div class="text-base font-black">🔧 Oshodi Danfo Garage</div>
-              <div class="text-xs font-semibold opacity-75">Upgrade your bus with collected fares</div>
+              <div class="text-base font-black">🔧 Yellow Star Motor Park Garage</div>
+              <div class="text-xs font-semibold opacity-75">Upgrade your bus while saving ₦60,000 for Alhaji</div>
             </div>
             <button id="btn-shop-close" type="button" class="slab-btn w-8 h-8 bg-[#fff8ec] text-sm flex items-center justify-center">✕</button>
           </div>
@@ -159,7 +201,253 @@
 
   <script>
     // =========================================================================
-    // 1. WEB AUDIO SYNTHESIZER
+    // 1. FULL STORYLINE DATA: LAGOS -> KANO/ANAMBRA -> GHANA -> ATLANTA -> WASHINGTON D.C.
+    // =========================================================================
+    const STORY_CHAPTERS = [
+      {
+        id: 'classic',
+        num: 1,
+        title: 'Prologue: Yaba → Balogun Market',
+        region: 'nigeria',
+        currency: '₦',
+        fareBase: 1200,
+        livery: { body: '#facc15', stripe: '#111827', text: 'LASG • YABA - BALOGUN MARKET', roof: 0xfef08a },
+        sky: 0x8ec5fc, fog: 0x9ecbff, ground: 0x5c8a47,
+        speaker: '🧢 Conductor Chidi',
+        startLine: "Oga, your uncle's danfo is all he left you. Alhaji wants ₦60,000 in 30 days or he takes it back. Make we start Yaba to Balogun!",
+        midLine: "Police ahead, Agbero after. Keep your papers ready and your change counted!",
+        arrivalLine: "Balogun! First day done. Alhaji go hear say we dey work. Next: Mama Nkechi at Ojuelegba Market!"
+      },
+      {
+        id: 'market',
+        num: 2,
+        title: 'Ch. 1: Ojuelegba → Oyingbo Market',
+        region: 'nigeria',
+        currency: '₦',
+        fareBase: 1450,
+        livery: { body: '#facc15', stripe: '#111827', text: 'LASG • OJUELEGBA - OYINGBO', roof: 0xfef08a },
+        sky: 0x93c5fd, fog: 0xfde68a, ground: 0x658a47,
+        speaker: '🌶️ Mama Nkechi & Chidi',
+        startLine: "Mama Nkechi: 'So you be the new driver? My pepper must reach Oyingbo fresh, no rough driving!'",
+        midLine: "Chidi: 'Go-slow ahead. Hawkers everywhere. Patience is money on this road, Oga!'",
+        arrivalLine: "Mama Nkechi: 'You do well! From today all my market women ride with you.' Next: Obalende to CMS!"
+      },
+      {
+        id: 'city',
+        num: 3,
+        title: 'Ch. 2: Obalende → CMS (Sgt. Bello)',
+        region: 'nigeria',
+        currency: '₦',
+        fareBase: 1650,
+        livery: { body: '#facc15', stripe: '#111827', text: 'LASG • OBALENDE - CMS MARINA', roof: 0xfef08a },
+        sky: 0x7dd3fc, fog: 0xbae6fd, ground: 0x4b5563,
+        speaker: '👮 Sgt. Bello & Chidi',
+        checkpoint: true,
+        startLine: "Chidi: 'Obalende to CMS. Sergeant Bello works this road — if he stops us, decide whether to settle or show clean papers!'",
+        midLine: "Chidi: 'Checkpoint ahead! Remember: whatever you do today, Sergeant Bello remembers tomorrow.'",
+        arrivalLine: "CMS! The Marina office crowd pays well. Next: Match day race against Tunde 'Speed' to the National Stadium!"
+      },
+      {
+        id: 'arcade',
+        num: 4,
+        title: 'Ch. 3: Surulere National Stadium Race',
+        region: 'nigeria',
+        currency: '₦',
+        fareBase: 1900,
+        livery: { body: '#facc15', stripe: '#111827', text: 'LASG • SURULERE STADIUM EXPRESS', roof: 0xfef08a },
+        sky: 0xa78bfa, fog: 0xfdba74, ground: 0x5c8a47,
+        speaker: '🏎️ Tunde "Speed" & Chidi',
+        startLine: "Tunde 'Speed': 'Old man's danfo? Na museum! The National Stadium crowd is mine today!'",
+        midLine: "Chidi: 'Tunde dey behind us! Hold your line and pick the stadium crowd sharp-sharp!'",
+        arrivalLine: "Chidi: 'We beat Tunde to the Stadium! Oga... my mother is sick in the village. Abeg, can we take the Village & North Shuttle?'"
+      },
+      {
+        id: 'countryside',
+        num: 5,
+        title: 'Ch. 4: Village, Niger Bridge & Kano Wall',
+        region: 'nigeria',
+        currency: '₦',
+        fareBase: 2200,
+        livery: { body: '#facc15', stripe: '#111827', text: 'NIGER BRIDGE • ONITSHA - KANO', roof: 0xfef08a },
+        sky: 0x93c5fd, fog: 0xfed7aa, ground: 0x9a5b32,
+        speaker: '🏡 Chidi & Chidi\'s Mother',
+        startLine: "Chidi: 'Garin Daji to Kasuwan Daji, over the Niger Bridge and north to Kano Kofar Nassarawa! Drive gently, my mother dey wait.'",
+        midLine: "Chidi: 'Oga, when Alhaji's debt is paid... I want my own bus one day. See Dala Hill ahead!'",
+        arrivalLine: "Chidi's Mother: 'God bless you for bringing my son!' Chidi: 'Bad news from Lagos — Baba Ibile and his Agberos seized the park!'"
+      },
+      {
+        id: 'finale',
+        num: 6,
+        title: 'Ch. 5: Lagos Finale vs. Baba Ibile',
+        region: 'nigeria',
+        currency: '₦',
+        fareBase: 2800,
+        livery: { body: '#facc15', stripe: '#111827', text: 'OGA DANFO • YELLOW STAR PARK', roof: 0xfef08a },
+        sky: 0x60a5fa, fog: 0xbfdbfe, ground: 0x5c8a47,
+        speaker: '👑 Baba Ibile & Alhaji',
+        startLine: "Baba Ibile: 'This park is mine now!' Chidi: 'One big run, Yaba to Balogun. Everybody we helped is backing us!'",
+        midLine: "Chidi: 'Mama Nkechi's women, the village, even Bello's men cleared the road for us! Keep pushing!'",
+        arrivalLine: "Alhaji: 'My ₦60,000 is complete. The danfo papers are yours!' Chidi: 'You be Oga now! Next stop: Ghana Tro-Tro Run!'"
+      },
+      {
+        id: 'ghana',
+        num: 7,
+        title: 'Ch. 6: Ghana Tro-Tro & Aburi Mountain',
+        region: 'ghana',
+        currency: '₵',
+        fareBase: 180,
+        livery: { body: '#1d4ed8', stripe: '#ffffff', text: 'ACCRA • CIRCLE - ABURI - JAMESTOWN', roof: 0xf8fafc },
+        sky: 0x38bdf8, fog: 0xe0f2fe, ground: 0x3f7a38,
+        speaker: '🇬🇭 Kwesi & Mate Koffi',
+        startLine: "Koffi: 'Circle Circle Circle! Makola! Black Star Square! Then up the Aburi mountain hairpins to Koforidua! Enter, enter, chale!'",
+        midLine: "Koffi: 'Kwesi, gently on the Aburi bends! Look at Black Star Square — Freedom and Justice, my brother!'",
+        arrivalLine: "Kwesi: 'Jamestown Lighthouse & Kotoka Border! Medaase, Koffi. Stamp the visas — we're flying into Atlanta, USA!'"
+      },
+      {
+        id: 'usa',
+        num: 8,
+        title: 'Ch. 7: Atlanta MARTA (Peachtree → Lenox)',
+        region: 'usa',
+        currency: '$',
+        fareBase: 120,
+        livery: { body: '#f8fafc', stripe: '#0284c7', text: 'MARTA • PEACHTREE - BUCKHEAD - LENOX', roof: 0xffffff },
+        sky: 0x60a5fa, fog: 0xdbeafe, ground: 0x3b6e4c,
+        speaker: '🇺🇸 Driver Ray & Bobo (ATL)',
+        startLine: "Ray: 'Morning, y'all. Welcome to Atlanta! College Park station up Peachtree Road to Buckhead and Lenox Mall. Bobo, call 'em!'",
+        midLine: "Bobo: 'Peachtree Road, baby! Ray, you see them Buckhead glass towers? One day I'ma live up there!'",
+        arrivalLine: "Ray: 'Lenox Mall! Good run, Bobo. Next up: I-95 North all the way to Washington D.C.!'"
+      },
+      {
+        id: 'usa_dc',
+        num: 9,
+        title: 'Ch. 8: Atlanta → Washington D.C. Finale',
+        region: 'usa',
+        currency: '$',
+        fareBase: 220,
+        livery: { body: '#e2e8f0', stripe: '#dc2626', text: 'METRO D.C. • NATIONAL MALL - UNION STN', roof: 0xf8fafc },
+        sky: 0x3b82f6, fog: 0xdbeafe, ground: 0x2f6846,
+        speaker: '🏛️ Ray & Bobo (Washington D.C.)',
+        dcMonuments: true,
+        startLine: "Bobo: 'From Lagos to Washington D.C.! Look ahead on the National Mall — the Washington Monument and the U.S. Capitol Dome!'",
+        midLine: "Ray: 'Constitution Ave up to Capitol Hill and Union Station. Easy round the monument plaza, y'all!'",
+        arrivalLine: "Bobo: 'Union Station, Washington D.C.! From Agbero in Lagos to the steps of the Capitol — y'all made history today!'"
+      }
+    ];
+
+    // =========================================================================
+    // 2. OPTIONAL REGIONAL MUSIC PLAYER (OGG Tracks + Synth Groove Fallback + Auto-Ducking)
+    // =========================================================================
+    const MusicPlayer = (() => {
+      let enabled = false; // Optional: starts OFF until user clicks "Music: OFF"
+      let currentRegion = 'nigeria';
+      const audioEls = {};
+      const TRACK_LABELS = {
+        nigeria: 'Afro House — Alex Morgan',
+        ghana: 'Hot Amapiano — Alex Morgan',
+        usa: 'Glass Window Hip-Hop — Kaino'
+      };
+      const TRACK_FILES = {
+        nigeria: './music/nigeria.ogg',
+        ghana: './music/ghana.ogg',
+        usa: './music/usa.ogg'
+      };
+      let synthTimer = 0;
+      let duckUntil = 0;
+
+      function getAudioEl(reg) {
+        if (!audioEls[reg]) {
+          const a = new Audio(TRACK_FILES[reg]);
+          a.loop = true;
+          a.volume = 0.42;
+          audioEls[reg] = a;
+        }
+        return audioEls[reg];
+      }
+
+      // Lightweight procedural WebAudio Afrobeat/Amapiano/Hip-Hop groove fallback if OGG isn't loaded yet
+      function startSynthLoop() {
+        stopSynthLoop();
+        let step = 0;
+        synthTimer = setInterval(() => {
+          if (!enabled) return;
+          const duck = performance.now() < duckUntil ? 0.25 : 1.0;
+          const scales = {
+            nigeria: [220, 261.63, 293.66, 329.63, 392.0],
+            ghana:   [196, 246.94, 293.66, 370.0,  392.0],
+            usa:     [164.81, 196.0, 220.0, 246.94, 329.63]
+          };
+          const notes = scales[currentRegion] || scales.nigeria;
+          if (step % 2 === 0) {
+            AudioFx.rawTone(notes[step % notes.length], 0.16, 'triangle', 0.035 * duck);
+          }
+          if (step % 4 === 0) {
+            AudioFx.rawTone(98, 0.12, 'sine', 0.05 * duck);
+          }
+          step++;
+        }, 240);
+      }
+
+      function stopSynthLoop() {
+        if (synthTimer) { clearInterval(synthTimer); synthTimer = 0; }
+      }
+
+      function syncPlayback() {
+        const lbl = document.getElementById('music-lbl');
+        const btn = document.getElementById('btn-music');
+        const nowEl = document.getElementById('music-now');
+        for (const [r, el] of Object.entries(audioEls)) {
+          if (!enabled || r !== currentRegion) {
+            try { el.pause(); } catch {}
+          }
+        }
+        if (!enabled) {
+          stopSynthLoop();
+          lbl.textContent = 'Music: OFF';
+          nowEl.classList.add('hidden');
+          btn.className = 'slab-btn px-2.5 py-1.5 bg-gradient-to-b from-[#fff8ec] to-[#ffe7bd] text-[#14233b] text-xs flex items-center gap-1';
+          return;
+        }
+        lbl.textContent = 'Music: ON';
+        nowEl.textContent = `♪ ${TRACK_LABELS[currentRegion]}`;
+        nowEl.classList.remove('hidden');
+        btn.className = 'slab-btn px-2.5 py-1.5 bg-gradient-to-b from-[#7ff0a8] to-[#46d27a] text-[#08351a] text-xs flex items-center gap-1';
+
+        const el = getAudioEl(currentRegion);
+        el.volume = performance.now() < duckUntil ? 0.12 : 0.42;
+        el.play().then(() => {
+          stopSynthLoop();
+        }).catch(() => {
+          startSynthLoop();
+        });
+      }
+
+      return {
+        toggle() {
+          enabled = !enabled;
+          syncPlayback();
+          return enabled;
+        },
+        setRegion(reg) {
+          if (reg !== currentRegion) {
+            currentRegion = reg;
+            if (enabled) syncPlayback();
+          }
+        },
+        duck(ms = 2600) {
+          duckUntil = performance.now() + ms;
+          const el = audioEls[currentRegion];
+          if (el && enabled) {
+            el.volume = 0.14;
+            setTimeout(() => {
+              if (enabled && performance.now() >= duckUntil) el.volume = 0.42;
+            }, ms + 50);
+          }
+        }
+      };
+    })();
+
+    // =========================================================================
+    // 3. WEB AUDIO SYNTHESIZER (SFX)
     // =========================================================================
     const AudioFx = (() => {
       let ctx = null;
@@ -188,6 +476,7 @@
         osc.stop(t0 + dur + 0.02);
       }
       return {
+        rawTone: tone,
         honk() {
           tone(370, 0.22, 'sawtooth', 0.08, 0);
           tone(466, 0.22, 'sawtooth', 0.08, 0);
@@ -208,11 +497,11 @@
     })();
 
     // =========================================================================
-    // 2. EXACT TROTRO DRIVER 7-LAYER CHASING-ANCHOR THUMBSTICK (dj, a8, bS, fj, i8, r8, mj)
+    // 4. EXACT TROTRO DRIVER 7-LAYER CHASING-ANCHOR THUMBSTICK (dj, a8, bS, fj, i8, r8, mj)
     // =========================================================================
     const DEADZONE_PX = 7;
     const SPAN_PX = 57;
-    const LEASH_PX = 64; // 7 + 57
+    const LEASH_PX = 64;
     const FLICK_MAX_MS = 350;
     const FLICK_MIN_PEAK = 0.30;
     const FLICK_HOLD_MS = 1000;
@@ -288,7 +577,7 @@
     }
 
     // =========================================================================
-    // 3. THREE.JS WEBGL2 SCENE, PBR MATERIALS, PROCEDURAL TEXTURES & LIGHTING
+    // 5. THREE.JS WEBGL2 SCENE, PBR MATERIALS, LANDMARKS & DYNAMIC BUS LIVERY
     // =========================================================================
     const webglCanvas = document.getElementById('webgl-canvas');
     const hudCanvas = document.getElementById('hud-canvas');
@@ -309,7 +598,6 @@
 
     const camera = new THREE.PerspectiveCamera(56, 16 / 9, 0.3, 240);
 
-    // Warm Golden Lagos Sunlight + Sky/Ground Hemisphere Light
     const hemiLight = new THREE.HemisphereLight(0xdbeafe, 0x5c7c46, 0.95);
     hemiLight.position.set(0, 50, 0);
     scene.add(hemiLight);
@@ -330,7 +618,6 @@
     scene.add(sunLight);
     scene.add(sunLight.target);
 
-    // Helper: Create Beveled Rounded Box Geometry for Realistic Vehicles
     function createRoundedBox(w, h, d, radius = 0.14, smoothness = 4) {
       const shape = new THREE.Shape();
       const eps = 0.00001;
@@ -353,12 +640,12 @@
       return geom;
     }
 
-    // Procedural High-Resolution Architectural Facade Textures
-    const SHOP_NAMES = [
-      'MAMA PUT KITCHEN', 'EKO ELECTRONICS', 'OBALENDE SUYA',
-      'DANFO SPARES LTD', 'LAGOS POS & PAY', 'YABA TECH CAFE',
-      'BALOGUN TEXTILES', 'OSHODI MOTORS'
-    ];
+    const SHOP_NAMES = {
+      nigeria: ['MAMA PUT KITCHEN', 'EKO ELECTRONICS', 'OBALENDE SUYA', 'DANFO SPARES LTD', 'LAGOS POS & PAY', 'YABA TECH CAFE', 'BALOGUN TEXTILES', 'OSHODI MOTORS'],
+      ghana:   ['MAKOLA MARKET', 'OSU OXFORD SHOP', 'ACCRA CHOP BAR', 'KOFIDUA MOTORS', 'CIRCLE MOBILE', 'BLACK STAR CAFE', 'MEDAASE TEXTILES', 'TEMA HARBOUR CO'],
+      usa:     ['PEACHTREE DINER', 'BUCKHEAD PLAZA', 'LENOX BOUTIQUE', 'CAPITOL BOOKS', 'UNION STN CAFE', 'GEORGETOWN DELI', 'METRO TRANSIT', 'POTOMAC MARKET']
+    };
+
     const facadeTextureCache = new Map();
     function getBuildingTexture(wallHex, shopTitle) {
       const key = `${wallHex}|${shopTitle}`;
@@ -367,12 +654,9 @@
       const c = document.createElement('canvas');
       c.width = 256; c.height = 512;
       const g = c.getContext('2d');
-
-      // Base stucco plaster wall with warm gradient
       g.fillStyle = wallHex;
       g.fillRect(0, 0, 256, 512);
 
-      // Subtle architectural concrete floor ledges & vertical pilasters
       g.fillStyle = 'rgba(15, 23, 42, 0.14)';
       g.fillRect(0, 0, 12, 512);
       g.fillRect(244, 0, 12, 512);
@@ -383,26 +667,21 @@
         g.fillRect(0, y + 8, 256, 5);
       }
 
-      // Upper story recessed glass windows with frames, curtains & AC units
       for (let row = 0; row < 3; row++) {
         const wy = 32 + row * 110;
         for (let col = 0; col < 3; col++) {
           const wx = 24 + col * 74;
-          // Outer concrete sill
           g.fillStyle = '#f1f5f9';
           g.fillRect(wx - 4, wy - 4, 58, 66);
-          // Dark reflective window pane
           const wGrad = g.createLinearGradient(wx, wy, wx + 50, wy + 58);
           wGrad.addColorStop(0, '#0f172a');
           wGrad.addColorStop(0.5, '#1e3a8a');
           wGrad.addColorStop(1, '#0f172a');
           g.fillStyle = wGrad;
           g.fillRect(wx, wy, 50, 58);
-          // Window mullion bars
           g.fillStyle = '#e2e8f0';
           g.fillRect(wx + 24, wy, 2, 58);
           g.fillRect(wx, wy + 28, 50, 2);
-          // AC split unit box under some windows
           if ((row + col) % 2 === 0) {
             g.fillStyle = '#cbd5e1';
             g.fillRect(wx + 8, wy + 64, 32, 16);
@@ -414,17 +693,14 @@
         }
       }
 
-      // Ground-floor storefront with illuminated signboard & glass shop doors
       g.fillStyle = '#0f172a';
       g.fillRect(14, 368, 228, 144);
-      // Shop Signboard Header
       g.fillStyle = '#facc15';
       g.fillRect(18, 372, 220, 32);
       g.fillStyle = '#111827';
       g.font = '900 16px system-ui, sans-serif';
       g.textAlign = 'center';
       g.fillText(shopTitle, 128, 394);
-      // Lit storefront interior glass
       const sGrad = g.createLinearGradient(0, 408, 0, 510);
       sGrad.addColorStop(0, '#38bdf8');
       sGrad.addColorStop(1, '#0284c7');
@@ -439,26 +715,24 @@
       return tex;
     }
 
-    // Procedural Danfo Side Livery Texture (Yellow + Black Stripes + Route Lettering)
-    function createDanfoSideTexture() {
+    // Dynamic Bus Side Livery Texture Generator (Lagos Danfo / Ghana Tro-Tro / Atlanta MARTA / D.C. Metro)
+    function createBusLiveryTexture(bodyHex = '#facc15', stripeHex = '#111827', routeText = 'LASG • YABA - BALOGUN') {
       const c = document.createElement('canvas');
       c.width = 512; c.height = 256;
       const g = c.getContext('2d');
-      g.fillStyle = '#facc15';
+      g.fillStyle = bodyHex;
       g.fillRect(0, 0, 512, 256);
 
-      // Iconic Lagos Danfo Twin Black Waist Stripes
-      g.fillStyle = '#111827';
-      g.fillRect(0, 134, 512, 28);
-      g.fillRect(0, 172, 512, 14);
+      g.fillStyle = stripeHex;
+      g.fillRect(0, 134, 512, 30);
+      g.fillRect(0, 174, 512, 14);
 
-      // Route inscription on the yellow stripe
-      g.fillStyle = '#facc15';
-      g.font = '900 18px system-ui, sans-serif';
+      g.fillStyle = stripeHex === '#ffffff' ? '#1e3a8a' : '#ffffff';
+      if (bodyHex === '#facc15') g.fillStyle = '#facc15';
+      g.font = '900 17px system-ui, sans-serif';
       g.textAlign = 'center';
-      g.fillText('LASG • OBALENDE - YABA - OSHODI', 256, 154);
+      g.fillText(routeText, 256, 155);
 
-      // Sliding Door seam lines & chrome door handle
       g.strokeStyle = 'rgba(15, 23, 42, 0.45)';
       g.lineWidth = 4;
       g.strokeRect(180, 18, 145, 222);
@@ -471,28 +745,26 @@
       return tex;
     }
 
-    // Shared PBR Materials
     const MAT = {
       glass: new THREE.MeshStandardMaterial({ color: 0x0f172a, roughness: 0.08, metalness: 0.85 }),
       chrome: new THREE.MeshStandardMaterial({ color: 0xe2e8f0, roughness: 0.18, metalness: 0.92 }),
       darkSteel: new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.55, metalness: 0.5 }),
       tire: new THREE.MeshStandardMaterial({ color: 0x111827, roughness: 0.85, metalness: 0.05 }),
-      danfoYellow: new THREE.MeshStandardMaterial({ color: 0xfacc15, roughness: 0.26, metalness: 0.15 }),
-      danfoSide: new THREE.MeshStandardMaterial({ map: createDanfoSideTexture(), roughness: 0.28, metalness: 0.15 }),
+      danfoUpper: new THREE.MeshStandardMaterial({ color: 0xfacc15, roughness: 0.26, metalness: 0.15 }),
+      danfoSide: new THREE.MeshStandardMaterial({ map: createBusLiveryTexture(), roughness: 0.28, metalness: 0.15 }),
       danfoRoof: new THREE.MeshStandardMaterial({ color: 0xfef08a, roughness: 0.32, metalness: 0.1 }),
       headlight: new THREE.MeshStandardMaterial({ color: 0xffffff, emissive: 0xfffbeb, emissiveIntensity: 1.4, roughness: 0.1 }),
       brakeOn: new THREE.MeshStandardMaterial({ color: 0xff1e1e, emissive: 0xff0000, emissiveIntensity: 1.8, roughness: 0.2 }),
       brakeOff: new THREE.MeshStandardMaterial({ color: 0x7f1d1d, roughness: 0.4 }),
-      amberBlink: new THREE.MeshStandardMaterial({ color: 0xf59e0b, emissive: 0xf59e0b, emissiveIntensity: 1.5 }),
       asphalt: new THREE.MeshStandardMaterial({ color: 0x2d3748, roughness: 0.88, metalness: 0.04 }),
       sidewalk: new THREE.MeshStandardMaterial({ color: 0x94a3b8, roughness: 0.82 }),
       grass: new THREE.MeshStandardMaterial({ color: 0x5c8a47, roughness: 0.92 }),
       bark: new THREE.MeshStandardMaterial({ color: 0x6b4423, roughness: 0.9 }),
       foliage: new THREE.MeshStandardMaterial({ color: 0x15803d, roughness: 0.65 }),
-      skin: new THREE.MeshStandardMaterial({ color: 0x6f4228, roughness: 0.55 })
+      skin: new THREE.MeshStandardMaterial({ color: 0x6f4228, roughness: 0.55 }),
+      marble: new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.3, metalness: 0.1 })
     };
 
-    // Detailed 3D Wheel Builder (Tire + 5-Spoke Metallic Rim + Hub)
     const wheelTireGeom = new THREE.CylinderGeometry(0.38, 0.38, 0.28, 20);
     wheelTireGeom.rotateZ(Math.PI * 0.5);
     const wheelRimGeom = new THREE.CylinderGeometry(0.23, 0.23, 0.30, 14);
@@ -510,15 +782,11 @@
       return wg;
     }
 
-    // =========================================================================
-    // 4. SCULPTED 3D LAGOS DANFO MINIBUS + 11-SEGMENT 3D BUMPER LED STEERBAR
-    // =========================================================================
     function createDanfoMinibus() {
       const root = new THREE.Group();
-      const bodyTilt = new THREE.Group(); // Pivots for suspension pitch & roll
+      const bodyTilt = new THREE.Group();
       root.add(bodyTilt);
 
-      // 1. Sculpted Lower Chassis (Rounded Beveled Body with Side Livery)
       const lowerGeom = createRoundedBox(2.08, 1.04, 4.55, 0.16, 4);
       const lowerMesh = new THREE.Mesh(lowerGeom, MAT.danfoSide);
       lowerMesh.position.y = 0.88;
@@ -526,9 +794,8 @@
       lowerMesh.receiveShadow = true;
       bodyTilt.add(lowerMesh);
 
-      // 2. Sculpted Upper Cabin Greenhouse & Rounded Roof Cap
       const cabinGeom = createRoundedBox(1.94, 0.78, 4.18, 0.18, 4);
-      const cabinMesh = new THREE.Mesh(cabinGeom, MAT.danfoYellow);
+      const cabinMesh = new THREE.Mesh(cabinGeom, MAT.danfoUpper);
       cabinMesh.position.set(0, 1.66, 0.04);
       cabinMesh.castShadow = true;
       bodyTilt.add(cabinMesh);
@@ -539,7 +806,6 @@
       roofCap.castShadow = true;
       bodyTilt.add(roofCap);
 
-      // 3. Flush Wrap-Around Tinted Glass Windows (Front Windshield, Rear Glass, Side Windows)
       const windFront = new THREE.Mesh(createRoundedBox(1.74, 0.54, 0.12, 0.04, 2), MAT.glass);
       windFront.position.set(0, 1.68, -2.02);
       windFront.rotation.x = 0.12;
@@ -549,12 +815,10 @@
       windRear.position.set(0, 1.68, 2.11);
       bodyTilt.add(windRear);
 
-      const sideGlassGeom = createRoundedBox(1.98, 0.48, 3.55, 0.05, 2);
-      const sideGlass = new THREE.Mesh(sideGlassGeom, MAT.glass);
+      const sideGlass = new THREE.Mesh(createRoundedBox(1.98, 0.48, 3.55, 0.05, 2), MAT.glass);
       sideGlass.position.set(0, 1.68, 0.06);
       bodyTilt.add(sideGlass);
 
-      // 4. Front Black Radiator Grille, Round Chrome Halogen Headlights & Side Wing Mirrors
       const grille = new THREE.Mesh(createRoundedBox(1.72, 0.34, 0.08, 0.04, 2), MAT.tire);
       grille.position.set(0, 0.88, -2.26);
       bodyTilt.add(grille);
@@ -565,8 +829,6 @@
         const hl = new THREE.Mesh(hlGeom, MAT.headlight);
         hl.position.set(sx, 0.88, -2.28);
         bodyTilt.add(hl);
-
-        // Side Wing Mirrors on arms
         const arm = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.05, 0.05), MAT.darkSteel);
         arm.position.set(sx * 1.56, 1.48, -1.75);
         const mirrorHead = new THREE.Mesh(createRoundedBox(0.10, 0.24, 0.14, 0.03, 2), MAT.chrome);
@@ -574,14 +836,12 @@
         bodyTilt.add(arm, mirrorHead);
       }
 
-      // 5. Chrome Front & Rear Bumpers + Number Plate
       const frontBumper = new THREE.Mesh(createRoundedBox(2.16, 0.18, 0.22, 0.06, 3), MAT.chrome);
       frontBumper.position.set(0, 0.44, -2.24);
       const rearBumper = new THREE.Mesh(createRoundedBox(2.16, 0.18, 0.22, 0.06, 3), MAT.chrome);
       rearBumper.position.set(0, 0.44, 2.24);
       bodyTilt.add(frontBumper, rearBumper);
 
-      // Rear Tail / Brake Lamps
       const tailGeom = createRoundedBox(0.34, 0.22, 0.08, 0.04, 2);
       const brakeLampL = new THREE.Mesh(tailGeom, MAT.brakeOff);
       brakeLampL.position.set(-0.74, 0.90, 2.26);
@@ -589,7 +849,6 @@
       brakeLampR.position.set( 0.74, 0.90, 2.26);
       bodyTilt.add(brakeLampL, brakeLampR);
 
-      // 6. Tubular Steel Roof Rack + Loaded Market Cargo Sacks & Suitcases
       const rackGroup = new THREE.Group();
       const railL = new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.03, 3.2, 8), MAT.chrome);
       railL.rotation.x = Math.PI * 0.5;
@@ -605,7 +864,6 @@
       }
       bodyTilt.add(rackGroup);
 
-      // Dynamic Cargo Group (visible when carrying passengers)
       const cargoGroup = new THREE.Group();
       const sackMat = new THREE.MeshStandardMaterial({ color: 0xb45309, roughness: 0.85 });
       const boxMat = new THREE.MeshStandardMaterial({ color: 0xdc2626, roughness: 0.45 });
@@ -622,7 +880,6 @@
       cargoGroup.add(sack1, case1, bag1, spareWheel);
       bodyTilt.add(cargoGroup);
 
-      // 7. 4 Articulated 3D Wheels (Front pair steers, all 4 spin)
       const wheels = [];
       const frontSteerPivots = [];
       for (const [wx, wz, isFront] of [
@@ -638,7 +895,6 @@
         if (isFront) frontSteerPivots.push(pivot);
       }
 
-      // 8. 11-SEGMENT 3D REAR-BUMPER LED STEERING BAR (oj / tj from Trotro Driver)
       const steerBarGroup = new THREE.Group();
       steerBarGroup.position.set(0, 0.58, 2.31);
       const barHousing = new THREE.Mesh(createRoundedBox(1.42, 0.16, 0.08, 0.03, 2), MAT.tire);
@@ -661,39 +917,46 @@
       bodyTilt.add(steerBarGroup);
 
       scene.add(root);
-
-      return {
-        root,
-        bodyTilt,
-        cargoGroup,
-        wheels,
-        frontSteerPivots,
-        brakeLampL,
-        brakeLampR,
-        ledMaterials
-      };
+      return { root, bodyTilt, cargoGroup, wheels, frontSteerPivots, brakeLampL, brakeLampR, ledMaterials };
     }
 
     const danfoMesh = createDanfoMinibus();
 
-    // =========================================================================
-    // 5. SCULPTED 3D TRAFFIC VEHICLES (Sedans, Yellow Taxis, Korope Vans & Trucks)
-    // =========================================================================
+    // Build 3D Washington Monument Obelisk & U.S. Capitol Dome for Chapter 8 (Washington D.C.)
+    function createDCMallLandmarks(cx, cz) {
+      const group = new THREE.Group();
+      // Washington Monument (Tall white marble obelisk + pyramidion tip)
+      const shaft = new THREE.Mesh(new THREE.CylinderGeometry(1.1, 1.8, 34, 4), MAT.marble);
+      shaft.position.set(cx - 12, 17, cz - 10);
+      shaft.rotation.y = Math.PI * 0.25;
+      shaft.castShadow = true;
+      const tip = new THREE.Mesh(new THREE.ConeGeometry(1.1, 3.2, 4), MAT.marble);
+      tip.position.set(cx - 12, 35.6, cz - 10);
+      tip.rotation.y = Math.PI * 0.25;
+      group.add(shaft, tip);
+
+      // U.S. Capitol Dome Building (Neoclassical wings + rotunda drum + white dome + lantern)
+      const base = new THREE.Mesh(createRoundedBox(26, 7.5, 14, 0.2, 2), MAT.marble);
+      base.position.set(cx + 8, 3.8, cz + 10);
+      base.castShadow = true;
+      const drum = new THREE.Mesh(new THREE.CylinderGeometry(5.2, 5.6, 5.5, 20), MAT.marble);
+      drum.position.set(cx + 8, 9.8, cz + 10);
+      drum.castShadow = true;
+      const dome = new THREE.Mesh(new THREE.SphereGeometry(5.1, 20, 14, 0, Math.PI * 2, 0, Math.PI * 0.52), MAT.marble);
+      dome.position.set(cx + 8, 12.4, cz + 10);
+      dome.castShadow = true;
+      const lantern = new THREE.Mesh(new THREE.CylinderGeometry(0.7, 0.9, 2.4, 12), MAT.chrome);
+      lantern.position.set(cx + 8, 18.0, cz + 10);
+      group.add(base, drum, dome, lantern);
+      return group;
+    }
+
     function createTrafficMesh(spec) {
       const group = new THREE.Group();
-      const paintMat = new THREE.MeshStandardMaterial({
-        color: spec.color,
-        roughness: 0.24,
-        metalness: 0.35
-      });
-      const roofMat = new THREE.MeshStandardMaterial({
-        color: spec.roof,
-        roughness: 0.3,
-        metalness: 0.25
-      });
+      const paintMat = new THREE.MeshStandardMaterial({ color: spec.color, roughness: 0.24, metalness: 0.35 });
+      const roofMat = new THREE.MeshStandardMaterial({ color: spec.roof, roughness: 0.3, metalness: 0.25 });
 
       if (spec.kind === 'truck') {
-        // Detailed Cab + Ribbed Cargo Container Trailer + 6 Wheels
         const cab = new THREE.Mesh(createRoundedBox(2.15, 1.85, 1.85, 0.14, 3), paintMat);
         cab.position.set(0, 1.22, -1.75);
         cab.castShadow = true;
@@ -704,7 +967,6 @@
         box.castShadow = true;
         group.add(cab, wind, box);
       } else if (spec.kind === 'korope') {
-        // Rounded Mini-Van with Tinted Window Band
         const body = new THREE.Mesh(createRoundedBox(1.88, 1.52, 3.95, 0.18, 4), paintMat);
         body.position.set(0, 1.05, 0);
         body.castShadow = true;
@@ -714,7 +976,6 @@
         glass.position.set(0, 1.42, 0);
         group.add(body, stripe, glass);
       } else {
-        // Sculpted Sedan / Lagos Yellow Taxi (Lower body + Tapered Cabin Greenhouse + Taxi Sign)
         const lower = new THREE.Mesh(createRoundedBox(1.86, 0.68, 4.15, 0.14, 4), paintMat);
         lower.position.set(0, 0.64, 0);
         lower.castShadow = true;
@@ -724,7 +985,6 @@
         const glass = new THREE.Mesh(createRoundedBox(1.66, 0.44, 2.22, 0.10, 3), MAT.glass);
         glass.position.set(0, 1.18, 0.12);
         group.add(lower, upper, glass);
-
         if (spec.kind === 'taxi') {
           const sign = new THREE.Mesh(createRoundedBox(0.55, 0.18, 0.24, 0.04, 2), MAT.headlight);
           sign.position.set(0, 1.54, 0.05);
@@ -732,7 +992,6 @@
         }
       }
 
-      // 4 Spinning 3D Wheels + Headlights + Brake Lamps
       const wheels = [];
       const zOff = spec.kind === 'truck' ? 1.85 : 1.28;
       const xOff = spec.w * 0.48;
@@ -745,7 +1004,6 @@
           wheels.push(w);
         }
       }
-
       const tailZ = spec.l * 0.5 + 0.02;
       const bL = new THREE.Mesh(new THREE.BoxGeometry(0.32, 0.18, 0.06), MAT.brakeOff);
       bL.position.set(-0.62, 0.68, tailZ);
@@ -757,9 +1015,6 @@
       return { group, wheels, bL, bR };
     }
 
-    // =========================================================================
-    // 6. ARTICULATED SMOOTH 3D HUMANS (Spherical Heads, Gele/Caps, Capsule Limbs)
-    // =========================================================================
     const headGeom = new THREE.SphereGeometry(0.19, 14, 12);
     const geleGeom = new THREE.TorusGeometry(0.16, 0.075, 10, 16);
     geleGeom.rotateX(Math.PI * 0.42);
@@ -772,13 +1027,11 @@
       const trouserMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.7 });
       const hatMat = new THREE.MeshStandardMaterial({ color: hatHex, roughness: 0.45 });
 
-      // Torso
       const torso = new THREE.Mesh(torsoGeom, shirtMat);
       torso.position.y = 1.06;
       torso.castShadow = true;
       root.add(torso);
 
-      // Head + Cap or Nigerian Gele Headwrap
       const head = new THREE.Mesh(headGeom, MAT.skin);
       head.position.y = 1.62;
       head.castShadow = true;
@@ -794,7 +1047,6 @@
         root.add(cap);
       }
 
-      // Articulated Left & Right Legs (pivot at hip y = 0.72)
       const legLPivot = new THREE.Group();
       legLPivot.position.set(-0.12, 0.72, 0);
       const legL = new THREE.Mesh(limbGeom, trouserMat);
@@ -809,7 +1061,6 @@
       legR.castShadow = true;
       legRPivot.add(legR);
 
-      // Articulated Left & Right Arms (pivot at shoulder y = 1.34)
       const armLPivot = new THREE.Group();
       armLPivot.position.set(-0.29, 1.34, 0);
       const armL = new THREE.Mesh(limbGeom, shirtMat);
@@ -826,7 +1077,6 @@
 
       root.add(legLPivot, legRPivot, armLPivot, armRPivot);
       scene.add(root);
-
       return { root, legLPivot, legRPivot, armLPivot, armRPivot };
     }
 
@@ -838,7 +1088,6 @@
       hMesh.legRPivot.rotation.x = -swing;
       hMesh.armLPivot.rotation.x = -swing * 0.7;
       if (waving) {
-        // Raise right arm overhead and wave side-to-side!
         hMesh.armRPivot.rotation.x = -Math.PI * 0.85;
         hMesh.armRPivot.rotation.z = 0.25 + Math.sin(now * 0.015 + phase) * 0.38;
       } else {
@@ -847,12 +1096,8 @@
       }
     }
 
-    // =========================================================================
-    // 7. TROPICAL COCONUT PALMS, ARCHITECTURAL CITY BLOCKS & FUEL STATIONS
-    // =========================================================================
     function createPalmTreeMesh(height = 5.2) {
       const group = new THREE.Group();
-      // Curved segmented trunk
       const segs = 6;
       for (let i = 0; i < segs; i++) {
         const t = i / segs;
@@ -864,7 +1109,6 @@
         seg.castShadow = true;
         group.add(seg);
       }
-      // Crown of 7 arching palm fronds
       const topX = Math.sin(1.4) * 0.35;
       const frondGeom = createRoundedBox(0.42, 0.06, 2.25, 0.03, 2);
       for (let f = 0; f < 7; f++) {
@@ -884,14 +1128,6 @@
 
     const CELL = 90;
     const ROAD_HALF = 7.5;
-    const DISTRICTS = [
-      'Lagos Island • Marina',
-      'Yaba Tech • Sabo Market',
-      'Oshodi Underbridge',
-      'Obalende Roundabout',
-      'Surulere • Stadium Way',
-      'Victoria Island • Eko'
-    ];
     const WALL_PALETTE = [
       '#f4a261', '#e76f51', '#2a9d8f', '#e9c46a', '#60a5fa',
       '#f8fafc', '#fbbf24', '#a78bfa', '#34d399', '#fb7185'
@@ -906,15 +1142,24 @@
       return ((h ^ (h >>> 15)) >>> 0) / 4294967296;
     }
 
-    // Infinite Ground Asphalt Base & Grid Block Pool
     const groundPlane = new THREE.Mesh(new THREE.PlaneGeometry(600, 600), MAT.asphalt);
     groundPlane.rotation.x = -Math.PI * 0.5;
     groundPlane.receiveShadow = true;
     scene.add(groundPlane);
 
+    let currentChapterIdx = 0;
     const blockGroups = new Map();
+
+    function clearCityBlocks() {
+      for (const entry of blockGroups.values()) {
+        scene.remove(entry.group);
+      }
+      blockGroups.clear();
+    }
+
     function ensureCityBlock(qx, qz) {
-      const key = `${qx},${qz}`;
+      const ch = STORY_CHAPTERS[currentChapterIdx];
+      const key = `${ch.id}:${qx},${qz}`;
       if (blockGroups.has(key)) return blockGroups.get(key);
 
       const group = new THREE.Group();
@@ -925,7 +1170,6 @@
       const bw = x1 - x0, bd = z1 - z0;
       const cx = (x0 + x1) * 0.5, cz = (z0 + z1) * 0.5;
 
-      // Raised Concrete Sidewalk Slab + Green Inner Courtyard
       const sidewalk = new THREE.Mesh(createRoundedBox(bw, 0.24, bd, 0.08, 2), MAT.sidewalk);
       sidewalk.position.set(cx, 0.12, cz);
       sidewalk.receiveShadow = true;
@@ -936,7 +1180,6 @@
       lawn.receiveShadow = true;
       group.add(lawn);
 
-      // Dashed Yellow Road Markings along West & South Edges of this Cell
       const dashMat = new THREE.MeshBasicMaterial({ color: 0xfacc15 });
       for (let s = -34; s <= 34; s += 12) {
         const dNS = new THREE.Mesh(new THREE.PlaneGeometry(0.28, 5.2), dashMat);
@@ -948,8 +1191,13 @@
         group.add(dNS, dEW);
       }
 
+      // If Washington D.C. route, place the Washington Monument & U.S. Capitol Dome on alternating National Mall blocks!
+      if (ch.dcMonuments && ((qx + qz) & 1) === 0) {
+        group.add(createDCMallLandmarks(cx, cz));
+      }
+
       let fuelStation = null;
-      if (((qx * 3 + qz * 5) & 3) === 0) {
+      if (((qx * 3 + qz * 5) & 3) === 0 && !ch.dcMonuments) {
         const fx = x0 + 6.5, fz = cz;
         fuelStation = { x: fx, z: fz, pumpX: x0 + 1.2, pumpZ: fz };
         const canopyMat = new THREE.MeshStandardMaterial({ color: 0x10b981, roughness: 0.3 });
@@ -968,30 +1216,32 @@
         group.add(pump);
       }
 
-      // Multi-Tiered Architectural Buildings around Perimeter
       const slots = [
         [x0 + 12, z0 + 12], [x1 - 12, z0 + 12],
         [x0 + 12, z1 - 12], [x1 - 12, z1 - 12],
         [cx, z0 + 11.5],    [cx, z1 - 11.5],
         [x0 + 11.5, cz],    [x1 - 11.5, cz]
       ];
+      const shops = SHOP_NAMES[ch.region] || SHOP_NAMES.nigeria;
 
       slots.forEach(([bx, bz], idx) => {
         if (fuelStation && Math.hypot(bx - fuelStation.x, bz - fuelStation.z) < 16) return;
+        if (ch.dcMonuments && ((qx + qz) & 1) === 0 && idx >= 4) return;
         const r1 = hash2(qx, qz, idx * 7 + 1);
         const r2 = hash2(qx, qz, idx * 7 + 2);
         const r3 = hash2(qx, qz, idx * 7 + 3);
         const w = 11.5 + r1 * 6.5;
         const d = 11.5 + r2 * 6.5;
-        const floors = 2 + Math.floor(r3 * 3); // 2 to 4 stories
+        const isTower = ch.region === 'usa' && !ch.dcMonuments;
+        const floors = (isTower ? 4 : 2) + Math.floor(r3 * (isTower ? 4 : 3));
         const h = floors * 3.6;
 
-        const wallHex = WALL_PALETTE[Math.floor(r1 * WALL_PALETTE.length)];
-        const shopName = SHOP_NAMES[(Math.abs(qx * 5 + qz * 3) + idx) % SHOP_NAMES.length];
+        const wallHex = ch.dcMonuments ? '#f1f5f9' : isTower ? '#93c5fd' : WALL_PALETTE[Math.floor(r1 * WALL_PALETTE.length)];
+        const shopName = shops[(Math.abs(qx * 5 + qz * 3) + idx) % shops.length];
         const bMat = new THREE.MeshStandardMaterial({
           map: getBuildingTexture(wallHex, shopName),
-          roughness: 0.48,
-          metalness: 0.08
+          roughness: isTower ? 0.25 : 0.48,
+          metalness: isTower ? 0.35 : 0.08
         });
 
         const bMesh = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), bMat);
@@ -1000,7 +1250,6 @@
         bMesh.receiveShadow = true;
         group.add(bMesh);
 
-        // Overhanging Pitched Roof / Penthouse Slab + Rooftop Water Tank
         const roofMat = new THREE.MeshStandardMaterial({
           color: ROOF_PALETTE[Math.floor(r2 * ROOF_PALETTE.length)],
           roughness: 0.6
@@ -1009,16 +1258,8 @@
         roof.position.set(bx, h + 0.52, bz);
         roof.castShadow = true;
         group.add(roof);
-
-        if (r3 > 0.35) {
-          const tank = new THREE.Mesh(new THREE.CylinderGeometry(0.85, 0.85, 1.6, 12), MAT.darkSteel);
-          tank.position.set(bx + w * 0.22, h + 1.5, bz - d * 0.2);
-          tank.castShadow = true;
-          group.add(tank);
-        }
       });
 
-      // Tropical Coconut Palm Trees along the Sidewalk Edges
       for (let i = 0; i < 5; i++) {
         const r = hash2(qx, qz, 90 + i);
         const tx = i < 2 ? (i === 0 ? x0 + 1.8 : x1 - 1.8) : cx + (r - 0.5) * 36;
@@ -1037,7 +1278,7 @@
     }
 
     // =========================================================================
-    // 8. GAME STATE: DANFO, UPGRADES, WAVING 3D PASSENGERS, PEDESTRIANS & TRAFFIC
+    // 6. CAMPAIGN STATE, ALHAJI DEBT, SERGEANT BELLO CHOICE & STOPS
     // =========================================================================
     const stick = createStick();
     let autoDriveEnabled = true;
@@ -1049,10 +1290,10 @@
     const keys = { left: false, right: false, up: false, down: false, rev: false };
 
     const upgrades = {
-      engine: { level: 0, max: 3, cost: [300, 650, 1200], name: 'V6 Tokunbo Engine', desc: '+15 km/h top speed & punchier launch' },
-      seats:  { level: 0, max: 3, cost: [350, 750, 1400], name: 'Extra Danfo Bench', desc: '+2 passenger capacity per trip' },
-      tank:   { level: 0, max: 3, cost: [250, 550, 1000], name: 'Long-Range Fuel Tank', desc: '+35L fuel capacity & faster pump' },
-      steer:  { level: 0, max: 3, cost: [280, 600, 1100], name: 'Power Steering Rack', desc: 'Tighter corner radius & quick U-turn' }
+      engine: { level: 0, max: 3, cost: [1500, 3500, 6500], name: 'V6 Tokunbo Engine', desc: '+15 km/h top speed & punchier launch' },
+      seats:  { level: 0, max: 3, cost: [2000, 4500, 8000], name: 'Extra Danfo Bench', desc: '+2 passenger capacity per trip' },
+      tank:   { level: 0, max: 3, cost: [1200, 2800, 5000], name: 'Long-Range Fuel Tank', desc: '+35L fuel capacity & faster pump' },
+      steer:  { level: 0, max: 3, cost: [1400, 3200, 6000], name: 'Power Steering Rack', desc: 'Tighter corner radius & quick U-turn' }
     };
 
     function getBusStats() {
@@ -1066,38 +1307,96 @@
       };
     }
 
-    const bus = {
-      x: 3.5,
-      z: -12,
-      y: 0,
-      heading: 0,
-      roadHeading: 0,
-      speed: 0,
-      steer: 0,
-      roll: 0,
-      pitch: 0,
-      wheelSpin: 0,
-      turning: false,
-      turnIntent: null,
-      turnTarget: 0,
-      turnNode: null,
-      turnSpent: 0,
-      homeAsk: 0,
-      lastDir: 0,
-      offerL: false,
-      offerR: false,
-      uTurn: false,
-      uTurnLeg: 0,
-      uTurnTurned: 0,
-      kerbBias: 0,
-      cash: 500,
-      fuel: 100,
-      riders: [],
-      stopHoldT: 0,
-      districtIdx: 0
+    const campaign = {
+      debtTotal: 60000,
+      day: 1,
+      tripsInChapter: 0,
+      midSpoken: false,
+      checkpointShown: false,
+      respect: 1
     };
 
-    // 3D Bus Stop Zone Marker + Shelter Signpost + Pool of 5 Waving Passenger Meshes
+    const bus = {
+      x: 3.5, z: -12, y: 0,
+      heading: 0, roadHeading: 0,
+      speed: 0, steer: 0, roll: 0, pitch: 0, wheelSpin: 0,
+      turning: false, turnIntent: null, turnTarget: 0, turnNode: null,
+      turnSpent: 0, homeAsk: 0, lastDir: 0,
+      offerL: false, offerR: false,
+      uTurn: false, uTurnLeg: 0, uTurnTurned: 0,
+      kerbBias: 0,
+      cash: 5000,
+      fuel: 100,
+      riders: [],
+      stopHoldT: 0
+    };
+
+    const mateBox = document.getElementById('mate-box');
+    const mateText = document.getElementById('mate-text');
+    const mateSpeaker = document.getElementById('mate-speaker');
+    const mateRegion = document.getElementById('mate-region');
+
+    function storySay(speaker, msg, reg = 'NIGERIA') {
+      mateSpeaker.textContent = speaker;
+      mateRegion.textContent = reg.toUpperCase();
+      mateText.textContent = msg;
+      mateBox.classList.remove('mate-pop');
+      void mateBox.offsetWidth;
+      mateBox.classList.add('mate-pop');
+      MusicPlayer.duck(2800);
+    }
+
+    const fareToast = document.getElementById('fare-toast');
+    const toastTitle = document.getElementById('toast-title');
+    const toastSub = document.getElementById('toast-sub');
+    let toastTimer = 0;
+    function showToast(title, sub) {
+      toastTitle.textContent = title;
+      toastSub.textContent = sub;
+      fareToast.classList.remove('hidden');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => fareToast.classList.add('hidden'), 2600);
+    }
+
+    // Apply Chapter Look, Bus Livery, Music Region & Opening Story Beat
+    function applyChapter(idx) {
+      currentChapterIdx = (idx + STORY_CHAPTERS.length) % STORY_CHAPTERS.length;
+      const ch = STORY_CHAPTERS[currentChapterIdx];
+      campaign.tripsInChapter = 0;
+      campaign.midSpoken = false;
+      campaign.checkpointShown = false;
+
+      // Update Bus Livery & Colors
+      MAT.danfoSide.map = createBusLiveryTexture(ch.livery.body, ch.livery.stripe, ch.livery.text);
+      MAT.danfoSide.needsUpdate = true;
+      MAT.danfoUpper.color.set(ch.livery.body);
+      MAT.danfoRoof.color.setHex(ch.livery.roof);
+
+      // Update Sky, Fog & Ground Colors
+      scene.background.setHex(ch.sky);
+      scene.fog.color.setHex(ch.fog);
+      MAT.grass.color.setHex(ch.ground);
+
+      clearCityBlocks();
+      MusicPlayer.setRegion(ch.region);
+
+      document.getElementById('chapter-badge').textContent = `Ch.${ch.num}/${STORY_CHAPTERS.length} • ${ch.title}`;
+      storySay(ch.speaker, ch.startLine, ch.region);
+    }
+
+    // Sergeant Bello Checkpoint Modal Wiring
+    const cpModal = document.getElementById('checkpoint-modal');
+    document.getElementById('btn-cp-clean').addEventListener('click', () => {
+      cpModal.classList.add('hidden');
+      campaign.respect++;
+      storySay('🧢 Conductor Chidi', 'Papers clean, no settlement! Sergeant Bello vexed, but the passengers respect you (+1 Respect).', STORY_CHAPTERS[currentChapterIdx].region);
+    });
+    document.getElementById('btn-cp-settle').addEventListener('click', () => {
+      cpModal.classList.add('hidden');
+      bus.cash = Math.max(0, bus.cash - 500);
+      storySay('🧢 Conductor Chidi', 'We settled Bello ₦500. The road opens fast, but passengers saw it.', STORY_CHAPTERS[currentChapterIdx].region);
+    });
+
     const stopZoneGroup = new THREE.Group();
     const stopPadMat = new THREE.MeshStandardMaterial({ color: 0x22c55e, emissive: 0x16a34a, emissiveIntensity: 0.45, roughness: 0.4 });
     const stopPad = new THREE.Mesh(createRoundedBox(3.8, 0.08, 6.2, 0.1, 2), stopPadMat);
@@ -1148,7 +1447,6 @@
       }
 
       const stopAlong = 32;
-      // Place bus stop pad along curb edge, and waiting passengers on the raised sidewalk (+1.45m past ROAD_HALF)
       const curbOffset = ROAD_HALF - 0.3;
       const sx = targetGx * CELL - sfx * stopAlong + srx * curbOffset;
       const sz = targetGz * CELL - sfz * stopAlong + srz * curbOffset;
@@ -1177,21 +1475,16 @@
         }
       }
 
+      const ch = STORY_CHAPTERS[currentChapterIdx];
       activeStop = {
         kind,
-        x: sx,
-        z: sz,
-        fx: sfx,
-        fz: sfz,
-        rx: srx,
-        rz: srz,
+        x: sx, z: sz,
+        fx: sfx, fz: sfz, rx: srx, rz: srz,
         people: waitingPeople,
-        farePerRider: 150 + Math.floor(Math.random() * 6) * 25
+        farePerRider: Math.round(ch.fareBase / 4)
       };
     }
-    spawnMissionStop('pickup');
 
-    // Sidewalk Pedestrians Pool (14 Articulated 3D Walkers locked strictly to raised block sidewalks)
     function snapPedestrianToSidewalk(p, refX, refZ) {
       const gx = Math.round(refX / CELL);
       const gz = Math.round(refZ / CELL);
@@ -1220,9 +1513,7 @@
         i % 3 === 0
       );
       const p = {
-        mesh: hm,
-        x: 0,
-        z: 0,
+        mesh: hm, x: 0, z: 0,
         axis: i % 2 === 0 ? 'z' : 'x',
         side: i % 2 === 0 ? 1 : -1,
         dir: i % 4 < 2 ? 1 : -1,
@@ -1233,7 +1524,6 @@
       pedestrians.push(p);
     }
 
-    // 3D Traffic Vehicles Pool (10 Sculpted Taxis, Sedans, Korope Vans & Trucks)
     const TRAFFIC_SPECS = [
       { kind: 'taxi',   color: 0xfacc15, roof: 0x111827, w: 1.86, h: 1.45, l: 4.15, speed: 16 },
       { kind: 'sedan',  color: 0x2563eb, roof: 0xdbeafe, w: 1.86, h: 1.42, l: 4.15, speed: 18 },
@@ -1251,63 +1541,40 @@
       const rx = Math.cos(h), rz = Math.sin(h);
       const gx = (i % 3) - 1, gz = Math.floor(i / 3) - 1;
       traffic.push({
-        ...spec,
-        mesh: tMesh,
+        ...spec, mesh: tMesh,
         x: gx * CELL + rx * (ROAD_HALF * 0.48) + fx * ((i * 19) % 60 - 30),
         z: gz * CELL + rz * (ROAD_HALF * 0.48) + fz * ((i * 19) % 60 - 30),
-        heading: h,
-        curSpeed: spec.speed,
-        wheelSpin: 0,
-        braking: false
+        heading: h, curSpeed: spec.speed, wheelSpin: 0, braking: false
       });
     }
 
-    // =========================================================================
-    // 9. CONDUCTOR CHIDI SPEECH BUBBLES & UI TOASTS
-    // =========================================================================
-    const mateBox = document.getElementById('mate-box');
-    const mateText = document.getElementById('mate-text');
-    function chidiSay(msg) {
-      mateText.textContent = msg;
-      mateBox.classList.remove('mate-pop');
-      void mateBox.offsetWidth;
-      mateBox.classList.add('mate-pop');
-    }
-
-    const fareToast = document.getElementById('fare-toast');
-    const toastTitle = document.getElementById('toast-title');
-    const toastSub = document.getElementById('toast-sub');
-    let toastTimer = 0;
-    function showToast(title, sub) {
-      toastTitle.textContent = title;
-      toastSub.textContent = sub;
-      fareToast.classList.remove('hidden');
-      clearTimeout(toastTimer);
-      toastTimer = setTimeout(() => fareToast.classList.add('hidden'), 2300);
-    }
+    applyChapter(0);
+    spawnMissionStop('pickup');
 
     // =========================================================================
-    // 10. ROAD-ASSISTED VEHICLE PHYSICS & INTERSECTION STATE MACHINE (zq + Q3e)
+    // 7. COLLISION CONFINEMENT & ROAD-ASSISTED VEHICLE PHYSICS (zq + Q3e)
     // =========================================================================
-    // Hard 2D Oriented-Box / City-Block Collision Solver: prevents Danfo from ever entering a sidewalk or building
+    function wrapAngle(a, b) {
+      let d = (b - a) % (Math.PI * 2);
+      if (d > Math.PI) d -= Math.PI * 2;
+      if (d <= -Math.PI) d += Math.PI * 2;
+      return d;
+    }
+
     function confineBusToRoadCorridors() {
       const sinH = Math.sin(bus.heading), cosH = Math.cos(bus.heading);
-      // Effective half-extents of the Danfo (width 2.08m, length 4.55m) projected onto world X and Z axes
       const extX = Math.abs(cosH) * 1.12 + Math.abs(sinH) * 2.32;
       const extZ = Math.abs(sinH) * 1.12 + Math.abs(cosH) * 2.32;
-
       const qx0 = Math.floor(bus.x / CELL);
       const qz0 = Math.floor(bus.z / CELL);
 
       for (let qx = qx0 - 1; qx <= qx0 + 1; qx++) {
         for (let qz = qz0 - 1; qz <= qz0 + 1; qz++) {
-          // City block sidewalk AABB bounds
           const minX = qx * CELL + ROAD_HALF;
           const maxX = (qx + 1) * CELL - ROAD_HALF;
           const minZ = qz * CELL + ROAD_HALF;
           const maxZ = (qz + 1) * CELL - ROAD_HALF;
 
-          // Expanded Minkowski AABB by Danfo's projected half-extents
           const eMinX = minX - extX;
           const eMaxX = maxX + extX;
           const eMinZ = minZ - extZ;
@@ -1323,12 +1590,10 @@
 
             if (minPenX < minPenZ) {
               bus.x = penLeft < penRight ? eMinX : eMaxX;
-              // Gently align heading toward North/South street axis
               const targetH = cosH >= 0 ? 0 : Math.PI;
               bus.heading += wrapAngle(bus.heading, targetH) * 0.22;
             } else {
               bus.z = penTop < penBot ? eMinZ : eMaxZ;
-              // Gently align heading toward East/West street axis
               const targetH = sinH >= 0 ? Math.PI * 0.5 : -Math.PI * 0.5;
               bus.heading += wrapAngle(bus.heading, targetH) * 0.22;
             }
@@ -1338,7 +1603,6 @@
       }
     }
 
-    // Repel any pedestrian or passenger outside the Danfo's physical hull so the bus never drives through people
     function keepPersonOutOfBus(px, pz) {
       const dx = px - bus.x, dz = pz - bus.z;
       const sinH = Math.sin(bus.heading), cosH = -Math.cos(bus.heading);
@@ -1356,12 +1620,6 @@
         };
       }
       return { x: px, z: pz, pushed: false };
-    }
-    function wrapAngle(a, b) {
-      let d = (b - a) % (Math.PI * 2);
-      if (d > Math.PI) d -= Math.PI * 2;
-      if (d <= -Math.PI) d += Math.PI * 2;
-      return d;
     }
 
     function gatherInput(now) {
@@ -1403,6 +1661,7 @@
 
     function stepPhysics(dt, now) {
       const stats = getBusStats();
+      const ch = STORY_CHAPTERS[currentChapterIdx];
       const inp = gatherInput(now);
       bus.homeAsk = 0;
 
@@ -1410,7 +1669,6 @@
         bus.fuel = Math.max(4, bus.fuel - dt * 0.55);
       }
 
-      // 3-Point U-Turn Solver (wq)
       if (bus.uTurn) {
         const legRev = bus.uTurnLeg % 2 === 1;
         const uSpeed = legRev ? -8.5 : 11.5;
@@ -1436,7 +1694,6 @@
           bus.uTurn = false;
           bus.turning = false;
           bus.speed = 0;
-          chidiSay('One-time U-turn! Road clear ahead Boss.');
         }
         return inp;
       }
@@ -1479,12 +1736,6 @@
       const nodeZ = nodeGz * CELL;
       const along = (nodeX - bus.x) * fx + (nodeZ - bus.z) * fz;
 
-      const dIdx = Math.abs(nodeGx * 3 + nodeGz * 5) % DISTRICTS.length;
-      if (dIdx !== bus.districtIdx) {
-        bus.districtIdx = dIdx;
-        document.getElementById('district-tag').textContent = DISTRICTS[dIdx];
-      }
-
       const turnWindow = Math.max(18, Math.abs(bus.speed) * 0.75);
       const inWindow = !bus.turning && along > -5 && along < turnWindow && bus.speed > 3;
       bus.offerL = inWindow;
@@ -1494,7 +1745,6 @@
       const turnDir = Math.abs(r) >= thresh ? Math.sign(r) : 0;
       bus.lastDir = turnDir;
 
-      // Start 90° turn only once the bus nose reaches the intersection throat (along < 9.5m) so it never cuts building corners
       if (inWindow && turnDir !== 0 && along < 9.2) {
         bus.turning = true;
         bus.turnIntent = turnDir < 0 ? 'left' : 'right';
@@ -1516,13 +1766,22 @@
         const dAlong = dx * fx + dz * fz;
         const dLat = Math.abs(dx * rx + dz * rz);
 
+        // Mid-route Story Beat & Sergeant Bello Checkpoint trigger
+        if (activeStop.kind === 'dropoff' && !campaign.midSpoken && dAlong < 65) {
+          campaign.midSpoken = true;
+          storySay(ch.speaker, ch.midLine, ch.region);
+          if (ch.checkpoint && !campaign.checkpointShown) {
+            campaign.checkpointShown = true;
+            cpModal.classList.remove('hidden');
+          }
+        }
+
         if (bus.stopHoldT > 0) {
           bus.stopHoldT -= dt;
           targetSpeed = 0;
           bus.kerbBias = ROAD_HALF * 0.28;
 
           if (activeStop.kind === 'pickup') {
-            // Walk passengers toward the Danfo's right-side sliding door (+1.18m lateral), NOT through the bus body
             const doorX = bus.x + rx * 1.18;
             const doorZ = bus.z + rz * 1.18;
             for (const p of activeStop.people) {
@@ -1548,16 +1807,24 @@
                 bus.riders.push({ fare: activeStop.farePerRider });
                 AudioFx.board(i);
               }
-              chidiSay(`Oya ${taken} passengers enter! Follow the yellow arrow go drop-off!`);
+              campaign.midSpoken = false;
+              storySay(ch.speaker, ch.midLine, ch.region);
               spawnMissionStop('dropoff');
             } else {
               const count = bus.riders.length;
               const earned = bus.riders.reduce((s, r) => s + r.fare, 0);
               bus.riders = [];
               bus.cash += earned;
+              campaign.day = Math.min(30, campaign.day + 1);
               AudioFx.cash();
-              showToast(`+₦${earned}`, `${count} Passengers Dropped Off!`);
-              chidiSay(`Correct Boss! +₦${earned} enter hand. Look front for next waving passengers!`);
+              showToast(`+${ch.currency}${earned.toLocaleString()}`, `${ch.title} Delivered!`);
+              storySay(ch.speaker, ch.arrivalLine, ch.region);
+
+              // Advance to next chapter in the Lagos -> Ghana -> Atlanta -> Washington D.C. storyline!
+              setTimeout(() => {
+                applyChapter(currentChapterIdx + 1);
+                spawnMissionStop('pickup');
+              }, 3400);
               spawnMissionStop('pickup');
             }
           }
@@ -1572,7 +1839,6 @@
         }
       }
 
-      // Traffic Lead Gap Slowdown
       for (const tc of traffic) {
         const dx = tc.x - bus.x, dz = tc.z - bus.z;
         const ahead = dx * Math.sin(bus.heading) + dz * -Math.cos(bus.heading);
@@ -1653,10 +1919,8 @@
         }
       }
 
-      // Enforce hard city-block / building collision confinement every frame
       confineBusToRoadCorridors();
 
-      // Solid Vehicle-to-Vehicle Collision Separation (prevent clipping through traffic cars)
       for (const tc of traffic) {
         const dx = bus.x - tc.x, dz = bus.z - tc.z;
         const minSep = 3.6;
@@ -1678,7 +1942,6 @@
         stickAskHome(stick, bus.homeAsk, now);
       }
 
-      // Step Ambient Traffic Vehicles
       for (const tc of traffic) {
         const tfx = Math.sin(tc.heading), tfz = -Math.cos(tc.heading);
         const trx = Math.cos(tc.heading), trz = Math.sin(tc.heading);
@@ -1704,7 +1967,6 @@
         }
       }
 
-      // Step Sidewalk Pedestrians (strictly within each block's raised sidewalk bounds [q*CELL + ROAD_HALF + 1.8 .. (q+1)*CELL - ROAD_HALF - 1.8])
       for (const p of pedestrians) {
         const gx = Math.round(p.x / CELL);
         const gz = Math.round(p.z / CELL);
@@ -1727,7 +1989,6 @@
           else if (p.x > maxX) { p.x = maxX; p.dir = -1; }
         }
 
-        // Physical collision repulsion away from Danfo hull
         const safe = keepPersonOutOfBus(p.x, p.z);
         p.x = safe.x;
         p.z = safe.z;
@@ -1741,7 +2002,6 @@
         }
       }
 
-      // Also ensure waiting passengers at bus stops never overlap the Danfo hull
       if (activeStop && activeStop.kind === 'pickup') {
         for (const p of activeStop.people) {
           if (!p.boarded) {
@@ -1756,7 +2016,7 @@
     }
 
     // =========================================================================
-    // 11. INPUT EVENTS & GARAGE SHOP WIRING
+    // 8. UI CONTROLS, OPTIONAL MUSIC BUTTON, STORY ROUTE SWITCHER & GARAGE
     // =========================================================================
     webglCanvas.addEventListener('pointerdown', e => {
       e.preventDefault();
@@ -1825,7 +2085,11 @@
 
     document.getElementById('btn-horn').addEventListener('click', () => {
       AudioFx.honk();
-      chidiSay('PIM-PIM! Comot for road o! Yellow Danfo dey pass!');
+    });
+
+    // Optional Music Toggle
+    document.getElementById('btn-music').addEventListener('click', () => {
+      MusicPlayer.toggle();
     });
 
     const btnAutoDrive = document.getElementById('btn-autodrive');
@@ -1836,12 +2100,53 @@
       btnAutoDrive.className = autoDriveEnabled
         ? 'slab-btn px-2.5 py-1.5 bg-gradient-to-b from-[#7ff0a8] to-[#46d27a] text-[#08351a] text-xs flex items-center gap-1'
         : 'slab-btn px-2.5 py-1.5 bg-gradient-to-b from-[#fff8ec] to-[#ffe7bd] text-[#14233b] text-xs flex items-center gap-1';
-      chidiSay(autoDriveEnabled ? 'Auto-Drive ON! Sit back and watch, or touch road anytime to take wheel!' : 'Manual control! Hold road & slide thumb to drive.');
+    });
+
+    // Story / Route Selector Modal (Lagos -> Ghana -> Atlanta -> Washington D.C.)
+    const routesModal = document.getElementById('routes-modal');
+    const routesListEl = document.getElementById('routes-list');
+    function renderRoutesModal() {
+      routesListEl.innerHTML = '';
+      STORY_CHAPTERS.forEach((ch, idx) => {
+        const active = idx === currentChapterIdx;
+        const row = document.createElement('div');
+        row.className = `flex items-center justify-between gap-2 p-2 rounded-xl border-2 border-[#14233b] ${active ? 'bg-amber-200' : 'bg-[#fff8ec]'}`;
+        row.innerHTML = `
+          <div class="min-w-0 flex-1">
+            <div class="font-black text-[#14233b] truncate">${ch.title}</div>
+            <div class="text-[11px] opacity-80 truncate">${ch.speaker} • Fare: ${ch.currency}${ch.fareBase}</div>
+          </div>
+          <button type="button" data-ch="${idx}"
+            class="slab-btn px-2.5 py-1 text-xs ${active ? 'bg-[#14233b] text-white' : 'bg-[#46d27a] text-[#08351a]'}">
+            ${active ? 'DRIVING' : 'DRIVE'}
+          </button>
+        `;
+        routesListEl.appendChild(row);
+      });
+      routesListEl.querySelectorAll('button[data-ch]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const idx = Number(btn.dataset.ch);
+          applyChapter(idx);
+          spawnMissionStop('pickup');
+          routesModal.classList.add('hidden');
+          routesModal.classList.remove('flex');
+        });
+      });
+    }
+    document.getElementById('btn-routes').addEventListener('click', () => {
+      renderRoutesModal();
+      routesModal.classList.remove('hidden');
+      routesModal.classList.add('flex');
+    });
+    document.getElementById('btn-routes-close').addEventListener('click', () => {
+      routesModal.classList.add('hidden');
+      routesModal.classList.remove('flex');
     });
 
     const shopModal = document.getElementById('shop-modal');
     const shopItemsEl = document.getElementById('shop-items');
     function renderShop() {
+      const ch = STORY_CHAPTERS[currentChapterIdx];
       shopItemsEl.innerHTML = '';
       for (const [key, upg] of Object.entries(upgrades)) {
         const maxed = upg.level >= upg.max;
@@ -1856,7 +2161,7 @@
           </div>
           <button type="button" data-upg="${key}" ${!canBuy ? 'disabled' : ''}
             class="slab-btn px-3 py-1.5 text-xs ${maxed ? 'bg-slate-300 text-slate-600' : canBuy ? 'bg-[#46d27a] text-[#08351a]' : 'bg-amber-200/60 text-slate-500'}">
-            ${maxed ? 'MAXED' : '₦' + price}
+            ${maxed ? 'MAXED' : ch.currency + price}
           </button>
         `;
         shopItemsEl.appendChild(row);
@@ -1872,7 +2177,6 @@
             if (k === 'tank') bus.fuel = getBusStats().fuelMax;
             AudioFx.cash();
             renderShop();
-            chidiSay(`${u.name} upgraded! Bus dey fly now Boss!`);
           }
         });
       });
@@ -1895,6 +2199,7 @@
       if (k === 's' || k === 'arrowdown') keys.down = true;
       if (k === 'r' && !e.repeat) uturnRequestedAt = performance.now();
       if (k === 'h' && !e.repeat) AudioFx.honk();
+      if (k === 'm' && !e.repeat) MusicPlayer.toggle();
     });
     window.addEventListener('keyup', e => {
       const k = e.key.toLowerCase();
@@ -1905,7 +2210,7 @@
     });
 
     // =========================================================================
-    // 12. RESIZE & MAIN 60FPS THREE.JS WEBGL2 RENDER LOOP
+    // 9. RESIZE & MAIN 60FPS THREE.JS WEBGL2 RENDER LOOP
     // =========================================================================
     let camHeading = 0;
     function resize() {
@@ -1932,8 +2237,8 @@
 
       const inp = stepPhysics(dt, now);
       const stats = getBusStats();
+      const ch = STORY_CHAPTERS[currentChapterIdx];
 
-      // Stream visible 3D city blocks around player
       const gxCenter = Math.round(bus.x / CELL);
       const gzCenter = Math.round(bus.z / CELL);
       for (let qx = gxCenter - 2; qx <= gxCenter + 1; qx++) {
@@ -1943,7 +2248,6 @@
       }
       groundPlane.position.set(bus.x, 0, bus.z);
 
-      // Update Hero 3D Danfo Minibus Mesh, Wheels, Cargo, Brake Lights & 11-Segment Bumper LEDs
       danfoMesh.root.position.set(bus.x, 0, bus.z);
       danfoMesh.root.rotation.y = -bus.heading;
       danfoMesh.bodyTilt.rotation.z = bus.roll;
@@ -1961,7 +2265,6 @@
       danfoMesh.brakeLampL.material = isBraking ? MAT.brakeOn : MAT.brakeOff;
       danfoMesh.brakeLampR.material = isBraking ? MAT.brakeOn : MAT.brakeOff;
 
-      // Update 11-Segment 3D Rear-Bumper LED Steering Gauge (oj / tj)
       const qSteer = quantizeSteerBar(inp.steer, TURN_THRESH_KH);
       const turnDir = bus.turning && !bus.uTurn ? (bus.turnIntent === 'left' ? -1 : 1) : 0;
       const blink = (now * 0.007) % 1 < 0.5;
@@ -1997,20 +2300,19 @@
         mat.emissive.setHex(em);
       }
 
-      // Animate Waving 3D Passengers at Pickup Stop
       if (activeStop && activeStop.kind === 'pickup') {
         for (const p of activeStop.people) {
-          animateHuman3D(p.mesh, p.x, p.z, p.yaw, p.phase, now, 1.5, true);
+          if (!p.boarded) {
+            animateHuman3D(p.mesh, p.x, p.z, p.yaw, p.phase, now, 1.5, true);
+          }
         }
       }
 
-      // Animate Sidewalk Pedestrians
       for (const p of pedestrians) {
         const pYaw = p.axis === 'z' ? (p.dir > 0 ? Math.PI : 0) : (p.dir > 0 ? -Math.PI * 0.5 : Math.PI * 0.5);
         animateHuman3D(p.mesh, p.x, p.z, pYaw, p.phase, now, p.speed, false);
       }
 
-      // Animate 3D Traffic Fleet
       for (const tc of traffic) {
         tc.mesh.group.position.set(tc.x, 0, tc.z);
         tc.mesh.group.rotation.y = -tc.heading;
@@ -2021,7 +2323,6 @@
         tc.mesh.bR.material = tc.braking ? MAT.brakeOn : MAT.brakeOff;
       }
 
-      // Update 3D Chase Camera & Directional Sun Shadow Target (tN from Trotro Driver)
       const targetCamH = bus.uTurn ? bus.roadHeading : bus.heading;
       camHeading += wrapAngle(camHeading, targetCamH) * Math.min(1, 6.5 * dt);
       const camDist = 9.8 + Math.max(0, bus.speed) * 0.08;
@@ -2035,7 +2336,6 @@
 
       renderer.render(scene, camera);
 
-      // Draw 2D Overlay: Floating Overhead Navigation Arrow & Chasing-Anchor Leash Gizmo
       const rect = webglCanvas.getBoundingClientRect();
       const W = rect.width, H = rect.height;
       hudCtx.clearRect(0, 0, W, H);
@@ -2100,7 +2400,6 @@
         hudCtx.restore();
       }
 
-      // Render Bottom-Left 2D Route Minimap
       mmCtx.fillStyle = '#d5dfb8';
       mmCtx.fillRect(0, 0, 90, 90);
       mmCtx.save();
@@ -2136,7 +2435,7 @@
         mmCtx.fill();
       }
       mmCtx.restore();
-      mmCtx.fillStyle = '#facc15';
+      mmCtx.fillStyle = ch.livery.body;
       mmCtx.strokeStyle = '#14233b';
       mmCtx.lineWidth = 2;
       mmCtx.beginPath();
@@ -2147,11 +2446,14 @@
       mmCtx.fill();
       mmCtx.stroke();
 
-      // Update HUD Readouts
-      document.getElementById('hud-cash').textContent = `₦${bus.cash.toLocaleString()}`;
+      document.getElementById('hud-cash').textContent = `${ch.currency}${bus.cash.toLocaleString()}`;
       document.getElementById('hud-fuel').textContent = Math.round(bus.fuel);
       document.getElementById('hud-seats').textContent = `${bus.riders.length}/${stats.capacity}`;
       document.getElementById('hud-speed').textContent = Math.round(Math.abs(bus.speed) * 2.2);
+      const debtLeft = Math.max(0, campaign.debtTotal - bus.cash);
+      document.getElementById('debt-badge').textContent = debtLeft === 0
+        ? `Alhaji Debt: PAID IN FULL! (Oga Status)`
+        : `Alhaji Debt: ₦${debtLeft.toLocaleString()} left (Day ${campaign.day}/30)`;
       document.getElementById('t-steer').textContent = (inp.steer >= 0 ? '+' : '') + inp.steer.toFixed(2);
       document.getElementById('t-zone').textContent = bus.uTurn
         ? '3-PT U-TURN'
@@ -2164,14 +2466,8 @@
               : Math.abs(inp.steer) > 0.01
                 ? 'LANE (<0.70)'
                 : 'CRUISE';
-      document.getElementById('t-home').textContent = stick.home
-        ? `HOMING (${stick.home > 0 ? 'R' : 'L'})`
-        : bus.turnSpent
-          ? 'TURN SPENT'
-          : 'IDLE';
     }
     requestAnimationFrame(frame);
   </script>
 </body>
 </html>
-

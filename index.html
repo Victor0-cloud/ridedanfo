@@ -3738,13 +3738,17 @@
         }
       }
 
-      for (const tc of traffic) {
-        const dx = tc.x - bus.x, dz = tc.z - bus.z;
-        const ahead = dx * Math.sin(bus.heading) + dz * -Math.cos(bus.heading);
-        const lat = Math.abs(dx * Math.cos(bus.heading) + dz * Math.sin(bus.heading));
-        if (ahead > 0 && ahead < 13 && lat < 2.1) {
-          targetSpeed = Math.min(targetSpeed, Math.max(0, (ahead - 4.8) * 2.4));
+      if (bus.hopY <= 0.35) {
+        for (const tc of traffic) {
+          const dx = tc.x - bus.x, dz = tc.z - bus.z;
+          const ahead = dx * Math.sin(bus.heading) + dz * -Math.cos(bus.heading);
+          const lat = Math.abs(dx * Math.cos(bus.heading) + dz * Math.sin(bus.heading));
+          if (ahead > 0 && ahead < 13 && lat < 2.1) {
+            targetSpeed = Math.min(targetSpeed, Math.max(0, (ahead - 4.8) * 2.4));
+          }
         }
+      } else {
+        targetSpeed = Math.max(targetSpeed, 34);
       }
 
       const prevSpeed = bus.speed;
@@ -3847,6 +3851,7 @@
       confineBusToRoadCorridors();
 
       for (const tc of traffic) {
+        if (bus.hopY > 0.65) continue; // Hop cleanly over cars, trucks & people!
         const dx = bus.x - tc.x, dz = bus.z - tc.z;
         const minSep = 3.6;
         const dist = Math.hypot(dx, dz);
@@ -4050,7 +4055,8 @@
 
     function triggerDanfoHop() {
       if (bus.hopY <= 0.02) {
-        bus.hopVy = 9.5;
+        bus.hopVy = 13.8;
+        bus.speed = Math.max(bus.speed, 34);
         AudioFx.rawTone(340, 0.09, 'triangle', 0.14);
       }
     }

@@ -249,7 +249,7 @@
         speaker: '🧢 Chidi & Tunde (Classic)',
         midDrop: "Auntie Bola: 'Mate, I dey drop for the corner o! Stop for me!' → 'Thank you, driver. I don reach the corner.'",
         startLine: "Chidi: 'Oga, your uncle's danfo is all he left you. Alhaji wants ₦60,000 in 30 days or he takes it back. Oya, Balogun Market! Make we go!'",
-        midLine: "Clerk Ife: 'Council route ticket: ₦200.' Aunty Ronke: 'My change be ₦700!' Chidi: 'Hold your change well, Balogun ahead!'",
+        midLine: "Aunty Ronke: 'My change be ₦700!' Chidi: 'Fare ₦300, paid ₦1,000 — hold your change well, Balogun Market ahead!'",
         arrivalLine: "Chidi: 'Balogun! Balogun! Bole! Make una check your belongings!' Next leg: Market Shuttle (Ojuelegba → Oyingbo)!"
       },
       {
@@ -835,7 +835,7 @@
     }
 
     const SHOP_NAMES = {
-      classic:            ['COUNCIL TICKET ₦200', 'BALOGUN FABRICS', 'YELLOW STAR FUEL', 'MAMA PUT KITCHEN', 'VULCANIZER BAY', 'YABA BUS STOP'],
+      classic:            ['BALOGUN MARKET PLAZA', 'BALOGUN FABRICS', 'YELLOW STAR FUEL', 'MAMA PUT KITCHEN', 'VULCANIZER BAY', 'YABA BUS STOP'],
       market:             ['OJUELEGBA FLYOVER', 'OYINGBO MARKET', 'BABA SULE STORES', 'MAMA Bisi WARDEN', 'RUSTY ZINC STALL', 'PATCHED TAR MOTORS'],
       city:               ['PHONES · ACCESSORIES', 'LAPTOPS · REPAIRS', 'DANGOTE REFINERY', 'EKO HOTEL TOWER', 'MTN MAST PLAZA', 'CHARGERS · POWER BANK'],
       arcade:             ['NATIONAL STADIUM', 'SURULERE SPORTS', 'IFEANYI WORKSHOP', 'COSTAIN ROUNDABOUT', 'GREEN EAGLE FANS', 'STADIUM EXPRESS'],
@@ -1508,16 +1508,6 @@
         const gantry = createSignBannerMesh(archText, archCol, '#fef08a', 15, 1.9);
         gantry.position.set(x0 - 3.5, 6.6, cz);
         group.add(gantry);
-
-        // Green Council Route Ticket Booth (₦200) on Classic Run
-        if (!isYaba) {
-          const booth = new THREE.Mesh(new THREE.BoxGeometry(2.4, 2.6, 2.8), new THREE.MeshStandardMaterial({ color: 0x1e7342 }));
-          booth.position.set(x0 + 2.4, 1.4, z0 + 8);
-          const tSign = createSignBannerMesh('TICKET • COUNCIL ROUTE TICKET ₦200', '#1e7342', '#fde047', 6.2, 1.1);
-          tSign.position.set(x0 + 1.1, 3.3, z0 + 8);
-          tSign.rotation.y = -Math.PI * 0.5;
-          group.add(booth, tSign);
-        }
       } else if (ch.id === 'market') {
         // OJUELEGBA CONCRETE FLYOVER BRIDGE spanning over the street
         const bridgeDeck = new THREE.Mesh(new THREE.BoxGeometry(26, 1.3, 9.0), new THREE.MeshStandardMaterial({ color: 0x78716c, roughness: 0.85 }));
@@ -2406,9 +2396,15 @@
           root.rotation.y = -snapH;
           root.visible = true;
 
-          // Configure 3D scene pieces for the specific route event (no police checkpoints or agberos!)
+          // Configure 3D scene pieces for the specific route event (no police checkpoints, agberos, or council checkpoints!)
           cattleGroup.visible = routeId === 'countryside';
           patrolCar.visible = false;
+          const showBoothAndGate = routeId !== 'classic';
+          booth.visible = showBoothAndGate;
+          boothRoof.visible = showBoothAndGate;
+          boothWin.visible = showBoothAndGate;
+          barrierPost.visible = showBoothAndGate;
+          barrierPivot.visible = showBoothAndGate;
           leftBooth.visible = ['kano', 'kotoka_atlanta'].includes(routeId);
           supervisor3D.root.visible = false;
           tunde3D.root.visible = false;
@@ -2417,8 +2413,7 @@
           ronke3D.root.visible = ['classic', 'market', 'yaba', 'anambra', 'ghana', 'usa'].includes(routeId);
 
           if (routeId === 'classic') {
-            boothMat.color.setHex(0x15803d); // Green Council Ticket Booth ₦200
-            updateBannerText('🎟️ FARE STOP • COUNCIL ROUTE TICKET ₦200 & AUNTY RONKE', '#15803d', '#fde047');
+            updateBannerText('🛍️ BALOGUN FARE STOP • AUNTY RONKE (₦700 CHANGE)', '#1e3a8a', '#fde047');
           } else if (routeId === 'kotoka_atlanta') {
             boothMat.color.setHex(0x15803d);     // Ghana Kotoka Exit Booth
             leftBoothMat.color.setHex(0x1e3a8a); // USA Hartsfield Entry Booth
@@ -2744,9 +2739,9 @@
 
     const EVENT_SPECS = {
       classic: {
-        badge: 'LIVE 3D FARE STOP & COUNCIL TICKET',
-        title: '🎟️ 3D COUNCIL TICKET BOOTH (₦200) & AUNTY RONKE (₦700 CHANGE)',
-        body: 'Clerk Ife: "Council route ticket: ₦200." Aunty Ronke: "My change be ₦700!" Chidi: "Fare ₦300, paid ₦1,000, change owed ₦700."',
+        badge: 'LIVE 3D BALOGUN FARE STOP',
+        title: '🚌 BALOGUN FARE STOP & AUNTY RONKE (₦700 CHANGE)',
+        body: 'Aunty Ronke: "My change be ₦700!" Chidi: "Fare ₦300, paid ₦1,000, change owed ₦700."',
         btn1: "Use Chidi's Change (0s)",
         btn2: 'Ask Other Passengers (+10s)',
         btn3: 'Stop at Kiosk for Change (+15s)',

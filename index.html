@@ -106,9 +106,9 @@
           class="slab-btn px-2 py-1 bg-gradient-to-b from-[#c3cfe4] to-[#94a6c6] text-[#14233b] text-[11px] flex items-center gap-1">
           <span>🗺️</span><span>Story / Routes</span>
         </button>
-        <button id="btn-event" type="button" title="Open Physical 3D Route Event & Border Scene"
-          class="slab-btn px-2 py-1 bg-gradient-to-b from-[#fde047] to-[#f59e0b] text-[#14233b] text-[11px] flex items-center gap-1">
-          <span>🎬</span><span>Route Scene</span>
+        <button id="btn-event" type="button" title="Open 3D Border / Finale Scene"
+          class="slab-btn px-2 py-1 bg-gradient-to-b from-[#fde047] to-[#f59e0b] text-[#14233b] text-[11px] hidden items-center gap-1">
+          <span>🛂</span><span>Border Scene</span>
         </button>
         <button id="btn-autodrive" type="button" class="slab-btn px-2 py-1 bg-gradient-to-b from-[#7ff0a8] to-[#46d27a] text-[#08351a] text-[11px] flex items-center gap-1">
           <span>🎬</span><span id="autodrive-lbl">Auto-Drive: ON</span>
@@ -2843,6 +2843,13 @@
       clearCityBlocks();
       MusicPlayer.setRegion(ch.region);
 
+      const evBtn = document.getElementById('btn-event');
+      if (evBtn) {
+        const isBorderLeg = ['kano', 'kotoka_atlanta', 'usa_dc'].includes(ch.id);
+        evBtn.classList.toggle('hidden', !isBorderLeg);
+        evBtn.classList.toggle('flex', isBorderLeg);
+      }
+
       document.getElementById('chapter-badge').textContent = `Leg ${ch.num}/${STORY_CHAPTERS.length} • ${ch.title}`;
       storySay(ch.speaker, ch.startLine, ch.region);
     }
@@ -3435,7 +3442,7 @@
         if (activeStop.kind === 'dropoff' && !campaign.midSpoken && dAlong < 68) {
           campaign.midSpoken = true;
           storySay(ch.speaker, ch.midLine, ch.region);
-          if (!campaign.checkpointShown) {
+          if (!campaign.checkpointShown && ['kano', 'kotoka_atlanta', 'usa_dc'].includes(ch.id)) {
             campaign.checkpointShown = true;
             openEncounterModal(ch.id);
           }

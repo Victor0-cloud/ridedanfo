@@ -3181,6 +3181,10 @@
     function applyChapter(idx) {
       currentChapterIdx = (idx + STORY_CHAPTERS.length) % STORY_CHAPTERS.length;
       const ch = STORY_CHAPTERS[currentChapterIdx];
+      if (ch.id === 'aburi' || ch.id === 'koforidua_downhill') {
+        window.location.href = './aburi_mountain.html?leg=' + (ch.id === 'aburi' ? '10' : '10b');
+        return;
+      }
       campaign.tripsInChapter = 0;
       campaign.midSpoken = false;
       campaign.checkpointShown = false;
@@ -3572,8 +3576,16 @@
       });
     }
 
-    applyChapter(0);
+    const _urlParams = new URLSearchParams(window.location.search);
+    const _urlLeg = _urlParams.get('leg');
+    applyChapter(_urlLeg !== null && !Number.isNaN(Number(_urlLeg)) ? Number(_urlLeg) : 0);
     spawnMissionStop('pickup');
+    if (_urlParams.get('routes') === '1') {
+      setTimeout(() => {
+        const br = document.getElementById('btn-routes');
+        if (br) br.click();
+      }, 150);
+    }
 
     // =========================================================================
     // 7. COLLISION CONFINEMENT & ROAD-ASSISTED VEHICLE PHYSICS (zq + Q3e)

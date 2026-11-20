@@ -1,0 +1,2071 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
+  <title>Ride Danfo — Aburi Mountain Route 3D Test (Ghana Tro-Tro)</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-user-select: none; }
+    html, body { width: 100%; height: 100%; overflow: hidden; background: #0b1622; font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif; color: #f8fafc; }
+    #c { position: fixed; inset: 0; width: 100%; height: 100%; display: block; touch-action: none; }
+
+    #hud {
+      position: fixed; top: 12px; left: 12px; right: 12px;
+      display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px;
+      pointer-events: none; z-index: 10;
+    }
+    .pill-group { display: flex; flex-wrap: wrap; align-items: center; gap: 7px; pointer-events: auto; }
+    .pill {
+      background: rgba(11, 22, 34, 0.78);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255,255,255,0.16);
+      border-radius: 999px;
+      padding: 6px 12px;
+      font-size: 12px;
+      font-weight: 700;
+      color: #f8fafc;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.32);
+      display: inline-flex; align-items: center; gap: 6px;
+    }
+    .btn { cursor: pointer; transition: transform 0.12s ease, background 0.15s ease; }
+    .btn:active { transform: scale(0.95); }
+    .btn.active { background: rgba(250, 204, 21, 0.94); color: #0b1622; border-color: #fde047; }
+    .btn-rain.active { background: rgba(14, 165, 233, 0.92); color: #ffffff; border-color: #bae6fd; }
+
+    #telemetry {
+      position: fixed; left: 14px; bottom: 16px;
+      background: rgba(11, 22, 34, 0.80);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255,255,255,0.14);
+      border-radius: 14px;
+      padding: 10px 14px;
+      font-size: 12px;
+      line-height: 1.5;
+      pointer-events: none;
+      z-index: 10;
+      min-width: 210px;
+    }
+    #telemetry strong { color: #facc15; font-size: 16px; }
+    .sub { color: #cbd5e1; font-size: 11px; }
+
+    .slab-btn {
+      border: 3px solid #14233b;
+      border-radius: 15px;
+      font-weight: 800;
+      box-shadow: 0 4px 0 #0a1526, 0 8px 16px rgba(10, 21, 38, 0.35), inset 0 2px 0 rgba(255, 255, 255, 0.72);
+      transition: transform 0.12s cubic-bezier(0.3, 2.2, 0.45, 1);
+      cursor: pointer;
+      touch-action: none;
+    }
+    .slab-btn:active, .slab-btn.pressed {
+      transform: translateY(3px);
+      box-shadow: 0 1px 0 #0a1526, 0 4px 8px rgba(10, 21, 38, 0.3);
+    }
+    #hud-canvas { position: fixed; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 15; }
+    #thumb-cluster {
+      position: fixed; right: 14px; bottom: 26px;
+      display: flex; align-items: flex-end; gap: 6px;
+      z-index: 30;
+      pointer-events: auto;
+    }
+    .t-btn {
+      width: 44px; height: 44px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px;
+    }
+    #btn-horn-pad { background: linear-gradient(180deg, #fff8ec, #fde047); color: #14233b; }
+    #btn-hop      { background: linear-gradient(180deg, #d9f99d, #84cc16); color: #1a2e05; }
+    #btn-rev      { background: linear-gradient(180deg, #fff4f1, #ffd3ca); color: #a82d1b; }
+    #btn-uturn    { background: linear-gradient(180deg, #f7f2ff, #dccdff); color: #52349f; font-size: 20px; }
+
+    #narration-box {
+      position: fixed; left: 14px; bottom: 96px; max-width: 360px;
+      background: linear-gradient(180deg, #fffdf9, #fff5e2);
+      border: 3px solid #14233b;
+      border-radius: 16px;
+      padding: 8px 12px;
+      font-size: 12px;
+      line-height: 1.38;
+      color: #14233b;
+      z-index: 25;
+      display: none;
+      align-items: center;
+      gap: 10px;
+      box-shadow: 0 4px 0 #0a1526, 0 10px 22px rgba(10,21,38,0.42);
+    }
+    #narration-box strong { color: #b45309; display: block; font-size: 11px; font-weight: 900; margin-bottom: 2px; }
+    #mate-portrait { width: 44px; height: 44px; border-radius: 10px; border: 2px solid #14233b; flex-shrink: 0; background: #fde68a; }
+    #help-hint {
+      position: fixed; bottom: 16px; left: 50%; transform: translateX(-50%);
+      background: rgba(11, 22, 34, 0.72);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 999px;
+      padding: 5px 12px;
+      font-size: 11px;
+      color: #cbd5e1;
+      pointer-events: none;
+      z-index: 9;
+      white-space: nowrap;
+    }
+    @media (max-width: 780px) { #help-hint { display: none; } }
+  </style>
+</head>
+<body>
+  <canvas id="c"></canvas>
+  <canvas id="hud-canvas"></canvas>
+
+  <div id="hud">
+    <div class="pill-group" id="top-hud-bar">
+      <div class="pill">🇬🇭 Ghana Tro-Tro — Aburi Mountain Route 3D Test</div>
+      <div class="pill" id="zone-pill">📍 Uphill Mountain Climb</div>
+      <div class="pill" id="music-now" style="color:#4ade80;">♪ Hot Amapiano Beats</div>
+    </div>
+    <div class="pill-group">
+      <button class="pill btn" id="btn-back-routes">🗺️ Routes</button>
+      <button class="pill btn" id="btn-next-leg">✈️ Next: Kotoka</button>
+      <button class="pill btn active" id="btn-uphill">🏔️ Uphill Climb</button>
+      <button class="pill btn btn-rain" id="btn-downhill">🌧️ Downhill Valley</button>
+      <button class="pill btn" id="btn-ktown">🏙️ K-Town (Koforidua)</button>
+      <button class="pill btn" id="btn-return">🔄 Return Direction</button>
+      <button class="pill btn" id="btn-rain">☔ Rain &amp; Wet Road: AUTO</button>
+      <button class="pill btn active" id="btn-music">🎵 Music: ON</button>
+      <button class="pill btn active" id="btn-auto">🚐 Auto-Cruise: ON</button>
+      <button class="pill btn" id="btn-cam">🎥 Cam: Chase</button>
+    </div>
+  </div>
+
+  <div id="telemetry">
+    <div><strong id="spd-val">0</strong> km/h &nbsp;|&nbsp; Alt: <span id="alt-val">0</span>m</div>
+    <div class="sub">Grade: <span id="grade-val">0.0%</span> &nbsp;|&nbsp; Dir: <span id="dir-val">Climbing</span></div>
+    <div class="sub">Loop Progress: <span id="prog-val">0%</span></div>
+  </div>
+
+  <div id="narration-box"><canvas id="mate-portrait" width="44" height="44"></canvas><div><strong id="narr-speaker">🇬🇭 Mate Koffi</strong><span id="narr-text"></span></div></div>
+  <div id="help-hint">Steer: Drag / A-D · Gas/Rev: W/S · Horn: Space · Hop: H · U-Turn: U · Music: M</div>
+
+  <div id="thumb-cluster">
+    <button id="btn-horn-pad" type="button" title="Honk Danfo Horn (Space)" class="slab-btn t-btn">📯</button>
+    <button id="btn-hop" type="button" title="Hop Danfo (H)" class="slab-btn t-btn">🦘</button>
+    <button id="btn-rev" type="button" title="Hold to Reverse / Brake (S)" class="slab-btn t-btn">▼</button>
+    <button id="btn-uturn" type="button" title="U-Turn (U)" class="slab-btn t-btn"><span style="display:inline-block; transform: scaleX(-1);">↶</span></button>
+  </div>
+
+  <script src="./three.min.js"></script>
+  <script>
+  (() => {
+    'use strict';
+
+    // =========================================================================
+    // 1. RENDERER, SCENE, REALISTIC SKY & PMREM ENVIRONMENT REFLECTIONS
+    // =========================================================================
+    const canvas = document.getElementById('c');
+    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, powerPreference: 'high-performance' });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.06;
+
+    const scene = new THREE.Scene();
+    scene.fog = new THREE.FogExp2(0x9cb4c4, 0.0015);
+
+    const camera = new THREE.PerspectiveCamera(54, window.innerWidth / window.innerHeight, 0.5, 1800);
+
+    const skyUniforms = {
+      uTopColor: { value: new THREE.Color(0x1b4b7a) },
+      uMidColor: { value: new THREE.Color(0x6d9dc2) },
+      uHorizonColor: { value: new THREE.Color(0xcbdbe4) },
+      uSunDir: { value: new THREE.Vector3(0.55, 0.52, -0.45).normalize() },
+      uRainMix: { value: 0.0 }
+    };
+    const skyMat = new THREE.ShaderMaterial({
+      side: THREE.BackSide,
+      depthWrite: false,
+      uniforms: skyUniforms,
+      vertexShader: `
+        varying vec3 vWorldPos;
+        void main() {
+          vec4 wp = modelMatrix * vec4(position, 1.0);
+          vWorldPos = wp.xyz;
+          gl_Position = projectionMatrix * viewMatrix * wp;
+        }
+      `,
+      fragmentShader: `
+        uniform vec3 uTopColor;
+        uniform vec3 uMidColor;
+        uniform vec3 uHorizonColor;
+        uniform vec3 uSunDir;
+        uniform float uRainMix;
+        varying vec3 vWorldPos;
+        void main() {
+          vec3 dir = normalize(vWorldPos);
+          float h = clamp(dir.y, 0.0, 1.0);
+          vec3 col = mix(uHorizonColor, uMidColor, smoothstep(0.0, 0.24, h));
+          col = mix(col, uTopColor, smoothstep(0.24, 0.82, h));
+          float sunDot = max(dot(dir, normalize(uSunDir)), 0.0);
+          col += vec3(1.0, 0.94, 0.78) * pow(sunDot, 120.0) * 1.4 * (1.0 - uRainMix * 0.92);
+          col += vec3(0.96, 0.90, 0.76) * pow(sunDot, 8.0) * 0.22 * (1.0 - uRainMix * 0.85);
+          gl_FragColor = vec4(col, 1.0);
+        }
+      `
+    });
+    scene.add(new THREE.Mesh(new THREE.SphereGeometry(1250, 36, 24), skyMat));
+
+    const pmrem = new THREE.PMREMGenerator(renderer);
+    const envScene = new THREE.Scene();
+    envScene.add(new THREE.Mesh(new THREE.SphereGeometry(50, 24, 16), skyMat));
+    scene.environment = pmrem.fromScene(envScene, 0.04).texture;
+
+    const hemiLight = new THREE.HemisphereLight(0xd2e7f7, 0x1e2e1d, 0.88);
+    scene.add(hemiLight);
+
+    const sunLight = new THREE.DirectionalLight(0xfff3d6, 2.25);
+    sunLight.position.set(160, 220, -140);
+    sunLight.castShadow = true;
+    sunLight.shadow.mapSize.set(2048, 2048);
+    sunLight.shadow.camera.near = 15;
+    sunLight.shadow.camera.far = 700;
+    const dCam = 180;
+    sunLight.shadow.camera.left = -dCam;
+    sunLight.shadow.camera.right = dCam;
+    sunLight.shadow.camera.top = dCam;
+    sunLight.shadow.camera.bottom = -dCam;
+    sunLight.shadow.bias = -0.0004;
+    scene.add(sunLight);
+    scene.add(sunLight.target);
+
+    // =========================================================================
+    // 2. NOISE & ABURI MOUNTAIN SPLINE
+    // =========================================================================
+    function hash2(x, y) {
+      const s = Math.sin(x * 127.1 + y * 311.7) * 43758.5453123;
+      return s - Math.floor(s);
+    }
+    function valueNoise(x, y) {
+      const ix = Math.floor(x), iy = Math.floor(y);
+      const fx = x - ix, fy = y - iy;
+      const ux = fx * fx * (3 - 2 * fx);
+      const uy = fy * fy * (3 - 2 * fy);
+      const a = hash2(ix, iy), b = hash2(ix + 1, iy);
+      const c = hash2(ix, iy + 1), d = hash2(ix + 1, iy + 1);
+      return a + (b - a) * ux + (c - a) * uy + (a - b - c + d) * ux * uy;
+    }
+    function fbm(x, y, oct = 4) {
+      let v = 0, amp = 0.5, freq = 1;
+      for (let i = 0; i < oct; i++) {
+        v += amp * valueNoise(x * freq, y * freq);
+        freq *= 2.03; amp *= 0.5;
+      }
+      return v;
+    }
+    function smoothstep(e0, e1, x) {
+      const t = Math.max(0, Math.min(1, (x - e0) / (e1 - e0)));
+      return t * t * (3 - 2 * t);
+    }
+
+    const routeControlPoints = [
+      new THREE.Vector3(-230,   8,  210),
+      new THREE.Vector3(-135,  16,  235),
+      new THREE.Vector3( -30,  30,  200),
+      new THREE.Vector3(  60,  44,  245),
+      new THREE.Vector3( 160,  60,  205),
+      new THREE.Vector3( 218,  76,  108),
+      new THREE.Vector3( 132,  90,   42),
+      new THREE.Vector3( 198, 104,  -55),
+      new THREE.Vector3( 155, 114, -165),
+      new THREE.Vector3(  55, 116, -225),
+      new THREE.Vector3( -65, 110, -210),
+      new THREE.Vector3(-165,  92, -165),
+      new THREE.Vector3(-235,  70,  -95),
+      new THREE.Vector3(-175,  50,  -15),
+      new THREE.Vector3(-265,  32,   55),
+      new THREE.Vector3(-295,  16,  145)
+    ];
+
+    const roadCurve = new THREE.CatmullRomCurve3(routeControlPoints, true, 'catmullrom', 0.48);
+    const ROAD_HALF = 6.4;
+    const SAMPLES = 960;
+    const roadSamples = [];
+    const totalLen = roadCurve.getLength();
+    for (let i = 0; i < SAMPLES; i++) {
+      const t = i / SAMPLES;
+      const pos = roadCurve.getPointAt(t);
+      const tan = roadCurve.getTangentAt(t).normalize();
+      const right = new THREE.Vector3().crossVectors(tan, new THREE.Vector3(0, 1, 0)).normalize();
+      const up = new THREE.Vector3().crossVectors(right, tan).normalize();
+      roadSamples.push({ t, pos, tan, right, up });
+    }
+
+    function getNearestRoadSample(x, z) {
+      let bestIdx = 0, bestD2 = Infinity;
+      const step = 6;
+      for (let i = 0; i < SAMPLES; i += step) {
+        const p = roadSamples[i].pos;
+        const dx = x - p.x, dz = z - p.z;
+        const d2 = dx * dx + dz * dz;
+        if (d2 < bestD2) { bestD2 = d2; bestIdx = i; }
+      }
+      let best = roadSamples[bestIdx];
+      for (let k = -step; k <= step; k++) {
+        const idx = (bestIdx + k + SAMPLES) % SAMPLES;
+        const p = roadSamples[idx].pos;
+        const dx = x - p.x, dz = z - p.z;
+        const d2 = dx * dx + dz * dz;
+        if (d2 < bestD2) { bestD2 = d2; best = roadSamples[idx]; }
+      }
+      return { sample: best, dist: Math.sqrt(bestD2) };
+    }
+
+    function getRoadFrameAtT(t) {
+      const tt = ((t % 1) + 1) % 1;
+      const pos = roadCurve.getPointAt(tt);
+      const tan = roadCurve.getTangentAt(tt).normalize();
+      const right = new THREE.Vector3().crossVectors(tan, new THREE.Vector3(0, 1, 0)).normalize();
+      const up = new THREE.Vector3().crossVectors(right, tan).normalize();
+      return { t: tt, pos, tan, right, up };
+    }
+
+    // =========================================================================
+    // 3. DETAILED 3D MOUNTAIN TERRAIN, LAYERED RIDGES & VALLEY TOWN
+    // =========================================================================
+    function createTerrainDetailTexture() {
+      const c = document.createElement('canvas');
+      c.width = 512; c.height = 512;
+      const ctx = c.getContext('2d');
+      ctx.fillStyle = '#8b9980';
+      ctx.fillRect(0, 0, 512, 512);
+      for (let i = 0; i < 18000; i++) {
+        const x = Math.random() * 512, y = Math.random() * 512;
+        const r = 1 + Math.random() * 3.5;
+        const v = 88 + Math.floor(Math.random() * 98);
+        ctx.fillStyle = `rgba(${v},${v + 9},${v - 7},0.3)`;
+        ctx.fillRect(x, y, r, r);
+      }
+      const tex = new THREE.CanvasTexture(c);
+      tex.wrapS = THREE.RepeatWrapping;
+      tex.wrapT = THREE.RepeatWrapping;
+      tex.repeat.set(46, 46);
+      return tex;
+    }
+
+    const TERRAIN_SIZE = 1600;
+    const TERRAIN_SEGS = 240;
+    const terrainGeo = new THREE.PlaneGeometry(TERRAIN_SIZE, TERRAIN_SIZE, TERRAIN_SEGS, TERRAIN_SEGS);
+    terrainGeo.rotateX(-Math.PI / 2);
+
+    const tPos = terrainGeo.attributes.position;
+    const tColors = new Float32Array(tPos.count * 3);
+
+    function baseMountainHeight(x, z) {
+      const ridge = smoothstep(-280, 240, x * 0.55 - z * 0.65) * 98;
+      const valleyBowl = -smoothstep(190, 35, Math.hypot(x + 90, z - 25)) * 32;
+      const n1 = (fbm((x + 500) * 0.0045, (z + 500) * 0.0045, 4) - 0.45) * 62;
+      const n2 = (fbm((x + 120) * 0.018, (z + 120) * 0.018, 3) - 0.5) * 16;
+      const crags = (fbm(x * 0.045, z * 0.045, 2) - 0.5) * 5.5;
+      return Math.max(-22, ridge + valleyBowl + n1 + n2 + crags);
+    }
+
+    function getTerrainHeight(x, z) {
+      const natH = baseMountainHeight(x, z);
+      const { sample, dist } = getNearestRoadSample(x, z);
+      const roadH = sample.pos.y - 0.55;
+      const blend = 1.0 - smoothstep(ROAD_HALF + 3.0, ROAD_HALF + 26.0, dist);
+      let h = natH * (1 - blend) + roadH * blend;
+      if (dist > ROAD_HALF + 4.0 && dist < ROAD_HALF + 20.0 && natH > roadH + 2.0) {
+        h += (fbm(x * 0.08, z * 0.08, 3) - 0.25) * 4.5;
+      }
+      return h;
+    }
+
+    for (let i = 0; i < tPos.count; i++) {
+      const x = tPos.getX(i), z = tPos.getZ(i);
+      const natH = baseMountainHeight(x, z);
+      const { sample, dist } = getNearestRoadSample(x, z);
+      const roadH = sample.pos.y - 0.55;
+      const h = getTerrainHeight(x, z);
+      tPos.setY(i, h);
+
+      const nA = fbm(x * 0.03, z * 0.03, 3);
+      const nB = fbm(x * 0.11, z * 0.11, 2);
+      let r = 0.12, g = 0.28, b = 0.11;
+      if (dist < ROAD_HALF + 13 && natH > roadH + 3.2) {
+        const rockMix = smoothstep(0.35, 0.7, nB);
+        r = 0.34 * (1 - rockMix) + 0.44 * rockMix;
+        g = 0.30 * (1 - rockMix) + 0.27 * rockMix;
+        b = 0.26 * (1 - rockMix) + 0.18 * rockMix;
+      } else if (h < 10) {
+        r = 0.08 + nA * 0.06; g = 0.23 + nA * 0.10; b = 0.09 + nA * 0.04;
+      } else {
+        r = 0.11 + nA * 0.09; g = 0.29 + nA * 0.14 + nB * 0.05; b = 0.10 + nA * 0.05;
+      }
+      tColors[i * 3] = r; tColors[i * 3 + 1] = g; tColors[i * 3 + 2] = b;
+    }
+    terrainGeo.setAttribute('color', new THREE.BufferAttribute(tColors, 3));
+    terrainGeo.computeVertexNormals();
+
+    const terrainMesh = new THREE.Mesh(terrainGeo, new THREE.MeshStandardMaterial({
+      map: createTerrainDetailTexture(),
+      vertexColors: true,
+      roughness: 0.94,
+      metalness: 0.02
+    }));
+    terrainMesh.receiveShadow = true;
+    scene.add(terrainMesh);
+
+    const baseFloor = new THREE.Mesh(
+      new THREE.PlaneGeometry(2600, 2600),
+      new THREE.MeshStandardMaterial({ color: 0x152b18, roughness: 0.98 })
+    );
+    baseFloor.rotation.x = -Math.PI / 2;
+    baseFloor.position.y = -26;
+    scene.add(baseFloor);
+
+    // Layered 3D Distant Mountain Ridges
+    [
+      { radius: 560, height: 155, color: 0x29483a, yBase: -18 },
+      { radius: 780, height: 225, color: 0x3b5d62, yBase: -22 },
+      { radius: 1020, height: 285, color: 0x5c7b8f, yBase: -26 }
+    ].forEach((rc, idx) => {
+      const geo = new THREE.CylinderGeometry(rc.radius, rc.radius + 95, rc.height, 140, 8, true);
+      const p = geo.attributes.position;
+      for (let i = 0; i < p.count; i++) {
+        const vx = p.getX(i), vy = p.getY(i), vz = p.getZ(i);
+        if (vy > -rc.height * 0.35) {
+          const ang = Math.atan2(vz, vx);
+          const n = fbm(Math.cos(ang) * 2.4 + idx * 7, Math.sin(ang) * 2.4 + idx * 3, 4);
+          const peak = (vy + rc.height * 0.5) / rc.height;
+          p.setY(i, vy + (n - 0.35) * rc.height * 0.92 * peak);
+        }
+      }
+      geo.computeVertexNormals();
+      const m = new THREE.Mesh(geo, new THREE.MeshStandardMaterial({ color: rc.color, roughness: 0.96, side: THREE.DoubleSide }));
+      m.position.y = rc.yBase + rc.height * 0.4;
+      scene.add(m);
+    });
+
+    // Distant Valley Town Buildings
+    const bldgMats = [
+      new THREE.MeshStandardMaterial({ color: 0xd9cbb8, roughness: 0.85 }),
+      new THREE.MeshStandardMaterial({ color: 0xc2b29b, roughness: 0.85 }),
+      new THREE.MeshStandardMaterial({ color: 0xa86448, roughness: 0.85 })
+    ];
+    const roofMat = new THREE.MeshStandardMaterial({ color: 0x7c2d12, roughness: 0.75 });
+    for (let i = 0; i < 65; i++) {
+      const angle = hash2(i, 11) * Math.PI * 2;
+      const rad = 18 + hash2(i, 23) * 85;
+      const bx = -95 + Math.cos(angle) * rad, bz = 25 + Math.sin(angle) * rad;
+      const { dist } = getNearestRoadSample(bx, bz);
+      if (dist < ROAD_HALF + 18) continue;
+      const by = getTerrainHeight(bx, bz);
+      const w = 4 + hash2(i, 31) * 5, h = 3.5 + hash2(i, 47) * 7, d = 4 + hash2(i, 59) * 5;
+      const bMesh = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), bldgMats[i % bldgMats.length]);
+      bMesh.position.set(bx, by + h * 0.5 - 0.6, bz);
+      bMesh.rotation.y = hash2(i, 71) * Math.PI;
+      bMesh.castShadow = true;
+      scene.add(bMesh);
+      const roof = new THREE.Mesh(new THREE.ConeGeometry(Math.max(w, d) * 0.72, 1.8, 4), roofMat);
+      roof.position.set(bx, by + h + 0.3, bz);
+      roof.rotation.y = bMesh.rotation.y + Math.PI / 4;
+      scene.add(roof);
+    }
+
+    // =========================================================================
+    // 4. REALISTIC TAR ROAD (BUMP + WET CLEARCOAT), BARRIERS & ROADSIDE PROPS
+    // =========================================================================
+    function createTarRoadTextures() {
+      const c = document.createElement('canvas');
+      c.width = 1024; c.height = 1024;
+      const ctx = c.getContext('2d');
+      // Rich dark tar-asphalt base
+      ctx.fillStyle = '#181b20';
+      ctx.fillRect(0, 0, 1024, 1024);
+
+      // Fine mineral aggregate speckle
+      for (let i = 0; i < 36000; i++) {
+        const x = Math.random() * 1024, y = Math.random() * 1024;
+        const v = 16 + Math.floor(Math.random() * 34);
+        ctx.fillStyle = `rgb(${v},${v + 1},${v + 3})`;
+        ctx.fillRect(x, y, 2, 2);
+      }
+
+      // Subtle tar-sealant cracks for realism
+      ctx.strokeStyle = 'rgba(7, 8, 10, 0.55)';
+      ctx.lineWidth = 2;
+      for (let k = 0; k < 14; k++) {
+        ctx.beginPath();
+        let cx = 120 + Math.random() * 780, cy = Math.random() * 1024;
+        ctx.moveTo(cx, cy);
+        for (let s = 0; s < 6; s++) {
+          cx += (Math.random() - 0.5) * 45;
+          cy += 25 + Math.random() * 30;
+          ctx.lineTo(cx, cy);
+        }
+        ctx.stroke();
+      }
+
+      // Glossy wheel-wear tracks in both lanes
+      ctx.fillStyle = 'rgba(6, 8, 11, 0.38)';
+      ctx.fillRect(210, 0, 185, 1024);
+      ctx.fillRect(625, 0, 185, 1024);
+
+      // Gravel/tar shoulders
+      ctx.fillStyle = '#2d2a26';
+      ctx.fillRect(0, 0, 52, 1024);
+      ctx.fillRect(972, 0, 52, 1024);
+
+      // Crisp white edge lines
+      ctx.fillStyle = '#e2e8f0';
+      ctx.fillRect(60, 0, 16, 1024);
+      ctx.fillRect(948, 0, 16, 1024);
+
+      // Crisp white dashed center divider
+      for (let y = 0; y < 1024; y += 128) ctx.fillRect(500, y + 16, 24, 68);
+
+      const tex = new THREE.CanvasTexture(c);
+      tex.wrapS = THREE.ClampToEdgeWrapping;
+      tex.wrapT = THREE.RepeatWrapping;
+      tex.anisotropy = 8;
+
+      // Roughness puddle map
+      const rc = document.createElement('canvas');
+      rc.width = 256; rc.height = 256;
+      const rctx = rc.getContext('2d');
+      rctx.fillStyle = '#666';
+      rctx.fillRect(0, 0, 256, 256);
+      for (let i = 0; i < 120; i++) {
+        const px = Math.random() * 256, py = Math.random() * 256;
+        const rad = 10 + Math.random() * 34;
+        const g = rctx.createRadialGradient(px, py, 2, px, py, rad);
+        g.addColorStop(0, 'rgba(10,10,10,0.92)');
+        g.addColorStop(1, 'rgba(95,95,95,0)');
+        rctx.fillStyle = g;
+        rctx.beginPath(); rctx.arc(px, py, rad, 0, Math.PI * 2); rctx.fill();
+      }
+      const roughTex = new THREE.CanvasTexture(rc);
+      roughTex.wrapS = THREE.RepeatWrapping;
+      roughTex.wrapT = THREE.RepeatWrapping;
+
+      return { tex, roughTex };
+    }
+
+    const { tex: roadTex, roughTex: roadRoughTex } = createTarRoadTextures();
+    const roadMat = new THREE.MeshPhysicalMaterial({
+      map: roadTex,
+      bumpMap: roadTex,
+      bumpScale: 0.035,
+      roughnessMap: roadRoughTex,
+      roughness: 0.52,
+      metalness: 0.12,
+      clearcoat: 0.25,
+      clearcoatRoughness: 0.35,
+      envMapIntensity: 1.4
+    });
+
+    const roadPositions = [], roadUVs = [], roadIndices = [];
+    const skirtPos = [], skirtIdx = [];
+    let accumLen = 0;
+    for (let i = 0; i <= SAMPLES; i++) {
+      const s = roadSamples[i % SAMPLES];
+      const prev = roadSamples[(i - 1 + SAMPLES) % SAMPLES];
+      if (i > 0) accumLen += s.pos.distanceTo(prev.pos);
+      const lPt = s.pos.clone().addScaledVector(s.right, -ROAD_HALF);
+      const rPt = s.pos.clone().addScaledVector(s.right, ROAD_HALF);
+      roadPositions.push(lPt.x, lPt.y + 0.08, lPt.z, rPt.x, rPt.y + 0.08, rPt.z);
+      roadUVs.push(0, accumLen / 16, 1, accumLen / 16);
+      skirtPos.push(
+        lPt.x, lPt.y + 0.08, lPt.z, lPt.x, lPt.y - 2.6, lPt.z,
+        rPt.x, rPt.y + 0.08, rPt.z, rPt.x, rPt.y - 2.6, rPt.z
+      );
+      if (i < SAMPLES) {
+        const a = i * 2, b = a + 1, c = a + 2, d = a + 3;
+        roadIndices.push(a, b, c, b, d, c);
+        const sa = i * 4, sb = sa + 4;
+        skirtIdx.push(sa, sa + 1, sb, sa + 1, sb + 1, sb);
+        skirtIdx.push(sa + 2, sb + 2, sa + 3, sa + 3, sb + 2, sb + 3);
+      }
+    }
+    const roadGeo = new THREE.BufferGeometry();
+    roadGeo.setAttribute('position', new THREE.Float32BufferAttribute(roadPositions, 3));
+    roadGeo.setAttribute('uv', new THREE.Float32BufferAttribute(roadUVs, 2));
+    roadGeo.setIndex(roadIndices);
+    roadGeo.computeVertexNormals();
+    const roadMesh = new THREE.Mesh(roadGeo, roadMat);
+    roadMesh.receiveShadow = true;
+    scene.add(roadMesh);
+
+    const skirtGeo = new THREE.BufferGeometry();
+    skirtGeo.setAttribute('position', new THREE.Float32BufferAttribute(skirtPos, 3));
+    skirtGeo.setIndex(skirtIdx);
+    skirtGeo.computeVertexNormals();
+    scene.add(new THREE.Mesh(skirtGeo, new THREE.MeshStandardMaterial({ color: 0x333942, roughness: 0.92, side: THREE.DoubleSide })));
+
+    // Red-and-White Concrete Jersey Barriers, Curve Chevrons & Utility Poles
+    const barrierRedMat = new THREE.MeshStandardMaterial({ color: 0xb91c1c, roughness: 0.78 });
+    const barrierWhiteMat = new THREE.MeshStandardMaterial({ color: 0xe2e8f0, roughness: 0.78 });
+    const postMat = new THREE.MeshStandardMaterial({ color: 0x475569, metalness: 0.6, roughness: 0.45 });
+    const chevronMat = new THREE.MeshStandardMaterial({ color: 0xfacc15, roughness: 0.35 });
+    const chevronStripeMat = new THREE.MeshStandardMaterial({ color: 0x111827, roughness: 0.35 });
+    const woodPoleMat = new THREE.MeshStandardMaterial({ color: 0x5c4033, roughness: 0.9 });
+
+    for (let i = 0; i < SAMPLES; i += 2) {
+      const s = roadSamples[i], next = roadSamples[(i + 2) % SAMPLES];
+      for (const side of [-1, 1]) {
+        const edge = s.pos.clone().addScaledVector(s.right, side * (ROAD_HALF + 0.48));
+        const edgeNext = next.pos.clone().addScaledVector(next.right, side * (ROAD_HALF + 0.48));
+        const natH = baseMountainHeight(edge.x, edge.z);
+        if (edge.y - natH > 1.2 || (side === 1 && i % 4 === 0)) {
+          const span = edge.distanceTo(edgeNext);
+          const mid = edge.clone().add(edgeNext).multiplyScalar(0.5);
+          const barrier = new THREE.Mesh(
+            new THREE.BoxGeometry(0.46, 0.88, span + 0.08),
+            (((i >> 1) % 2) === 0) ? barrierRedMat : barrierWhiteMat
+          );
+          barrier.position.set(mid.x, mid.y + 0.44, mid.z);
+          barrier.lookAt(edgeNext.x, edgeNext.y + 0.44, edgeNext.z);
+          barrier.castShadow = true;
+          barrier.receiveShadow = true;
+          scene.add(barrier);
+        }
+      }
+      // Roadside utility poles every ~28 samples
+      if (i % 28 === 0) {
+        const pPos = s.pos.clone().addScaledVector(s.right, -(ROAD_HALF + 2.1));
+        const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.11, 0.14, 7.2, 7), woodPoleMat);
+        pole.position.set(pPos.x, pPos.y + 3.5, pPos.z);
+        pole.castShadow = true;
+        scene.add(pole);
+        const crossArm = new THREE.Mesh(new THREE.BoxGeometry(1.4, 0.1, 0.1), woodPoleMat);
+        crossArm.position.set(pPos.x, pPos.y + 6.7, pPos.z);
+        scene.add(crossArm);
+      }
+      const prev = roadSamples[(i - 4 + SAMPLES) % SAMPLES];
+      if (s.tan.dot(prev.tan) < 0.992 && i % 10 === 0) {
+        const cross = new THREE.Vector3().crossVectors(prev.tan, s.tan);
+        const outerSide = cross.y > 0 ? 1 : -1;
+        const p = s.pos.clone().addScaledVector(s.right, outerSide * (ROAD_HALF + 1.35));
+        const sp = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.06, 2.2, 6), postMat);
+        sp.position.set(p.x, p.y + 1.1, p.z);
+        scene.add(sp);
+        const board = new THREE.Mesh(new THREE.BoxGeometry(0.95, 0.65, 0.08), chevronMat);
+        board.position.set(p.x, p.y + 1.9, p.z);
+        board.lookAt(s.pos.x, p.y + 1.9, s.pos.z);
+        scene.add(board);
+        const stripe = new THREE.Mesh(new THREE.BoxGeometry(0.42, 0.42, 0.1), chevronStripeMat);
+        stripe.position.copy(board.position);
+        stripe.quaternion.copy(board.quaternion);
+        scene.add(stripe);
+      }
+    }
+
+    // Ghana Roadside Fruit Stall & Aburi Ridge Signpost near Summit Overlook (t = 0.45)
+    {
+      const sf = getRoadFrameAtT(0.45);
+      const stallPos = sf.pos.clone().addScaledVector(sf.right, ROAD_HALF + 3.8);
+      const table = new THREE.Mesh(new THREE.BoxGeometry(2.8, 0.9, 1.3), woodPoleMat);
+      table.position.set(stallPos.x, stallPos.y + 0.45, stallPos.z);
+      table.castShadow = true;
+      scene.add(table);
+      const umbrella = new THREE.Mesh(new THREE.ConeGeometry(2.1, 0.9, 8), new THREE.MeshStandardMaterial({ color: 0xea580c, roughness: 0.7 }));
+      umbrella.position.set(stallPos.x, stallPos.y + 2.5, stallPos.z);
+      umbrella.castShadow = true;
+      scene.add(umbrella);
+      const uPole = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.05, 2.4, 6), postMat);
+      uPole.position.set(stallPos.x, stallPos.y + 1.3, stallPos.z);
+      scene.add(uPole);
+    }
+
+    function createGhanaFlagTexture() {
+      const c = document.createElement('canvas');
+      c.width = 256; c.height = 144;
+      const ctx = c.getContext('2d');
+      ctx.fillStyle = '#cf0921'; ctx.fillRect(0, 0, 256, 48);
+      ctx.fillStyle = '#fcd116'; ctx.fillRect(0, 48, 256, 48);
+      ctx.fillStyle = '#006b3f'; ctx.fillRect(0, 96, 256, 48);
+      ctx.fillStyle = '#000000';
+      ctx.font = 'bold 44px system-ui, sans-serif';
+      ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.fillText('★', 128, 74);
+      return new THREE.CanvasTexture(c);
+    }
+
+    // =========================================================================
+    // 4B. KOFORIDUA (K-TOWN) 3D LANDMARKS, FLOWERS PROMENADE & VOICE EVENTS
+    //     (Isolated test assets — Home of Alex Apaw awaits reference photo)
+    // =========================================================================
+    const koforiduaWalkers = [];
+    const koforiduaEvents = [
+      { t: 0.415, voice: 'ktown_entrance.mp3', speaker: '🇬🇭 Mate Koffi (Koforidua Entrance)', line: 'Welcome to Koforidua — K-Town! Last stop at the top of the ridge, Eastern Region, Ghana!', spoken: false },
+      { t: 0.440, voice: 'ktown_flowers.mp3',  speaker: '🇬🇭 Auntie Akosua (Koforidua Flowers)', line: 'Akwaaba to Koforidua Flowers avenue! Look at our vibrant Ankara fashion and K-Town style!', spoken: false },
+      { t: 0.470, voice: 'ktown_hotel.mp3',    speaker: '🇬🇭 Mate Koffi (Capital View Hotel)', line: 'Passing Capital View Hotel! Fresh breeze from the green hills right behind it.', spoken: false },
+      { t: 0.500, voice: 'ktown_yk.mp3',       speaker: '🇬🇭 Mate Koffi (Y&K Group Plaza)', line: 'There is Y&K Group Plaza — last K-Town landmark before we turn back downhill!', spoken: false }
+    ];
+
+    function orientGroupOnRoad(grp, frame, sideOffset, matchSlope = false) {
+      const p = frame.pos.clone().addScaledVector(frame.right, sideOffset);
+      grp.position.copy(p);
+      const lookT = p.clone().add(frame.tan);
+      grp.lookAt(lookT.x, matchSlope ? lookT.y : p.y, lookT.z);
+      return grp;
+    }
+
+    // 1. Koforidua Town Entrance: Black Granite "K-Town" Monument + Blue Welcome Sign
+    {
+      const f = getRoadFrameAtT(0.415);
+      const mon = new THREE.Group();
+      // Black-and-white curbed planter bed
+      const curb = new THREE.Mesh(new THREE.BoxGeometry(4.4, 0.42, 7.6), new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.8 }));
+      curb.position.y = 0.21;
+      mon.add(curb);
+      const soil = new THREE.Mesh(new THREE.BoxGeometry(3.8, 0.45, 7.0), new THREE.MeshStandardMaterial({ color: 0x3b2f24, roughness: 0.95 }));
+      soil.position.y = 0.24;
+      mon.add(soil);
+      // Black marble K-Town monument slab
+      const mc = document.createElement('canvas'); mc.width = 512; mc.height = 512;
+      const mctx = mc.getContext('2d');
+      mctx.fillStyle = '#111827'; mctx.fillRect(0, 0, 512, 512);
+      mctx.strokeStyle = '#d4af37'; mctx.lineWidth = 8; mctx.strokeRect(14, 14, 484, 484);
+      mctx.fillStyle = '#facc15'; mctx.font = 'bold 78px Georgia, serif'; mctx.textAlign = 'center';
+      mctx.fillText('K-Town', 256, 175);
+      mctx.fillStyle = '#ffffff'; mctx.font = 'bold 54px Georgia, serif';
+      mctx.fillText('Koforidua', 256, 250);
+      mctx.font = 'bold 24px system-ui, sans-serif';
+      mctx.fillText('Eastern Region - Ghana', 256, 305);
+      // Ghana flag at base of monument
+      mctx.fillStyle = '#cf0921'; mctx.fillRect(110, 345, 292, 30);
+      mctx.fillStyle = '#fcd116'; mctx.fillRect(110, 375, 292, 30);
+      mctx.fillStyle = '#006b3f'; mctx.fillRect(110, 405, 292, 30);
+      mctx.fillStyle = '#000000'; mctx.font = 'bold 28px system-ui'; mctx.fillText('★', 256, 400);
+      const monMat = new THREE.MeshStandardMaterial({ map: new THREE.CanvasTexture(mc), roughness: 0.35, metalness: 0.2 });
+      const slab = new THREE.Mesh(new THREE.BoxGeometry(0.65, 3.8, 3.8), [monMat, monMat, new THREE.MeshStandardMaterial({ color: 0x1e293b }), new THREE.MeshStandardMaterial({ color: 0x1e293b }), monMat, monMat]);
+      slab.position.set(0, 2.2, 0);
+      slab.castShadow = true;
+      mon.add(slab);
+      // Red hibiscus & green shrubs around monument
+      for (let b = 0; b < 8; b++) {
+        const bush = new THREE.Mesh(new THREE.DodecahedronGeometry(0.55, 1), new THREE.MeshStandardMaterial({ color: b % 2 === 0 ? 0x15803d : 0xdc2626, roughness: 0.85 }));
+        bush.position.set((b % 2 === 0 ? -1.1 : 1.1), 0.65, -2.5 + b * 0.72);
+        mon.add(bush);
+      }
+      orientGroupOnRoad(mon, f, -(ROAD_HALF + 3.2));
+      scene.add(mon);
+
+      // Blue Highway "Welcome to Koforidua (K-Town)" Signpost on opposite side
+      const signGrp = new THREE.Group();
+      const sc = document.createElement('canvas'); sc.width = 512; sc.height = 384;
+      const sctx = sc.getContext('2d');
+      sctx.fillStyle = '#0c4a6e'; sctx.fillRect(0, 0, 512, 260);
+      sctx.strokeStyle = '#ffffff'; sctx.lineWidth = 8; sctx.strokeRect(8, 8, 496, 368);
+      sctx.fillStyle = '#ffffff'; sctx.font = 'bold 34px system-ui'; sctx.textAlign = 'center';
+      sctx.fillText('Welcome to', 256, 65);
+      sctx.font = 'bold 64px system-ui'; sctx.fillText('Koforidua', 256, 140);
+      sctx.font = 'bold 42px system-ui'; sctx.fillText('(K-Town)', 256, 200);
+      sctx.fillStyle = '#cf0921'; sctx.fillRect(0, 260, 512, 42);
+      sctx.fillStyle = '#fcd116'; sctx.fillRect(0, 302, 512, 42);
+      sctx.fillStyle = '#006b3f'; sctx.fillRect(0, 344, 512, 40);
+      sctx.fillStyle = '#0f172a'; sctx.font = 'bold 26px system-ui'; sctx.fillText('★  Eastern Region, Ghana', 256, 331);
+      const signBoard = new THREE.Mesh(new THREE.BoxGeometry(3.6, 2.7, 0.14), new THREE.MeshStandardMaterial({ map: new THREE.CanvasTexture(sc), roughness: 0.4 }));
+      signBoard.position.y = 3.2;
+      signBoard.castShadow = true;
+      signGrp.add(signBoard);
+      for (const px of [-1.2, 1.2]) {
+        const post = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.08, 3.6, 8), postMat);
+        post.position.set(px, 1.8, 0);
+        signGrp.add(post);
+      }
+      orientGroupOnRoad(signGrp, f, ROAD_HALF + 2.6);
+      scene.add(signGrp);
+    }
+
+    // 2. Koforidua Flowers Promenade (Respectful, lively 3D Ghanaian women in colorful Ankara fashion)
+    {
+      const f = getRoadFrameAtT(0.440);
+      const prom = new THREE.Group();
+      const sidewalk = new THREE.Mesh(new THREE.BoxGeometry(6.5, 0.26, 28), new THREE.MeshStandardMaterial({ color: 0xd6c7b2, roughness: 0.85 }));
+      sidewalk.position.set(0, 0.13, 0);
+      sidewalk.receiveShadow = true;
+      prom.add(sidewalk);
+      // Shopfronts & colorful market awnings along promenade
+      for (let s = 0; s < 3; s++) {
+        const shop = new THREE.Mesh(new THREE.BoxGeometry(4.2, 4.2, 8.2), new THREE.MeshStandardMaterial({ color: [0xfef3c7, 0xe0f2fe, 0xfce7f3][s], roughness: 0.8 }));
+        shop.position.set(-4.2, 2.1, -8.5 + s * 8.6);
+        shop.castShadow = true;
+        prom.add(shop);
+        const awning = new THREE.Mesh(new THREE.BoxGeometry(2.2, 0.16, 8.0), new THREE.MeshStandardMaterial({ color: [0xdc2626, 0x0284c7, 0x16a34a][s], roughness: 0.7 }));
+        awning.position.set(-1.5, 2.85, -8.5 + s * 8.6);
+        awning.rotation.z = -0.25;
+        prom.add(awning);
+      }
+      orientGroupOnRoad(prom, f, -(ROAD_HALF + 3.6), true);
+      scene.add(prom);
+
+      // Build 6 lively 3D Ghanaian women ("Koforidua Flowers") in vibrant Ankara & Kente dresses
+      const dressConfigs = [
+        { bg: '#1e293b', fg: '#facc15', acc: '#fb923c', bag: 0x111827, xOff: -2.2, zOff: -4.5 }, // Yellow/navy Ankara
+        { bg: '#065f46', fg: '#fb7185', acc: '#fef08a', bag: 0xf8fafc, xOff: -0.9, zOff: -2.0 }, // Emerald/coral leaf
+        { bg: '#be185d', fg: '#f472b6', acc: '#1e1b4b', bag: 0x111827, xOff:  0.4, zOff:  0.2 }, // Magenta Ankara
+        { bg: '#ca8a04', fg: '#dc2626', acc: '#15803d', bag: 0xfef3c7, xOff:  1.6, zOff:  2.4 }, // Kente gold/red/green
+        { bg: '#581c87', fg: '#e879f9', acc: '#f8fafc', bag: 0xf8fafc, xOff: -1.4, zOff:  4.5 }, // Deep violet Ankara
+        { bg: '#b45309', fg: '#fde047', acc: '#7f1d1d', bag: 0x111827, xOff:  0.8, zOff: -6.2 }  // Amber/gold Ankara
+      ];
+      const skinMat = new THREE.MeshStandardMaterial({ color: 0x5c3317, roughness: 0.55 });
+      const hairMat = new THREE.MeshStandardMaterial({ color: 0x0f0f12, roughness: 0.85 });
+
+      dressConfigs.forEach((dc, idx) => {
+        const pc = document.createElement('canvas'); pc.width = 128; pc.height = 128;
+        const pctx = pc.getContext('2d');
+        pctx.fillStyle = dc.bg; pctx.fillRect(0, 0, 128, 128);
+        for (let k = 0; k < 28; k++) {
+          pctx.fillStyle = k % 2 === 0 ? dc.fg : dc.acc;
+          pctx.beginPath();
+          pctx.arc((k * 37) % 128, (k * 53) % 128, 8 + (k % 5) * 2, 0, Math.PI * 2);
+          pctx.fill();
+        }
+        const dressMat = new THREE.MeshStandardMaterial({ map: new THREE.CanvasTexture(pc), roughness: 0.65 });
+        const woman = new THREE.Group();
+        // Skirt / lower dress
+        const skirt = new THREE.Mesh(new THREE.CylinderGeometry(0.20, 0.32, 0.72, 10), dressMat);
+        skirt.position.y = 0.64;
+        skirt.castShadow = true;
+        woman.add(skirt);
+        // Bodice & puff sleeves
+        const torso = new THREE.Mesh(new THREE.CylinderGeometry(0.21, 0.18, 0.44, 10), dressMat);
+        torso.position.y = 1.18;
+        torso.castShadow = true;
+        woman.add(torso);
+        for (const sx of [-0.24, 0.24]) {
+          const arm = new THREE.Mesh(new THREE.CylinderGeometry(0.055, 0.045, 0.48, 8), skinMat);
+          arm.position.set(sx, 1.12, 0);
+          woman.add(arm);
+        }
+        // Legs
+        for (const lx of [-0.10, 0.10]) {
+          const leg = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.05, 0.38, 8), skinMat);
+          leg.position.set(lx, 0.19, 0);
+          woman.add(leg);
+        }
+        // Head + natural curls / braided updo
+        const head = new THREE.Mesh(new THREE.SphereGeometry(0.15, 12, 10), skinMat);
+        head.position.y = 1.54;
+        head.castShadow = true;
+        woman.add(head);
+        const hair = new THREE.Mesh(new THREE.SphereGeometry(0.165, 10, 8), hairMat);
+        hair.position.set(0, 1.59, 0.02);
+        woman.add(hair);
+        if (idx % 2 === 0) {
+          const bun = new THREE.Mesh(new THREE.SphereGeometry(0.11, 8, 8), hairMat);
+          bun.position.set(0, 1.75, 0.02);
+          woman.add(bun);
+        }
+        // Handbag
+        const bag = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.22, 0.26), new THREE.MeshStandardMaterial({ color: dc.bag, roughness: 0.5 }));
+        bag.position.set(0.28, 0.92, 0.04);
+        woman.add(bag);
+
+        const wp = f.pos.clone().addScaledVector(f.right, -(ROAD_HALF + 2.8) + dc.xOff).addScaledVector(f.tan, dc.zOff);
+        wp.y += 0.27; // Stand flush on top of the 0.26m sidewalk deck
+        woman.position.copy(wp);
+        woman.lookAt(wp.x - f.tan.x, wp.y, wp.z - f.tan.z);
+        scene.add(woman);
+        koforiduaWalkers.push({ mesh: woman, basePos: wp.clone(), tan: f.tan.clone(), phase: idx * 1.1 });
+      });
+    }
+
+    // 3. Capital View Hotel Landmark + Twin Telecom Masts on Ridge Behind (t = 0.470)
+    {
+      const f = getRoadFrameAtT(0.470);
+      const hotel = new THREE.Group();
+      const creamMat = new THREE.MeshStandardMaterial({ color: 0xf5ecd8, roughness: 0.72 });
+      const blueTrimMat = new THREE.MeshStandardMaterial({ color: 0x1e4e79, roughness: 0.45 });
+      const glassMat = new THREE.MeshPhysicalMaterial({ color: 0x38bdf8, roughness: 0.12, metalness: 0.55, clearcoat: 0.8 });
+      const goldMat = new THREE.MeshStandardMaterial({ color: 0xd97706, roughness: 0.35, metalness: 0.5 });
+
+      // Main 2-story hotel wing + curved blue roof crown
+      const mainWing = new THREE.Mesh(new THREE.BoxGeometry(10, 8.2, 22), creamMat);
+      mainWing.position.set(-3, 4.1, 0);
+      mainWing.castShadow = true; mainWing.receiveShadow = true;
+      hotel.add(mainWing);
+
+      const blueCrown = new THREE.Mesh(new THREE.BoxGeometry(10.4, 1.5, 22.4), blueTrimMat);
+      blueCrown.position.set(-3, 8.4, 0);
+      hotel.add(blueCrown);
+
+      // Decorative gold frieze & arched glass balcony windows
+      const frieze = new THREE.Mesh(new THREE.BoxGeometry(0.2, 1.1, 21.4), goldMat);
+      frieze.position.set(2.05, 4.1, 0);
+      hotel.add(frieze);
+      for (let w = -8; w <= 8; w += 3.2) {
+        const win = new THREE.Mesh(new THREE.BoxGeometry(0.18, 2.4, 2.1), glassMat);
+        win.position.set(2.05, 6.2, w);
+        hotel.add(win);
+        const rail = new THREE.Mesh(new THREE.BoxGeometry(0.35, 0.8, 2.4), new THREE.MeshStandardMaterial({ color: 0xe2e8f0, metalness: 0.5 }));
+        rail.position.set(2.15, 5.1, w);
+        hotel.add(rail);
+      }
+
+      // "CAPITAL VIEW HOTEL" roof signage
+      const hc = document.createElement('canvas'); hc.width = 512; hc.height = 96;
+      const hctx = hc.getContext('2d');
+      hctx.fillStyle = '#1e4e79'; hctx.fillRect(0, 0, 512, 96);
+      hctx.fillStyle = '#ffffff'; hctx.font = 'bold 42px system-ui'; hctx.textAlign = 'center';
+      hctx.fillText('CAPITAL VIEW HOTEL', 256, 62);
+      const signMesh = new THREE.Mesh(new THREE.BoxGeometry(0.2, 1.4, 14), new THREE.MeshStandardMaterial({ map: new THREE.CanvasTexture(hc) }));
+      signMesh.position.set(2.1, 9.4, 0);
+      hotel.add(signMesh);
+
+      // Ghana Flagpole out front
+      const fPole = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.08, 7.5, 8), postMat);
+      fPole.position.set(4.6, 3.75, 9.2);
+      hotel.add(fPole);
+      const ghFlag = new THREE.Mesh(new THREE.PlaneGeometry(2.1, 1.25), new THREE.MeshBasicMaterial({ map: createGhanaFlagTexture(), side: THREE.DoubleSide }));
+      ghFlag.position.set(4.6, 6.8, 8.1);
+      ghFlag.rotation.y = Math.PI / 2;
+      hotel.add(ghFlag);
+
+      // Twin radio/telecom masts on the green hill behind Capital View Hotel
+      for (const mz of [-6, 6]) {
+        const mast = new THREE.Mesh(new THREE.ConeGeometry(0.65, 16, 4), new THREE.MeshStandardMaterial({ color: 0x94a3b8, wireframe: true }));
+        mast.position.set(-22, 18, mz);
+        hotel.add(mast);
+      }
+
+      orientGroupOnRoad(hotel, f, -(ROAD_HALF + 7.5));
+      scene.add(hotel);
+    }
+
+    // 4. Y&K Group Commercial Plaza Landmark (t = 0.500)
+    {
+      const f = getRoadFrameAtT(0.500);
+      const yk = new THREE.Group();
+      const stoneMat = new THREE.MeshStandardMaterial({ color: 0xd6cbb8, roughness: 0.78 });
+      const glassMat = new THREE.MeshPhysicalMaterial({ color: 0x1e3a8a, roughness: 0.14, metalness: 0.65, clearcoat: 0.8 });
+
+      const bldg = new THREE.Mesh(new THREE.BoxGeometry(9.5, 8.8, 20), stoneMat);
+      bldg.position.set(-2.5, 4.4, 0);
+      bldg.castShadow = true; bldg.receiveShadow = true;
+      yk.add(bldg);
+
+      // Large retail glass bays
+      for (let gz = -6.5; gz <= 6.5; gz += 4.3) {
+        const bay = new THREE.Mesh(new THREE.BoxGeometry(0.18, 5.2, 3.4), glassMat);
+        bay.position.set(2.3, 3.2, gz);
+        yk.add(bay);
+      }
+
+      // "Y&K GROUP" fascia sign with red/blue arch
+      const yc = document.createElement('canvas'); yc.width = 512; yc.height = 160;
+      const yctx = yc.getContext('2d');
+      yctx.fillStyle = '#e5dccb'; yctx.fillRect(0, 0, 512, 160);
+      yctx.strokeStyle = '#dc2626'; yctx.lineWidth = 10;
+      yctx.beginPath(); yctx.arc(256, 72, 48, Math.PI * 1.15, Math.PI * 1.85); yctx.stroke();
+      yctx.strokeStyle = '#1d4ed8'; yctx.lineWidth = 8;
+      yctx.beginPath(); yctx.arc(256, 86, 40, Math.PI * 1.1, Math.PI * 1.9); yctx.stroke();
+      yctx.fillStyle = '#1e3a8a'; yctx.font = 'bold 54px system-ui'; yctx.textAlign = 'center';
+      yctx.fillText('Y&K GROUP', 256, 132);
+      const ySign = new THREE.Mesh(new THREE.BoxGeometry(0.2, 2.4, 11.5), new THREE.MeshStandardMaterial({ map: new THREE.CanvasTexture(yc) }));
+      ySign.position.set(2.35, 7.3, 0);
+      yk.add(ySign);
+
+      orientGroupOnRoad(yk, f, -(ROAD_HALF + 7.2));
+      scene.add(yk);
+    }
+
+    // =========================================================================
+    // 5. DENSE TROPICAL FOLIAGE, OIL PALMS, FERN SHRUBS & ROCK CLIFFS
+    // =========================================================================
+    function createFoliageTexture() {
+      const c = document.createElement('canvas');
+      c.width = 256; c.height = 256;
+      const ctx = c.getContext('2d');
+      ctx.clearRect(0, 0, 256, 256);
+      const greens = ['#143d18', '#1f5422', '#2b6b29', '#387d2e', '#17471e'];
+      for (let i = 0; i < 160; i++) {
+        const ang = Math.random() * Math.PI * 2;
+        const rad = Math.random() * 92;
+        const x = 128 + Math.cos(ang) * rad, y = 128 + Math.sin(ang) * rad;
+        ctx.save();
+        ctx.translate(x, y);
+        ctx.rotate(ang + Math.random());
+        ctx.fillStyle = greens[i % greens.length];
+        ctx.beginPath();
+        ctx.ellipse(0, 0, 18 + Math.random() * 14, 7 + Math.random() * 6, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      }
+      return new THREE.CanvasTexture(c);
+    }
+    const foliageTex = createFoliageTexture();
+    const foliageMat = new THREE.MeshStandardMaterial({
+      map: foliageTex,
+      alphaTest: 0.30,
+      side: THREE.DoubleSide,
+      roughness: 0.82
+    });
+    const trunkMat = new THREE.MeshStandardMaterial({ color: 0x4d382a, roughness: 0.94 });
+    const rockMats = [
+      new THREE.MeshStandardMaterial({ color: 0x57534e, roughness: 0.94, flatShading: true }),
+      new THREE.MeshStandardMaterial({ color: 0x6e4733, roughness: 0.92, flatShading: true })
+    ];
+
+    function addRealisticTree(x, y, z, scale, seed) {
+      const g = new THREE.Group();
+      const h = (5.4 + hash2(seed, 5) * 4.0) * scale;
+      const trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.18 * scale, 0.38 * scale, h, 8), trunkMat);
+      trunk.position.y = h * 0.5;
+      trunk.castShadow = true;
+      g.add(trunk);
+      for (let c = 0; c < 5; c++) {
+        const ang = (c / 5) * Math.PI * 2 + hash2(seed, c);
+        const cx = Math.cos(ang) * 1.45 * scale, cy = h * (0.78 + (c % 2) * 0.16), cz = Math.sin(ang) * 1.45 * scale;
+        const sz = (3.6 + hash2(seed, c + 10) * 1.6) * scale;
+        for (let rot = 0; rot < 2; rot++) {
+          const card = new THREE.Mesh(new THREE.PlaneGeometry(sz, sz * 0.82), foliageMat);
+          card.position.set(cx, cy, cz);
+          card.rotation.y = ang + rot * (Math.PI / 2);
+          card.rotation.x = (hash2(seed + c, rot) - 0.5) * 0.45;
+          card.castShadow = true;
+          g.add(card);
+        }
+      }
+      g.position.set(x, y - 0.25, z);
+      scene.add(g);
+    }
+
+    function addRealisticPalm(x, y, z, scale, seed) {
+      const g = new THREE.Group();
+      const h = 8.4 * scale;
+      const lean = (hash2(seed, 3) - 0.5) * 0.24;
+      const trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.14 * scale, 0.26 * scale, h, 8), trunkMat);
+      trunk.position.y = h * 0.5;
+      trunk.rotation.z = lean;
+      trunk.castShadow = true;
+      g.add(trunk);
+      const topX = -Math.sin(lean) * h * 0.5, topY = h * 0.96;
+      for (let f = 0; f < 9; f++) {
+        const ang = (f / 9) * Math.PI * 2 + hash2(seed, f) * 0.35;
+        const frond = new THREE.Mesh(new THREE.PlaneGeometry(1.45 * scale, 4.3 * scale), foliageMat);
+        frond.position.set(topX + Math.cos(ang) * 1.8 * scale, topY - 0.3 * scale, Math.sin(ang) * 1.8 * scale);
+        frond.rotation.order = 'YXZ';
+        frond.rotation.y = ang + Math.PI / 2;
+        frond.rotation.x = Math.PI * 0.34;
+        frond.castShadow = true;
+        g.add(frond);
+      }
+      g.position.set(x, y - 0.25, z);
+      scene.add(g);
+    }
+
+    function addFernShrub(x, y, z, scale, seed) {
+      const g = new THREE.Group();
+      const sz = 2.4 * scale;
+      for (let rot = 0; rot < 3; rot++) {
+        const card = new THREE.Mesh(new THREE.PlaneGeometry(sz, sz * 0.72), foliageMat);
+        card.position.y = sz * 0.3;
+        card.rotation.y = (rot / 3) * Math.PI + hash2(seed, rot);
+        g.add(card);
+      }
+      g.position.set(x, y - 0.15, z);
+      scene.add(g);
+    }
+
+    function addRockOutcrop(x, y, z, scale, seed) {
+      const geo = new THREE.DodecahedronGeometry(1.9 * scale, 1);
+      const p = geo.attributes.position;
+      for (let i = 0; i < p.count; i++) {
+        const n = 0.72 + hash2(i + seed, seed) * 0.55;
+        p.setXYZ(i, p.getX(i) * n * 1.35, p.getY(i) * n * 0.8, p.getZ(i) * n * 1.2);
+      }
+      geo.computeVertexNormals();
+      const rock = new THREE.Mesh(geo, rockMats[seed % rockMats.length]);
+      rock.position.set(x, y + 0.35 * scale, z);
+      rock.rotation.set(hash2(seed, 1), hash2(seed, 2) * Math.PI, hash2(seed, 3));
+      rock.castShadow = true;
+      rock.receiveShadow = true;
+      scene.add(rock);
+    }
+
+    for (let i = 0; i < 480; i++) {
+      const rx = (hash2(i, 101) - 0.5) * 780, rz = (hash2(i, 202) - 0.5) * 720;
+      const { dist } = getNearestRoadSample(rx, rz);
+      if (dist < ROAD_HALF + 7.2) continue;
+      const ry = getTerrainHeight(rx, rz);
+      const sc = 0.8 + hash2(i, 303) * 0.9;
+      const k = i % 9;
+      if (k === 0 || k === 1) addRealisticPalm(rx, ry, rz, sc, i);
+      else if (k >= 2 && k <= 4) addRealisticTree(rx, ry, rz, sc, i);
+      else if (k === 5 || k === 6) addFernShrub(rx, ry, rz, sc, i);
+      else addRockOutcrop(rx, ry, rz, sc * 1.2, i);
+    }
+
+    // =========================================================================
+    // 6. SOFT BILLOWY CLOUDS, VALLEY MIST & RAIN
+    // =========================================================================
+    function createSoftCloudTexture() {
+      const c = document.createElement('canvas');
+      c.width = 256; c.height = 256;
+      const ctx = c.getContext('2d');
+      const g = ctx.createRadialGradient(128, 128, 14, 128, 128, 122);
+      g.addColorStop(0, 'rgba(255, 255, 255, 0.85)');
+      g.addColorStop(0.45, 'rgba(235, 242, 248, 0.45)');
+      g.addColorStop(1, 'rgba(220, 232, 242, 0)');
+      ctx.fillStyle = g;
+      ctx.fillRect(0, 0, 256, 256);
+      return new THREE.CanvasTexture(c);
+    }
+    const cloudTex = createSoftCloudTexture();
+    const cloudMat = new THREE.MeshBasicMaterial({ map: cloudTex, transparent: true, opacity: 0.78, depthWrite: false, side: THREE.DoubleSide });
+    const clouds = [];
+    for (let i = 0; i < 36; i++) {
+      const cg = new THREE.Group();
+      for (let p = 0; p < 5; p++) {
+        const puff = new THREE.Mesh(new THREE.PlaneGeometry(58 + p * 8, 32 + p * 4), cloudMat);
+        puff.position.set((p - 2) * 18, (hash2(p, i) - 0.5) * 6, (hash2(i, p + 5) - 0.5) * 16);
+        puff.rotation.x = -Math.PI * 0.28;
+        cg.add(puff);
+      }
+      cg.position.set((hash2(i, 41) - 0.5) * 1000, 155 + hash2(i, 42) * 85, (hash2(i, 43) - 0.5) * 1000);
+      cg.userData.speed = 1.6 + hash2(i, 44) * 2.4;
+      scene.add(cg);
+      clouds.push(cg);
+    }
+
+    const mistMat = new THREE.MeshBasicMaterial({ map: cloudTex, transparent: true, opacity: 0.36, depthWrite: false, side: THREE.DoubleSide });
+    const mistLayers = [];
+    for (let i = 0; i < 26; i++) {
+      const m = new THREE.Mesh(new THREE.PlaneGeometry(120 + (i % 4) * 25, 120 + (i % 3) * 25), mistMat);
+      m.rotation.x = -Math.PI / 2;
+      m.position.set(-120 + (hash2(i, 61) - 0.5) * 340, 16 + (i % 5) * 8, 10 + (hash2(i, 62) - 0.5) * 340);
+      m.userData.drift = (hash2(i, 63) - 0.5) * 3.0;
+      scene.add(m);
+      mistLayers.push(m);
+    }
+
+    const RAIN_COUNT = 1400;
+    const rainGeo = new THREE.BufferGeometry();
+    const rainPos = new Float32Array(RAIN_COUNT * 6);
+    for (let i = 0; i < RAIN_COUNT; i++) {
+      const rx = (Math.random() - 0.5) * 80, ry = Math.random() * 44, rz = (Math.random() - 0.5) * 80;
+      rainPos[i * 6] = rx; rainPos[i * 6 + 1] = ry; rainPos[i * 6 + 2] = rz;
+      rainPos[i * 6 + 3] = rx - 0.22; rainPos[i * 6 + 4] = ry - 1.6; rainPos[i * 6 + 5] = rz;
+    }
+    rainGeo.setAttribute('position', new THREE.BufferAttribute(rainPos, 3));
+    const rainMat = new THREE.LineBasicMaterial({ color: 0xdbeafe, transparent: true, opacity: 0.0 });
+    const rainLines = new THREE.LineSegments(rainGeo, rainMat);
+    scene.add(rainLines);
+
+    // =========================================================================
+    // 7. GHANA TRO-TRO (SPRINTER / HIACE COACH) + REALISTIC TIRED TRAFFIC
+    // =========================================================================
+    function createShadowTexture() {
+      const c = document.createElement('canvas');
+      c.width = 128; c.height = 128;
+      const ctx = c.getContext('2d');
+      const g = ctx.createRadialGradient(64, 64, 12, 64, 64, 62);
+      g.addColorStop(0, 'rgba(0,0,0,0.72)');
+      g.addColorStop(0.65, 'rgba(0,0,0,0.35)');
+      g.addColorStop(1, 'rgba(0,0,0,0)');
+      ctx.fillStyle = g;
+      ctx.fillRect(0, 0, 128, 128);
+      return new THREE.CanvasTexture(c);
+    }
+    const contactShadowTex = createShadowTexture();
+    function makeContactShadow(w, l) {
+      const m = new THREE.Mesh(
+        new THREE.PlaneGeometry(w, l),
+        new THREE.MeshBasicMaterial({ map: contactShadowTex, transparent: true, depthWrite: false })
+      );
+      m.rotation.x = -Math.PI / 2;
+      m.position.y = 0.03;
+      return m;
+    }
+
+    function createRoundedBox(w, h, d, radius = 0.14, smoothness = 4) {
+      const shape = new THREE.Shape();
+      const eps = 0.00001;
+      const r = Math.min(radius, w * 0.45, h * 0.45, d * 0.45) - eps;
+      const hw = w * 0.5 - radius, hh = h * 0.5 - radius;
+      shape.absarc(-hw, -hh, r, -Math.PI, -Math.PI * 0.5, true);
+      shape.absarc( hw, -hh, r, -Math.PI * 0.5, 0, true);
+      shape.absarc( hw,  hh, r, 0, Math.PI * 0.5, true);
+      shape.absarc(-hw,  hh, r, Math.PI * 0.5, Math.PI, true);
+      const geom = new THREE.ExtrudeGeometry(shape, {
+        depth: d - radius * 2,
+        bevelEnabled: true,
+        bevelSegments: smoothness,
+        steps: 1,
+        bevelSize: r,
+        bevelThickness: radius,
+        curveSegments: smoothness
+      });
+      geom.center();
+      return geom;
+    }
+
+    function createBusLiveryTexture(bodyHex = '#f8fafc', stripeHex = '#dc2626', routeText = 'GR 2468-26 • ABURI MOUNTAIN - KOFORIDUA', flagCode = 'GH') {
+      const c = document.createElement('canvas');
+      c.width = 512; c.height = 256;
+      const g = c.getContext('2d');
+      g.fillStyle = bodyHex;
+      g.fillRect(0, 0, 512, 256);
+
+      if (flagCode === 'GH') {
+        g.fillStyle = '#dc2626'; g.fillRect(0, 126, 512, 18);
+        g.fillStyle = '#facc15'; g.fillRect(0, 144, 512, 22);
+        g.fillStyle = '#15803d'; g.fillRect(0, 166, 512, 18);
+        g.fillStyle = '#111827';
+        g.font = '900 18px system-ui, sans-serif';
+        g.textAlign = 'center';
+        g.fillText('★  ' + routeText + '  ★', 256, 161);
+      }
+      g.strokeStyle = 'rgba(15, 23, 42, 0.45)';
+      g.lineWidth = 4;
+      g.strokeRect(180, 18, 145, 222);
+      g.fillStyle = '#e2e8f0';
+      g.fillRect(305, 120, 14, 6);
+
+      const tex = new THREE.CanvasTexture(c);
+      tex.colorSpace = THREE.SRGBColorSpace;
+      tex.anisotropy = 4;
+      return tex;
+    }
+
+    const MAT = {
+      glass: new THREE.MeshStandardMaterial({ color: 0x0f172a, roughness: 0.08, metalness: 0.85 }),
+      chrome: new THREE.MeshStandardMaterial({ color: 0xe2e8f0, roughness: 0.18, metalness: 0.92 }),
+      darkSteel: new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.55, metalness: 0.5 }),
+      tire: new THREE.MeshStandardMaterial({ color: 0x111827, roughness: 0.85, metalness: 0.05 }),
+      danfoUpper: new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.26, metalness: 0.15 }),
+      danfoSide: new THREE.MeshStandardMaterial({ map: createBusLiveryTexture(), roughness: 0.28, metalness: 0.15 }),
+      danfoRoof: new THREE.MeshStandardMaterial({ color: 0xfacc15, roughness: 0.32, metalness: 0.1 }),
+      headlight: new THREE.MeshStandardMaterial({ color: 0xffffff, emissive: 0xfffbeb, emissiveIntensity: 1.4, roughness: 0.1 }),
+      brakeOn: new THREE.MeshStandardMaterial({ color: 0xff1e1e, emissive: 0xff0000, emissiveIntensity: 1.8, roughness: 0.2 }),
+      brakeOff: new THREE.MeshStandardMaterial({ color: 0x7f1d1d, roughness: 0.4 })
+    };
+
+    const wheelTireGeom = new THREE.CylinderGeometry(0.38, 0.38, 0.28, 20);
+    wheelTireGeom.rotateZ(Math.PI * 0.5);
+    const wheelRimGeom = new THREE.CylinderGeometry(0.23, 0.23, 0.30, 14);
+    wheelRimGeom.rotateZ(Math.PI * 0.5);
+    const wheelHubGeom = new THREE.CylinderGeometry(0.09, 0.09, 0.32, 10);
+    wheelHubGeom.rotateZ(Math.PI * 0.5);
+
+    function createWheel3D() {
+      const wg = new THREE.Group();
+      const tire = new THREE.Mesh(wheelTireGeom, MAT.tire);
+      tire.castShadow = true;
+      const rim = new THREE.Mesh(wheelRimGeom, MAT.chrome);
+      const hub = new THREE.Mesh(wheelHubGeom, MAT.darkSteel);
+      wg.add(tire, rim, hub);
+      return wg;
+    }
+
+    function createGhanaTroTro() {
+      const root = new THREE.Group();
+      root.add(makeContactShadow(2.7, 5.4));
+      const bodyTilt = new THREE.Group();
+      root.add(bodyTilt);
+
+      const lowerGeom = createRoundedBox(2.08, 1.04, 4.55, 0.16, 4);
+      const lowerMesh = new THREE.Mesh(lowerGeom, MAT.danfoSide);
+      lowerMesh.position.y = 0.88;
+      lowerMesh.castShadow = true;
+      lowerMesh.receiveShadow = true;
+      bodyTilt.add(lowerMesh);
+
+      const cabinGeom = createRoundedBox(1.94, 0.78, 4.18, 0.18, 4);
+      const cabinMesh = new THREE.Mesh(cabinGeom, MAT.danfoUpper);
+      cabinMesh.position.set(0, 1.66, 0.04);
+      cabinMesh.castShadow = true;
+      bodyTilt.add(cabinMesh);
+
+      const roofCapGeom = createRoundedBox(1.82, 0.18, 3.95, 0.08, 3);
+      const roofCap = new THREE.Mesh(roofCapGeom, MAT.danfoRoof);
+      roofCap.position.set(0, 2.08, 0.04);
+      roofCap.castShadow = true;
+      bodyTilt.add(roofCap);
+
+      const windFront = new THREE.Mesh(createRoundedBox(1.74, 0.54, 0.12, 0.04, 2), MAT.glass);
+      windFront.position.set(0, 1.68, -2.02);
+      windFront.rotation.x = 0.12;
+      bodyTilt.add(windFront);
+
+      const windRear = new THREE.Mesh(createRoundedBox(1.66, 0.50, 0.10, 0.04, 2), MAT.glass);
+      windRear.position.set(0, 1.68, 2.11);
+      bodyTilt.add(windRear);
+
+      const sideGlass = new THREE.Mesh(createRoundedBox(1.98, 0.48, 3.55, 0.05, 2), MAT.glass);
+      sideGlass.position.set(0, 1.68, 0.06);
+      bodyTilt.add(sideGlass);
+
+      const grille = new THREE.Mesh(createRoundedBox(1.72, 0.34, 0.08, 0.04, 2), MAT.tire);
+      grille.position.set(0, 0.88, -2.26);
+      bodyTilt.add(grille);
+
+      const hlGeom = new THREE.CylinderGeometry(0.14, 0.14, 0.08, 16);
+      hlGeom.rotateX(Math.PI * 0.5);
+      for (const sx of [-0.66, 0.66]) {
+        const hl = new THREE.Mesh(hlGeom, MAT.headlight);
+        hl.position.set(sx, 0.88, -2.28);
+        bodyTilt.add(hl);
+        const arm = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.05, 0.05), MAT.darkSteel);
+        arm.position.set(sx * 1.56, 1.48, -1.75);
+        const mirrorHead = new THREE.Mesh(createRoundedBox(0.10, 0.24, 0.14, 0.03, 2), MAT.chrome);
+        mirrorHead.position.set(sx * 1.68, 1.48, -1.75);
+        bodyTilt.add(arm, mirrorHead);
+      }
+
+      const frontBumper = new THREE.Mesh(createRoundedBox(2.16, 0.18, 0.22, 0.06, 3), MAT.chrome);
+      frontBumper.position.set(0, 0.44, -2.24);
+      const rearBumper = new THREE.Mesh(createRoundedBox(2.16, 0.18, 0.22, 0.06, 3), MAT.chrome);
+      rearBumper.position.set(0, 0.44, 2.24);
+      bodyTilt.add(frontBumper, rearBumper);
+
+      const tailGeom = createRoundedBox(0.34, 0.22, 0.08, 0.04, 2);
+      const brakeLampL = new THREE.Mesh(tailGeom, MAT.brakeOff);
+      brakeLampL.position.set(-0.74, 0.90, 2.26);
+      const brakeLampR = new THREE.Mesh(tailGeom, MAT.brakeOff);
+      brakeLampR.position.set( 0.74, 0.90, 2.26);
+      bodyTilt.add(brakeLampL, brakeLampR);
+
+      const rackGroup = new THREE.Group();
+      const railL = new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.03, 3.2, 8), MAT.chrome);
+      railL.rotation.x = Math.PI * 0.5;
+      railL.position.set(-0.78, 2.20, 0.1);
+      const railR = railL.clone();
+      railR.position.x = 0.78;
+      rackGroup.add(railL, railR);
+      for (let z = -1.3; z <= 1.5; z += 0.7) {
+        const cross = new THREE.Mesh(new THREE.CylinderGeometry(0.025, 0.025, 1.56, 8), MAT.chrome);
+        cross.rotation.z = Math.PI * 0.5;
+        cross.position.set(0, 2.20, z);
+        rackGroup.add(cross);
+      }
+      bodyTilt.add(rackGroup);
+
+      const cargoGroup = new THREE.Group();
+      const sackMat = new THREE.MeshStandardMaterial({ color: 0xb45309, roughness: 0.85 });
+      const boxMat = new THREE.MeshStandardMaterial({ color: 0xdc2626, roughness: 0.45 });
+      const blueBagMat = new THREE.MeshStandardMaterial({ color: 0x2563eb, roughness: 0.5 });
+      const sack1 = new THREE.Mesh(createRoundedBox(0.68, 0.36, 0.92, 0.12, 3), sackMat);
+      sack1.position.set(-0.36, 2.38, 0.35);
+      const case1 = new THREE.Mesh(createRoundedBox(0.62, 0.32, 0.78, 0.06, 3), boxMat);
+      case1.position.set(0.38, 2.36, -0.25);
+      const bag1 = new THREE.Mesh(createRoundedBox(0.55, 0.30, 0.65, 0.10, 3), blueBagMat);
+      bag1.position.set(0.28, 2.35, 0.65);
+      const spareWheel = createWheel3D();
+      spareWheel.rotation.z = Math.PI * 0.5;
+      spareWheel.position.set(-0.32, 2.34, -0.65);
+      cargoGroup.add(sack1, case1, bag1, spareWheel);
+      bodyTilt.add(cargoGroup);
+
+      for (const [wx, wz] of [[-0.98, -1.38], [0.98, -1.38], [-0.98, 1.38], [0.98, 1.38]]) {
+        const wMesh = createWheel3D();
+        wMesh.position.set(wx, 0.38, wz);
+        root.add(wMesh);
+      }
+
+      const steerBarGroup = new THREE.Group();
+      steerBarGroup.position.set(0, 0.58, 2.31);
+      steerBarGroup.add(new THREE.Mesh(createRoundedBox(1.42, 0.16, 0.08, 0.03, 2), MAT.tire));
+      const ledGeom = new THREE.BoxGeometry(0.095, 0.095, 0.04);
+      const ledColors = [0x4ade80, 0x4ade80, 0x1e293b, 0x1e293b, 0xf8fafc, 0xf8fafc, 0xf8fafc, 0xf8fafc, 0xfacc15, 0xfacc15, 0x1e293b];
+      for (let i = 0; i < 11; i++) {
+        const led = new THREE.Mesh(ledGeom, new THREE.MeshStandardMaterial({ color: ledColors[i], emissive: ledColors[i], emissiveIntensity: 0.45 }));
+        led.position.set((i - 5) * 0.118, 0, 0.03);
+        steerBarGroup.add(led);
+      }
+      bodyTilt.add(steerBarGroup);
+
+      const tailGlow = new THREE.PointLight(0xff2222, 3.0, 12, 1.5);
+      tailGlow.position.set(0, 0.75, 2.7);
+      root.add(tailGlow);
+
+      const headBeam = new THREE.SpotLight(0xfff4d6, 3.6, 56, Math.PI * 0.24, 0.55, 1.25);
+      headBeam.position.set(0, 1.0, -2.5);
+      const target = new THREE.Object3D();
+      target.position.set(0, 0.1, -22);
+      root.add(target);
+      headBeam.target = target;
+      root.add(headBeam);
+
+      return root;
+    }
+
+    const troTroMesh = createGhanaTroTro();
+    scene.add(troTroMesh);
+
+    // Realistic Traffic Vehicles (SUVs, Sedans, Pickups & Box Trucks — ALL with visible tires, rims & contact shadows!)
+    function createRealisticTrafficVehicle(color, kind) {
+      const g = new THREE.Group();
+      const paintMat = new THREE.MeshPhysicalMaterial({ color, roughness: 0.28, metalness: 0.22, clearcoat: 0.65 });
+      const glassMat = new THREE.MeshPhysicalMaterial({ color: 0x0f172a, roughness: 0.12, metalness: 0.4, clearcoat: 0.8 });
+      const trimMat = new THREE.MeshStandardMaterial({ color: 0x111827, roughness: 0.8 });
+      const tireMat = new THREE.MeshStandardMaterial({ color: 0x0f1216, roughness: 0.9 });
+      const rimMat = new THREE.MeshStandardMaterial({ color: 0xd1d5db, metalness: 0.85, roughness: 0.25 });
+
+      const isTruck = kind === 'truck';
+      const isSuv = kind === 'suv';
+      const len = isTruck ? 5.6 : 4.35;
+      const wid = isTruck ? 2.2 : 1.88;
+
+      // Ground contact shadow (prevents any floating appearance!)
+      g.add(makeContactShadow(wid + 0.7, len + 0.8));
+
+      if (isTruck) {
+        // Cab + cargo box
+        const cab = new THREE.Mesh(new THREE.BoxGeometry(2.1, 1.65, 1.65), paintMat);
+        cab.position.set(0, 1.22, -1.9);
+        cab.castShadow = true;
+        g.add(cab);
+        const wShield = new THREE.Mesh(new THREE.BoxGeometry(1.9, 0.72, 0.08), glassMat);
+        wShield.position.set(0, 1.48, -2.74);
+        g.add(wShield);
+        const cargo = new THREE.Mesh(new THREE.BoxGeometry(2.24, 2.05, 3.85), new THREE.MeshStandardMaterial({ color: 0xe2e8f0, roughness: 0.6 }));
+        cargo.position.set(0, 1.55, 0.95);
+        cargo.castShadow = true;
+        g.add(cargo);
+      } else {
+        // Realistic sedan / SUV lower chassis + tapered cabin + bumpers
+        const lower = new THREE.Mesh(new THREE.BoxGeometry(wid, 0.68, len), paintMat);
+        lower.position.y = 0.68;
+        lower.castShadow = true;
+        g.add(lower);
+
+        const cabin = new THREE.Mesh(new THREE.BoxGeometry(wid * 0.86, isSuv ? 0.62 : 0.52, isSuv ? 2.65 : 2.15), glassMat);
+        cabin.position.set(0, isSuv ? 1.32 : 1.26, 0.22);
+        cabin.castShadow = true;
+        g.add(cabin);
+
+        const roof = new THREE.Mesh(new THREE.BoxGeometry(wid * 0.84, 0.08, isSuv ? 2.55 : 1.95), paintMat);
+        roof.position.set(0, isSuv ? 1.65 : 1.54, 0.22);
+        g.add(roof);
+
+        const fBump = new THREE.Mesh(new THREE.BoxGeometry(wid + 0.04, 0.22, 0.16), trimMat);
+        fBump.position.set(0, 0.42, -len * 0.5);
+        g.add(fBump);
+        const rBump = new THREE.Mesh(new THREE.BoxGeometry(wid + 0.04, 0.22, 0.16), trimMat);
+        rBump.position.set(0, 0.42, len * 0.5);
+        g.add(rBump);
+      }
+
+      // Prominent protruding 4 tires + silver alloy rims sitting flush at y=0!
+      const wRad = isTruck ? 0.44 : 0.36;
+      const wGeo = new THREE.CylinderGeometry(wRad, wRad, 0.28, 16);
+      wGeo.rotateZ(Math.PI / 2);
+      const rGeo = new THREE.CylinderGeometry(wRad * 0.56, wRad * 0.56, 0.30, 12);
+      rGeo.rotateZ(Math.PI / 2);
+      const wxOff = wid * 0.5 - 0.02;
+      const wzF = isTruck ? -1.85 : -1.35;
+      const wzR = isTruck ? 1.85 : 1.35;
+      for (const [wx, wz] of [[-wxOff, wzF], [wxOff, wzF], [-wxOff, wzR], [wxOff, wzR]]) {
+        const tire = new THREE.Mesh(wGeo, tireMat);
+        tire.position.set(wx, wRad, wz);
+        tire.castShadow = true;
+        g.add(tire);
+        const rim = new THREE.Mesh(rGeo, rimMat);
+        rim.position.set(wx, wRad, wz);
+        g.add(rim);
+      }
+
+      // Headlights & Taillights
+      const hlMat = new THREE.MeshBasicMaterial({ color: 0xfff3b0 });
+      const tlMat = new THREE.MeshBasicMaterial({ color: 0xef4444 });
+      for (const sx of [-wid * 0.34, wid * 0.34]) {
+        const hl = new THREE.Mesh(new THREE.BoxGeometry(0.32, 0.14, 0.08), hlMat);
+        hl.position.set(sx, 0.68, -len * 0.5 - 0.02);
+        g.add(hl);
+        const tl = new THREE.Mesh(new THREE.BoxGeometry(0.32, 0.14, 0.08), tlMat);
+        tl.position.set(sx, 0.72, len * 0.5 + 0.02);
+        g.add(tl);
+      }
+      return g;
+    }
+
+    const trafficPalette = [0x1e40af, 0x991b1b, 0x475569, 0x0f766e, 0xd97706, 0xe2e8f0];
+    const trafficKinds = ['suv', 'sedan', 'truck', 'sedan'];
+    const trafficCars = [];
+    for (let i = 0; i < 14; i++) {
+      const kind = trafficKinds[i % trafficKinds.length];
+      const mesh = createRealisticTrafficVehicle(trafficPalette[i % trafficPalette.length], kind);
+      scene.add(mesh);
+      trafficCars.push({
+        mesh,
+        t: (i / 14 + 0.05) % 1,
+        dir: i % 2 === 0 ? 1 : -1,
+        laneOffset: (i % 2 === 0 ? 1 : -1) * (ROAD_HALF * 0.45),
+        speed: (kind === 'truck' ? 9.5 : 13.5) + (i % 3) * 1.5
+      });
+    }
+
+    // =========================================================================
+    // 8. WEB AUDIO HORN, CONTROLS (HORN, HOP, REV, U-TURN + DRAG STEER) & LOOP
+    // =========================================================================
+    let audioCtx = null;
+    function playTroTroHorn() {
+      try {
+        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+        const t0 = audioCtx.currentTime;
+        for (const freq of [340, 428]) {
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.type = 'sawtooth';
+          osc.frequency.setValueAtTime(freq, t0);
+          gain.gain.setValueAtTime(0.08, t0);
+          gain.gain.exponentialRampToValueAtTime(0.001, t0 + 0.28);
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+          osc.start(t0);
+          osc.stop(t0 + 0.3);
+        }
+      } catch {}
+    }
+
+    const legParam = new URLSearchParams(window.location.search).get('leg');
+    const state = {
+      t: legParam === '10b' ? 0.50 : 0.03,
+      dir: 1,
+      laneOffset: 2.6,
+      speed: 14,
+      hopY: 0,
+      hopVy: 0,
+      autoCruise: true,
+      rainMode: 'auto',
+      rainStrength: 0,
+      camMode: 'chase',
+      snapCam: true
+    };
+
+    function triggerHop() {
+      if (state.hopY <= 0.02) {
+        state.hopVy = 8.2;
+      }
+    }
+
+    const keys = { w: false, s: false, a: false, d: false };
+    const LEASH_PX = 56;
+    const stick = { down: false, ax: 0, ay: 0, x: 0, y: 0, id: null };
+    let dragSteer = 0;
+    let dragThrottle = 0;
+
+    canvas.addEventListener('pointerdown', e => {
+      e.preventDefault();
+      stick.down = true;
+      stick.id = e.pointerId;
+      stick.ax = e.clientX;
+      stick.ay = e.clientY;
+      stick.x = e.clientX;
+      stick.y = e.clientY;
+      dragSteer = 0;
+      dragThrottle = 0;
+    });
+    window.addEventListener('pointermove', e => {
+      if (!stick.down || e.pointerId !== stick.id) return;
+      const dx = e.clientX - stick.ax;
+      const dy = e.clientY - stick.ay;
+      const dist = Math.hypot(dx, dy);
+      if (dist > LEASH_PX) {
+        stick.x = stick.ax + (dx / dist) * LEASH_PX;
+        stick.y = stick.ay + (dy / dist) * LEASH_PX;
+      } else {
+        stick.x = e.clientX;
+        stick.y = e.clientY;
+      }
+      dragSteer = Math.max(-1, Math.min(1, (stick.x - stick.ax) / LEASH_PX));
+      dragThrottle = Math.max(-1, Math.min(1, -(stick.y - stick.ay) / LEASH_PX));
+      if (dist > 8 && state.autoCruise) {
+        state.autoCruise = false;
+        syncButtons();
+      }
+    });
+    const endStick = e => {
+      if (!stick.down || (e.pointerId != null && e.pointerId !== stick.id)) return;
+      stick.down = false;
+      stick.id = null;
+      dragSteer = 0;
+      dragThrottle = 0;
+    };
+    window.addEventListener('pointerup', endStick);
+    window.addEventListener('pointercancel', endStick);
+
+    window.addEventListener('keydown', e => {
+      const k = e.key.toLowerCase();
+      if (k === 'w' || e.key === 'ArrowUp') { keys.w = true; state.autoCruise = false; syncButtons(); }
+      if (k === 's' || e.key === 'ArrowDown') { keys.s = true; state.autoCruise = false; syncButtons(); }
+      if (k === 'a' || e.key === 'ArrowLeft') { keys.a = true; state.autoCruise = false; syncButtons(); }
+      if (k === 'd' || e.key === 'ArrowRight') { keys.d = true; state.autoCruise = false; syncButtons(); }
+      if (k === 'u') flipDirection();
+      if (k === 'r') cycleRainMode();
+      if (k === 'm') MusicPlayer.toggle();
+      if (k === 'h') triggerHop();
+      if (e.code === 'Space') { e.preventDefault(); playTroTroHorn(); }
+    });
+    window.addEventListener('keyup', e => {
+      const k = e.key.toLowerCase();
+      if (k === 'w' || e.key === 'ArrowUp') keys.w = false;
+      if (k === 's' || e.key === 'ArrowDown') keys.s = false;
+      if (k === 'a' || e.key === 'ArrowLeft') keys.a = false;
+      if (k === 'd' || e.key === 'ArrowRight') keys.d = false;
+    });
+
+    // Ghana Regional Music Player (matching Ride Danfo Ghana pool)
+    const MusicPlayer = (() => {
+      let enabled = true;
+      let idx = 0;
+      let audio = null;
+      const tracks = [
+        { file: 'ghana_hot_amapiano.ogg', title: 'Hot Amapiano Beats — Alex Morgan (CC BY)' },
+        { file: 'ghana_afrobeat.ogg',     title: 'Afrobeat — Alex Morgan (CC BY)' }
+      ];
+      function playTrack() {
+        if (!enabled) return;
+        const tr = tracks[idx % tracks.length];
+        if (audio) { try { audio.pause(); } catch {} }
+        audio = new Audio(`./music/${tr.file}`);
+        audio.volume = 0.42;
+        audio.addEventListener('ended', () => { idx++; if (enabled) playTrack(); });
+        const nowEl = document.getElementById('music-now');
+        if (nowEl) nowEl.textContent = `♪ ${tr.title}`;
+        audio.play().catch(() => {
+          const unlock = () => { if (enabled && audio && audio.paused) audio.play().catch(() => {}); };
+          window.addEventListener('pointerdown', unlock, { once: true });
+          window.addEventListener('keydown', unlock, { once: true });
+        });
+      }
+      function toggle() {
+        enabled = !enabled;
+        const btn = document.getElementById('btn-music');
+        const nowEl = document.getElementById('music-now');
+        if (enabled) {
+          btn.textContent = '🎵 Music: ON';
+          btn.classList.add('active');
+          if (nowEl) nowEl.style.display = 'inline-flex';
+          playTrack();
+        } else {
+          if (audio) { try { audio.pause(); } catch {} }
+          btn.textContent = '🎵 Music: OFF';
+          btn.classList.remove('active');
+          if (nowEl) nowEl.style.display = 'none';
+        }
+      }
+      playTrack();
+      return { toggle };
+    })();
+
+    // Thumb cluster bindings: Horn, Hop, Reverse, U-Turn (matching Ride Danfo)
+    const btnHorn = document.getElementById('btn-horn-pad');
+    const btnHop = document.getElementById('btn-hop');
+    const btnRev = document.getElementById('btn-rev');
+    const btnUturn = document.getElementById('btn-uturn');
+    btnHorn.addEventListener('pointerdown', e => { e.preventDefault(); playTroTroHorn(); });
+    btnHorn.addEventListener('click', playTroTroHorn);
+    btnHop.addEventListener('pointerdown', e => { e.preventDefault(); triggerHop(); });
+    btnHop.addEventListener('click', triggerHop);
+    btnRev.addEventListener('pointerdown', e => {
+      e.preventDefault(); keys.s = true; state.autoCruise = false; btnRev.classList.add('pressed'); syncButtons();
+    });
+    window.addEventListener('pointerup', () => { keys.s = false; btnRev.classList.remove('pressed'); });
+    window.addEventListener('pointercancel', () => { keys.s = false; btnRev.classList.remove('pressed'); });
+    btnUturn.addEventListener('pointerdown', e => { e.preventDefault(); flipDirection(); });
+    btnUturn.addEventListener('click', flipDirection);
+    document.getElementById('btn-music').addEventListener('click', () => MusicPlayer.toggle());
+
+    const btnUphill = document.getElementById('btn-uphill');
+    const btnDownhill = document.getElementById('btn-downhill');
+    const btnKtown = document.getElementById('btn-ktown');
+    const btnReturn = document.getElementById('btn-return');
+    const btnRain = document.getElementById('btn-rain');
+    const btnAuto = document.getElementById('btn-auto');
+    const btnCam = document.getElementById('btn-cam');
+    const zonePill = document.getElementById('zone-pill');
+    const narrBox = document.getElementById('narration-box');
+    const narrSpeaker = document.getElementById('narr-speaker');
+    const narrText = document.getElementById('narr-text');
+    let narrHideAt = 0;
+
+    function drawMatePortrait(isFemale) {
+      const c = document.getElementById('mate-portrait');
+      if (!c) return;
+      const ctx = c.getContext('2d');
+      ctx.fillStyle = isFemale ? '#fbcfe8' : '#fde68a';
+      ctx.fillRect(0, 0, 44, 44);
+      // Shirt
+      ctx.fillStyle = isFemale ? '#9333ea' : '#1a8040';
+      ctx.fillRect(8, 30, 28, 14);
+      // Head
+      ctx.fillStyle = '#5c3317';
+      ctx.beginPath(); ctx.arc(22, 22, 10, 0, Math.PI * 2); ctx.fill();
+      // Cap (Koffi red cap) or Headwrap (Auntie Akosua)
+      ctx.fillStyle = isFemale ? '#dc2626' : '#cc1f1f';
+      ctx.fillRect(11, 8, 22, 9);
+      if (!isFemale) ctx.fillRect(11, 14, 26, 3); // Cap visor
+      // Eyes & smile
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(17, 20, 3, 2); ctx.fillRect(24, 20, 3, 2);
+      ctx.fillStyle = '#fde047';
+      ctx.fillRect(18, 26, 8, 2);
+    }
+
+    let currentNarrAudio = null;
+    function triggerNarration(speaker, line, voiceFile) {
+      const sLow = (speaker + ' ' + line).toLowerCase();
+      const isFemale = sLow.includes('akosua') || sLow.includes('ama') || sLow.includes('ronke') || sLow.includes('flowers') || sLow.includes('female');
+      drawMatePortrait(isFemale);
+      narrSpeaker.textContent = speaker;
+      narrText.textContent = line;
+      narrBox.style.display = 'flex';
+      narrHideAt = performance.now() + 7000;
+      if (currentNarrAudio) {
+        try { currentNarrAudio.pause(); } catch {}
+        currentNarrAudio = null;
+      }
+      if (voiceFile) {
+        const a = new Audio(`./voices/${voiceFile}`);
+        a.volume = 0.96;
+        currentNarrAudio = a;
+        a.play().catch(() => {
+          const resume = () => {
+            if (currentNarrAudio === a && a.paused) a.play().catch(() => {});
+          };
+          window.addEventListener('pointerdown', resume, { once: true });
+          window.addEventListener('keydown', resume, { once: true });
+        });
+      }
+    }
+
+    function flipDirection() {
+      state.dir *= -1;
+      state.laneOffset *= -1;
+      state.snapCam = true;
+      syncButtons();
+    }
+    function cycleRainMode() {
+      state.rainMode = state.rainMode === 'auto' ? 'on' : state.rainMode === 'on' ? 'off' : 'auto';
+      syncButtons();
+    }
+
+    document.getElementById('btn-back-routes').addEventListener('click', () => {
+      window.location.href = './play.html?routes=1';
+    });
+    document.getElementById('btn-next-leg').addEventListener('click', () => {
+      window.location.href = './play.html?leg=11';
+    });
+    btnUphill.addEventListener('click', () => {
+      state.t = 0.08; state.dir = 1; state.laneOffset = 2.6; state.speed = 15; state.snapCam = true; syncButtons();
+    });
+    btnDownhill.addEventListener('click', () => {
+      state.t = 0.58; state.dir = 1; state.laneOffset = 2.6; state.speed = 16; state.snapCam = true; syncButtons();
+    });
+    btnKtown.addEventListener('click', () => {
+      state.t = 0.405; state.dir = 1; state.laneOffset = 2.6; state.speed = 13; state.snapCam = true;
+      koforiduaEvents.forEach(ev => { ev.spoken = false; });
+      syncButtons();
+    });
+    btnReturn.addEventListener('click', flipDirection);
+    btnRain.addEventListener('click', cycleRainMode);
+    btnAuto.addEventListener('click', () => { state.autoCruise = !state.autoCruise; syncButtons(); });
+    btnCam.addEventListener('click', () => {
+      state.camMode = state.camMode === 'chase' ? 'hood' : state.camMode === 'hood' ? 'overview' : 'chase';
+      syncButtons();
+    });
+
+    function syncButtons() {
+      const inKtown = state.t >= 0.40 && state.t <= 0.53;
+      const inDownhill = state.t > 0.53 && state.t <= 0.96;
+      btnUphill.classList.toggle('active', !inDownhill && !inKtown);
+      btnDownhill.classList.toggle('active', inDownhill);
+      btnKtown.classList.toggle('active', inKtown);
+      btnReturn.classList.toggle('active', state.dir === -1);
+      btnAuto.classList.toggle('active', state.autoCruise);
+      btnAuto.textContent = `🚐 Auto-Cruise: ${state.autoCruise ? 'ON' : 'OFF'}`;
+      btnRain.classList.toggle('active', state.rainMode === 'on');
+      btnRain.textContent = `☔ Rain & Wet Road: ${state.rainMode.toUpperCase()}`;
+      btnCam.textContent = `🎥 Cam: ${state.camMode === 'chase' ? 'Chase' : state.camMode === 'hood' ? 'Hood' : 'Ridge View'}`;
+    }
+    syncButtons();
+
+    const spdEl = document.getElementById('spd-val');
+    const altEl = document.getElementById('alt-val');
+    const gradeEl = document.getElementById('grade-val');
+    const dirEl = document.getElementById('dir-val');
+    const progEl = document.getElementById('prog-val');
+
+    const camTargetPos = new THREE.Vector3();
+    const camLookTarget = new THREE.Vector3();
+    let prevTime = performance.now();
+
+    function animate(now) {
+      requestAnimationFrame(animate);
+      const dt = Math.min(0.05, (now - prevTime) / 1000);
+      prevTime = now;
+
+      if (state.autoCruise) {
+        state.speed += (15.5 - state.speed) * Math.min(1, 2.5 * dt);
+        state.laneOffset += (state.dir * 2.6 - state.laneOffset) * Math.min(1, 3 * dt);
+      } else {
+        if (keys.s) state.speed -= 24 * dt;
+        else if (keys.w) state.speed += 16 * dt;
+        else if (stick.down) state.speed += dragThrottle * 20 * dt;
+        else state.speed *= Math.pow(0.28, dt); // Coast smoothly to 0 when stopped/released
+        if (Math.abs(state.speed) < 0.08 && !keys.w && !keys.s && !stick.down) state.speed = 0;
+        state.speed = Math.max(-12, Math.min(26, state.speed));
+        const steerDir = (keys.a ? -1 : 0) + (keys.d ? 1 : 0) + dragSteer;
+        if (Math.abs(steerDir) > 0.05) state.laneOffset += steerDir * state.dir * 7.2 * dt;
+        state.laneOffset = Math.max(-(ROAD_HALF - 1.4), Math.min(ROAD_HALF - 1.4, state.laneOffset));
+      }
+
+      // Hop physics
+      if (state.hopY > 0 || state.hopVy !== 0) {
+        state.hopY += state.hopVy * dt;
+        state.hopVy -= 22.0 * dt;
+        if (state.hopY <= 0) { state.hopY = 0; state.hopVy = 0; }
+      }
+
+      state.t = ((state.t + (state.dir * state.speed * dt) / totalLen) % 1 + 1) % 1;
+      const frame = getRoadFrameAtT(state.t);
+      const aheadFrame = getRoadFrameAtT(state.t + state.dir * 0.005);
+
+      const busPos = frame.pos.clone().addScaledVector(frame.right, state.laneOffset);
+      busPos.y += 0.08 + state.hopY;
+      troTroMesh.position.copy(busPos);
+      const fwd = frame.tan.clone().multiplyScalar(state.dir);
+      const lookMat = new THREE.Matrix4().lookAt(busPos, busPos.clone().add(fwd), frame.up);
+      troTroMesh.quaternion.setFromRotationMatrix(lookMat);
+
+      const inKtown = state.t >= 0.40 && state.t <= 0.53;
+      const inDownhill = state.t > 0.53 && state.t <= 0.96;
+      const inSummit = false;
+      const targetRain = state.rainMode === 'on' ? 1.0 : state.rainMode === 'off' ? 0.0 : (inDownhill ? 1.0 : 0.08);
+      state.rainStrength += (targetRain - state.rainStrength) * Math.min(1, 1.8 * dt);
+
+      // Animate Koforidua Flowers promenade walkers & check landmark voice narration
+      for (const kw of koforiduaWalkers) {
+        const stride = Math.sin(now * 0.0022 + kw.phase) * 2.2;
+        kw.mesh.position.copy(kw.basePos).addScaledVector(kw.tan, stride);
+      }
+      for (const ev of koforiduaEvents) {
+        if (!ev.spoken && Math.abs(state.t - ev.t) < 0.008) {
+          ev.spoken = true;
+          triggerNarration(ev.speaker, ev.line, ev.voice);
+        }
+      }
+      if (narrBox.style.display === 'block' && now > narrHideAt) {
+        narrBox.style.display = 'none';
+      }
+
+      skyUniforms.uRainMix.value = state.rainStrength;
+      skyUniforms.uTopColor.value.setRGB(0.11 - 0.03 * state.rainStrength, 0.29 - 0.09 * state.rainStrength, 0.48 - 0.16 * state.rainStrength);
+      skyUniforms.uHorizonColor.value.setRGB(0.80 - 0.24 * state.rainStrength, 0.86 - 0.22 * state.rainStrength, 0.90 - 0.18 * state.rainStrength);
+      scene.fog.color.setRGB(0.61 - 0.18 * state.rainStrength, 0.71 - 0.18 * state.rainStrength, 0.77 - 0.14 * state.rainStrength);
+      scene.fog.density = 0.0014 + state.rainStrength * 0.0020;
+      sunLight.intensity = 2.25 - state.rainStrength * 1.25;
+      hemiLight.intensity = 0.88 - state.rainStrength * 0.24;
+
+      roadMat.roughness = 0.52 - state.rainStrength * 0.40;
+      roadMat.clearcoat = 0.25 + state.rainStrength * 0.75;
+      roadMat.clearcoatRoughness = 0.34 - state.rainStrength * 0.27;
+      roadMat.metalness = 0.12 + state.rainStrength * 0.20;
+
+      mistMat.opacity = 0.22 + state.rainStrength * 0.34;
+      rainMat.opacity = state.rainStrength * 0.58;
+      if (state.rainStrength > 0.05) {
+        rainLines.position.set(camera.position.x, camera.position.y - 16, camera.position.z);
+        const rp = rainGeo.attributes.position.array;
+        for (let i = 0; i < RAIN_COUNT; i++) {
+          let ry = rp[i * 6 + 1] - 36 * dt;
+          if (ry < -5) ry += 44;
+          rp[i * 6 + 1] = ry; rp[i * 6 + 4] = ry - 1.6;
+        }
+        rainGeo.attributes.position.needsUpdate = true;
+      }
+
+      for (const c of clouds) {
+        c.position.x += c.userData.speed * dt;
+        if (c.position.x > 500) c.position.x = -500;
+      }
+      for (const m of mistLayers) {
+        m.position.x += m.userData.drift * dt;
+        if (m.position.x > 160) m.position.x = -360;
+        if (m.position.x < -360) m.position.x = 160;
+      }
+
+      for (const tc of trafficCars) {
+        // Keep same-direction traffic spaced cleanly apart (no car-through-car overlap)
+        let blockedAhead = false;
+        for (const other of trafficCars) {
+          if (other === tc || other.dir !== tc.dir) continue;
+          const dtAhead = ((other.t - tc.t) * tc.dir + 1) % 1;
+          if (dtAhead > 0 && dtAhead * totalLen < 11.5) {
+            blockedAhead = true;
+            break;
+          }
+        }
+        const effSpd = blockedAhead ? 0 : tc.speed;
+        tc.t = ((tc.t + (tc.dir * effSpd * dt) / totalLen) % 1 + 1) % 1;
+        const tf = getRoadFrameAtT(tc.t);
+        const tp = tf.pos.clone().addScaledVector(tf.right, tc.laneOffset);
+        tp.y += 0.08; // Flush with road surface (tires sit at local y=0)
+        tc.mesh.position.copy(tp);
+        const tFwd = tf.tan.clone().multiplyScalar(tc.dir);
+        const tMat = new THREE.Matrix4().lookAt(tp, tp.clone().add(tFwd), tf.up);
+        tc.mesh.quaternion.setFromRotationMatrix(tMat);
+
+        // Tro-Tro vs. Traffic collision & auto-overtake (unless hopping over!)
+        if (state.hopY <= 0.65) {
+          const dtBus = ((tc.t - state.t) * state.dir + 1) % 1;
+          const distAlong = dtBus < 0.5 ? dtBus * totalLen : (dtBus - 1) * totalLen;
+          const dLat = Math.abs(tc.laneOffset - state.laneOffset);
+          if (state.autoCruise && tc.dir === state.dir && distAlong > 2.0 && distAlong < 14.0 && dLat < 2.2) {
+            // Smoothly steer into the passing lane around the slower truck/car
+            state.laneOffset += (-state.dir * 3.0 - state.laneOffset) * Math.min(1, 5.5 * dt);
+          }
+          const worldDist = busPos.distanceTo(tp);
+          if (worldDist < 5.4 && Math.abs(busPos.y - tp.y) < 2.4) {
+            if (Math.abs(distAlong) >= dLat) {
+              const pushSign = distAlong >= 0 ? -1 : 1;
+              state.t = ((state.t + (pushSign * state.dir * (5.6 - worldDist)) / totalLen) % 1 + 1) % 1;
+              state.speed = Math.min(state.speed, tc.dir === state.dir ? tc.speed * 0.85 : 2.0);
+            } else {
+              const latSign = state.laneOffset >= tc.laneOffset ? 1 : -1;
+              state.laneOffset = Math.max(-(ROAD_HALF - 1.4), Math.min(ROAD_HALF - 1.4, state.laneOffset + latSign * (2.6 - dLat)));
+            }
+          }
+        }
+      }
+
+      if (state.camMode === 'chase') {
+        camTargetPos.copy(busPos).addScaledVector(fwd, -13.5).addScaledVector(frame.up, 4.8);
+        camLookTarget.copy(aheadFrame.pos).addScaledVector(frame.up, 2.0);
+      } else if (state.camMode === 'hood') {
+        camTargetPos.copy(busPos).addScaledVector(fwd, 2.0).addScaledVector(frame.up, 2.5);
+        camLookTarget.copy(aheadFrame.pos).addScaledVector(fwd, 20).addScaledVector(frame.up, 1.6);
+      } else {
+        camTargetPos.copy(busPos).addScaledVector(fwd, -26).addScaledVector(frame.right, 16).addScaledVector(frame.up, 14);
+        camLookTarget.copy(busPos).addScaledVector(fwd, 14);
+      }
+      const minCamY = Math.max(getTerrainHeight(camTargetPos.x, camTargetPos.z) + 2.4, busPos.y + 2.2);
+      if (camTargetPos.y < minCamY) camTargetPos.y = minCamY;
+      if (state.snapCam) {
+        camera.position.copy(camTargetPos);
+        state.snapCam = false;
+      } else {
+        camera.position.lerp(camTargetPos, Math.min(1, 6.5 * dt));
+      }
+      camera.lookAt(camLookTarget);
+
+      sunLight.position.set(busPos.x + 120, busPos.y + 190, busPos.z - 100);
+      sunLight.target.position.copy(busPos);
+
+      spdEl.textContent = Math.round(Math.abs(state.speed) * 3.6);
+      altEl.textContent = Math.round(busPos.y);
+      const gradePct = (fwd.y / Math.max(0.01, Math.hypot(fwd.x, fwd.z))) * 100;
+      gradeEl.textContent = `${gradePct >= 0 ? '+' : ''}${gradePct.toFixed(1)}%`;
+      dirEl.textContent = gradePct > 1.2 ? 'Climbing' : gradePct < -1.2 ? 'Descending' : 'Ridge Level';
+      progEl.textContent = `${Math.round(state.t * 100)}%`;
+
+      zonePill.textContent = inKtown
+        ? '📍 Koforidua (K-Town) — Eastern Region'
+        : inSummit
+        ? '📍 Aburi Ridge Summit Lookout'
+        : inDownhill
+        ? '📍 Downhill Valley Road (Mist & Rain)'
+        : '📍 Uphill Mountain Climb';
+
+      syncButtons();
+      renderer.render(scene, camera);
+
+      // Exact Ride Danfo Direction Compass Arrow pointing toward Aburi Summit / Valley Stop
+      const hudCanvas = document.getElementById('hud-canvas');
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      const W = window.innerWidth, H = window.innerHeight;
+      if (hudCanvas.width !== Math.round(W * dpr) || hudCanvas.height !== Math.round(H * dpr)) {
+        hudCanvas.width = Math.round(W * dpr);
+        hudCanvas.height = Math.round(H * dpr);
+      }
+      const hudCtx = hudCanvas.getContext('2d');
+      hudCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      hudCtx.clearRect(0, 0, W, H);
+
+      const targetT = inDownhill ? 0.96 : 0.45;
+      const stopFrame = getRoadFrameAtT(targetT);
+      const distM = Math.round(busPos.distanceTo(stopFrame.pos));
+      const angToStop = Math.atan2(stopFrame.pos.x - busPos.x, -(stopFrame.pos.z - busPos.z));
+      const camFwd = new THREE.Vector3();
+      camera.getWorldDirection(camFwd);
+      const camHeading = Math.atan2(camFwd.x, -camFwd.z);
+      let relAng = angToStop - camHeading;
+      while (relAng > Math.PI) relAng -= Math.PI * 2;
+      while (relAng < -Math.PI) relAng += Math.PI * 2;
+
+      const hudEl = document.getElementById('hud');
+      const hudBarH = hudEl ? hudEl.getBoundingClientRect().bottom : 86;
+      const compassY = Math.max(92, Math.min(200, Math.round(hudBarH + 26)));
+
+      hudCtx.save();
+      hudCtx.translate(W * 0.5, compassY);
+      hudCtx.rotate(relAng);
+      hudCtx.fillStyle = inDownhill ? '#ffb347' : '#46d27a';
+      hudCtx.strokeStyle = '#14233b';
+      hudCtx.lineWidth = 3;
+      hudCtx.beginPath();
+      hudCtx.moveTo(0, -16);
+      hudCtx.lineTo(13, 12);
+      hudCtx.lineTo(0, 6);
+      hudCtx.lineTo(-13, 12);
+      hudCtx.closePath();
+      hudCtx.fill();
+      hudCtx.stroke();
+      hudCtx.restore();
+
+      hudCtx.save();
+      hudCtx.font = '800 11px system-ui, sans-serif';
+      hudCtx.textAlign = 'center';
+      hudCtx.fillStyle = '#ffffff';
+      hudCtx.strokeStyle = '#14233b';
+      hudCtx.lineWidth = 3;
+      const stopLabel = `${inDownhill ? 'DROP-OFF (VALLEY)' : 'ABURI SUMMIT'} • ${distM}m`;
+      hudCtx.strokeText(stopLabel, W * 0.5, compassY + 28);
+      hudCtx.fillText(stopLabel, W * 0.5, compassY + 28);
+      hudCtx.restore();
+
+      // Draw exact Ride Danfo Chasing Thumbstick Overlay when dragging
+      if (stick.down) {
+        hudCtx.save();
+        hudCtx.strokeStyle = 'rgba(255, 248, 236, 0.85)';
+        hudCtx.lineWidth = 2;
+        hudCtx.setLineDash([5, 4]);
+        hudCtx.beginPath();
+        hudCtx.arc(stick.ax, stick.ay, LEASH_PX, 0, Math.PI * 2);
+        hudCtx.stroke();
+        hudCtx.setLineDash([]);
+
+        hudCtx.fillStyle = 'rgba(20, 35, 59, 0.32)';
+        hudCtx.strokeStyle = '#fff8ec';
+        hudCtx.lineWidth = 3;
+        hudCtx.beginPath();
+        hudCtx.arc(stick.ax, stick.ay, 26, 0, Math.PI * 2);
+        hudCtx.fill();
+        hudCtx.stroke();
+
+        hudCtx.fillStyle = '#fde047';
+        hudCtx.strokeStyle = '#14233b';
+        hudCtx.lineWidth = 2.5;
+        hudCtx.beginPath();
+        hudCtx.arc(stick.x, stick.y, 16, 0, Math.PI * 2);
+        hudCtx.fill();
+        hudCtx.stroke();
+        hudCtx.restore();
+      }
+    }
+
+    window.addEventListener('resize', () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+
+    requestAnimationFrame(animate);
+  })();
+  </script>
+</body>
+</html>

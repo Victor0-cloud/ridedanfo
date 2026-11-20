@@ -4023,13 +4023,29 @@
       for (const tc of traffic) {
         const tfx = Math.sin(tc.heading), tfz = -Math.cos(tc.heading);
         const trx = Math.cos(tc.heading), trz = Math.sin(tc.heading);
+
+        // Gently re-center vehicle in its right-hand lane so bus/car bumps never leave it straddling lanes
+        const laneGx = Math.round(tc.x / CELL), laneGz = Math.round(tc.z / CELL);
+        if (Math.abs(tfz) > 0.5) {
+          const targetLaneX = laneGx * CELL + trx * (ROAD_HALF * 0.48);
+          tc.x += (targetLaneX - tc.x) * Math.min(1, 3.5 * dt);
+        } else {
+          const targetLaneZ = laneGz * CELL + trz * (ROAD_HALF * 0.48);
+          tc.z += (targetLaneZ - tc.z) * Math.min(1, 3.5 * dt);
+        }
+
+        const inIntersection =
+          Math.abs(tc.x - laneGx * CELL) < ROAD_HALF - 0.5 &&
+          Math.abs(tc.z - laneGz * CELL) < ROAD_HALF - 0.5;
+
         const toBusX = bus.x - tc.x, toBusZ = bus.z - tc.z;
         const busAhead = toBusX * tfx + toBusZ * tfz;
         const busLat = Math.abs(toBusX * trx + toBusZ * trz);
-        let mustBrake = busAhead > -2 && busAhead < 12 && busLat < 2.6;
+        let mustBrake = busAhead > 1.8 && busAhead < 9.5 && busLat < 2.2;
+        let atRedLight = false;
 
-        // Traffic Mode ON: all vehicles obey upcoming 3D intersection traffic lights!
-        if (trafficMode) {
+        // Traffic Mode ON: all vehicles obey upcoming 3D intersection traffic lights (but clear if already inside!)
+        if (trafficMode && !inIntersection) {
           const isNS = Math.abs(tfz) > 0.5;
           const redForMe = isNS ? !nsGreen : nsGreen;
           if (redForMe) {
@@ -4039,39 +4055,69 @@
               nextGz += Math.round(tfz);
             }
             const distToNode = (nextGx * CELL - tc.x) * tfx + (nextGz * CELL - tc.z) * tfz;
-            if (distToNode > ROAD_HALF + 1.5 && distToNode < ROAD_HALF + 20.0) {
+            if (distToNode > ROAD_HALF + 0.8 && distToNode < ROAD_HALF + 10.5) {
               mustBrake = true;
+              atRedLight = true;
             }
           }
         }
 
-        // Prevent traffic vehicles from hitting/merging with other cars or poles (stop on hit!)
+        // Smooth car-to-car following & intersection yielding without mutual deadlocks
         for (const other of traffic) {
           if (other === tc) continue;
           const odx = other.x - tc.x, odz = other.z - tc.z;
           const oDist = Math.hypot(odx, odz);
-          if (oDist > 0.001 && oDist < 4.5) {
-            const push = (4.5 - oDist) * 0.5;
-            tc.x -= (odx / oDist) * push;
-            tc.z -= (odz / oDist) * push;
-            tc.curSpeed = 0;
-            mustBrake = true;
-          }
           const oAhead = odx * tfx + odz * tfz;
           const oLat = Math.abs(odx * trx + odz * trz);
-          if (oAhead > 0 && oAhead < (trafficMode ? 15 : 10) && oLat < 2.5) {
+          const ofx = Math.sin(other.heading), ofz = -Math.cos(other.heading);
+          const dirDot = tfx * ofx + tfz * ofz;
+
+          if (oDist > 0.001 && oDist < 4.2 && oAhead > 0) {
+            const push = (4.2 - oDist) * 0.45;
+            tc.x -= (odx / oDist) * push;
+            tc.z -= (odz / oDist) * push;
+            tc.curSpeed = Math.min(tc.curSpeed, Math.max(0, other.curSpeed * 0.8));
             mustBrake = true;
+          } else if (dirDot > 0.7) {
+            // Same-direction following: compact 8.5m gap prevents intersection-blocking backups
+            if (oAhead > 0.5 && oAhead < 8.5 && oLat < 2.2) {
+              mustBrake = true;
+            }
+          } else if (Math.abs(dirDot) < 0.5) {
+            // Cross-traffic at intersections: never deadlock both cars!
+            const oGx = Math.round(other.x / CELL), oGz = Math.round(other.z / CELL);
+            const otherInInter =
+              Math.abs(other.x - oGx * CELL) < ROAD_HALF - 0.5 &&
+              Math.abs(other.z - oGz * CELL) < ROAD_HALF - 0.5;
+            if (!inIntersection && oAhead > 1.0 && oAhead < 10.5 && oLat < 3.0) {
+              // Yield if other is already in the intersection, or tie-break (N/S yields to E/W)
+              if (otherInInter || Math.abs(tfz) > 0.5) {
+                mustBrake = true;
+              }
+            }
           }
         }
+
+        // Deflect cleanly off poles without freezing permanently against them
         for (const p of poleColliders) {
           const pdx = tc.x - p.x, pdz = tc.z - p.z;
           const pDist = Math.hypot(pdx, pdz);
           if (pDist > 0.001 && pDist < 1.35) {
             tc.x += (pdx / pDist) * (1.35 - pDist);
             tc.z += (pdz / pDist) * (1.35 - pDist);
-            tc.curSpeed = 0;
-            mustBrake = true;
           }
+        }
+
+        // Anti-jam safeguard: if a car stays blocked (not at a red light) for >2.5s, free it
+        if (!atRedLight && tc.curSpeed < 0.8) {
+          tc.stuckT = (tc.stuckT || 0) + dt;
+          if (tc.stuckT > 2.5) {
+            mustBrake = false;
+            tc.curSpeed = Math.max(tc.curSpeed, tc.speed * 0.65);
+            tc.stuckT = 0;
+          }
+        } else {
+          tc.stuckT = 0;
         }
 
         tc.braking = mustBrake;
@@ -4095,12 +4141,16 @@
           const nrx = Math.cos(tc.heading), nrz = Math.sin(tc.heading);
           const ngx = Math.round(bus.x / CELL) + Math.round(Math.sin(bus.heading));
           const ngz = Math.round(bus.z / CELL) + Math.round(-Math.cos(bus.heading));
-          for (let attempt = 0; attempt < 5; attempt++) {
-            const candX = ngx * CELL + nrx * (ROAD_HALF * 0.48) - nfx * (25 + attempt * 18);
-            const candZ = ngz * CELL + nrz * (ROAD_HALF * 0.48) - nfz * (25 + attempt * 18);
-            if (!traffic.some(o => o !== tc && Math.hypot(o.x - candX, o.z - candZ) < 16)) {
+          for (let attempt = 0; attempt < 6; attempt++) {
+            const candX = ngx * CELL + nrx * (ROAD_HALF * 0.48) - nfx * (22 + attempt * 18);
+            const candZ = ngz * CELL + nrz * (ROAD_HALF * 0.48) - nfz * (22 + attempt * 18);
+            if (
+              Math.hypot(candX - bus.x, candZ - bus.z) > 14 &&
+              !traffic.some(o => o !== tc && Math.hypot(o.x - candX, o.z - candZ) < 16)
+            ) {
               tc.x = candX;
               tc.z = candZ;
+              tc.stuckT = 0;
               break;
             }
           }

@@ -1890,18 +1890,20 @@
       }
 
       for (const tc of trafficCars) {
-        // Keep same-direction traffic spaced cleanly apart (no car-through-car overlap)
-        let blockedAhead = false;
+        if (tc.curSpeed == null) tc.curSpeed = tc.speed;
+        // Smooth highway car-following: match lead vehicle speed instead of slamming to 0 km/h
+        let targetSpd = tc.speed;
         for (const other of trafficCars) {
           if (other === tc || other.dir !== tc.dir) continue;
           const dtAhead = ((other.t - tc.t) * tc.dir + 1) % 1;
-          if (dtAhead > 0 && dtAhead * totalLen < 11.5) {
-            blockedAhead = true;
-            break;
+          const distAhead = dtAhead * totalLen;
+          if (distAhead > 0 && distAhead < 18.0) {
+            const leadSpd = other.curSpeed != null ? other.curSpeed : other.speed;
+            targetSpd = Math.min(targetSpd, distAhead < 7.5 ? leadSpd * 0.4 : leadSpd);
           }
         }
-        const effSpd = blockedAhead ? 0 : tc.speed;
-        tc.t = ((tc.t + (tc.dir * effSpd * dt) / totalLen) % 1 + 1) % 1;
+        tc.curSpeed += (targetSpd - tc.curSpeed) * Math.min(1, 5.0 * dt);
+        tc.t = ((tc.t + (tc.dir * tc.curSpeed * dt) / totalLen) % 1 + 1) % 1;
         const tf = getRoadFrameAtT(tc.t);
         const tp = tf.pos.clone().addScaledVector(tf.right, tc.laneOffset);
         tp.y += 0.08; // Flush with road surface (tires sit at local y=0)
@@ -1910,21 +1912,29 @@
         const tMat = new THREE.Matrix4().lookAt(tp, tp.clone().add(tFwd), tf.up);
         tc.mesh.quaternion.setFromRotationMatrix(tMat);
 
-        // Tro-Tro vs. Traffic collision & auto-overtake (unless hopping over!)
+        // Tro-Tro vs. Traffic collision & safe overtaking (unless hopping over!)
         if (state.hopY <= 0.65) {
           const dtBus = ((tc.t - state.t) * state.dir + 1) % 1;
           const distAlong = dtBus < 0.5 ? dtBus * totalLen : (dtBus - 1) * totalLen;
           const dLat = Math.abs(tc.laneOffset - state.laneOffset);
-          if (state.autoCruise && tc.dir === state.dir && distAlong > 2.0 && distAlong < 14.0 && dLat < 2.2) {
-            // Smoothly steer into the passing lane around the slower truck/car
-            state.laneOffset += (-state.dir * 3.0 - state.laneOffset) * Math.min(1, 5.5 * dt);
+          if (state.autoCruise && tc.dir === state.dir && distAlong > 2.5 && distAlong < 15.0 && dLat < 2.2) {
+            const oncomingNear = trafficCars.some(o => {
+              if (o.dir === state.dir) return false;
+              const dOn = ((o.t - state.t) * state.dir + 1) % 1;
+              return dOn * totalLen < 38.0;
+            });
+            if (!oncomingNear) {
+              state.laneOffset += (-state.dir * 2.8 - state.laneOffset) * Math.min(1, 5.5 * dt);
+            } else {
+              state.speed += (tc.curSpeed - state.speed) * Math.min(1, 6.0 * dt);
+            }
           }
           const worldDist = busPos.distanceTo(tp);
           if (worldDist < 5.4 && Math.abs(busPos.y - tp.y) < 2.4) {
             if (Math.abs(distAlong) >= dLat) {
               const pushSign = distAlong >= 0 ? -1 : 1;
               state.t = ((state.t + (pushSign * state.dir * (5.6 - worldDist)) / totalLen) % 1 + 1) % 1;
-              state.speed = Math.min(state.speed, tc.dir === state.dir ? tc.speed * 0.85 : 2.0);
+              state.speed = Math.min(state.speed, tc.dir === state.dir ? tc.curSpeed * 0.9 : 2.0);
             } else {
               const latSign = state.laneOffset >= tc.laneOffset ? 1 : -1;
               state.laneOffset = Math.max(-(ROAD_HALF - 1.4), Math.min(ROAD_HALF - 1.4, state.laneOffset + latSign * (2.6 - dLat)));

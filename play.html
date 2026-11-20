@@ -187,16 +187,6 @@
         </div>
       </div>
 
-      <!-- On-Screen Touch Steering Arrow Console (always visible on touch/mobile, safe-area raised) -->
-      <div id="touch-arrows" class="absolute bottom-[calc(env(safe-area-inset-bottom,0px)+20px)] left-[92px] sm:left-1/2 sm:-translate-x-1/2 flex items-center gap-1 pointer-events-auto z-10">
-        <button id="btn-steer-left" type="button" title="Steer Left (A)"
-          class="slab-btn w-10 h-10 sm:w-11 sm:h-11 bg-gradient-to-b from-[#fff8ec] to-[#e2e8f0] text-[#14233b] text-base font-black flex items-center justify-center">◀</button>
-        <button id="btn-gas" type="button" title="Drive Forward (W)"
-          class="slab-btn w-10 h-10 sm:w-11 sm:h-11 bg-gradient-to-b from-[#bbf7d0] to-[#46d27a] text-[#08351a] text-base font-black flex items-center justify-center">▲</button>
-        <button id="btn-steer-right" type="button" title="Steer Right (D)"
-          class="slab-btn w-10 h-10 sm:w-11 sm:h-11 bg-gradient-to-b from-[#fff8ec] to-[#e2e8f0] text-[#14233b] text-base font-black flex items-center justify-center">▶</button>
-      </div>
-
       <!-- Bottom-Right Thumb Cluster: Horn, Hop, Reverse & 3-Point U-Turn (safe-area raised) -->
       <div class="absolute bottom-[calc(env(safe-area-inset-bottom,0px)+20px)] right-2.5 flex items-end gap-1 pointer-events-auto z-10">
         <button id="btn-horn-pad" type="button" title="Honk Danfo Horn (H)"
@@ -4277,21 +4267,6 @@
         ? 'slab-btn px-1.5 py-0.5 bg-gradient-to-b from-[#7ff0a8] to-[#46d27a] text-[#08351a] text-[10px] sm:text-[11px] flex items-center gap-1'
         : 'slab-btn px-1.5 py-0.5 bg-gradient-to-b from-[#fff8ec] to-[#ffe7bd] text-[#14233b] text-[10px] sm:text-[11px] flex items-center gap-1';
     });
-
-    // On-screen Steering Arrow Console (always active on touch/mobile & desktop click)
-    function bindHoldKey(btnId, keyName) {
-      const el = document.getElementById(btnId);
-      if (!el) return;
-      const on = (e) => { e.preventDefault(); try { el.setPointerCapture(e.pointerId); } catch {} keys[keyName] = true; el.classList.add('pressed'); };
-      const off = () => { keys[keyName] = false; el.classList.remove('pressed'); };
-      el.addEventListener('pointerdown', on);
-      el.addEventListener('pointerup', off);
-      el.addEventListener('pointercancel', off);
-      el.addEventListener('lostpointercapture', off);
-    }
-    bindHoldKey('btn-steer-left', 'left');
-    bindHoldKey('btn-gas', 'up');
-    bindHoldKey('btn-steer-right', 'right');
 
     // Optional Music Toggle
     document.getElementById('btn-music').addEventListener('click', () => {

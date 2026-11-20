@@ -129,7 +129,7 @@
       </div>
 
       <!-- Bottom-Right Peeking / Spying Character & Speech Bubble (safe-area aware) -->
-      <div id="mate-box" class="absolute bottom-[calc(env(safe-area-inset-bottom,0px)+84px)] right-0 flex items-end gap-0.5 pointer-events-none transition-all duration-300 ease-out translate-x-[120%] opacity-0 z-10">
+      <div id="mate-box" class="absolute bottom-[calc(env(safe-area-inset-bottom,0px)+108px)] right-0 flex items-end gap-0.5 pointer-events-none transition-all duration-300 ease-out translate-x-[120%] opacity-0 z-10">
         <div class="relative max-w-[175px] sm:max-w-[195px] slab-panel px-2 py-1 text-[9.5px] leading-tight mb-1.5">
           <div class="flex items-center justify-between gap-1 font-extrabold text-amber-800 text-[8.5px] uppercase tracking-wide mb-0.5">
             <span id="mate-speaker" class="truncate">🧢 Chidi</span>
@@ -176,8 +176,8 @@
         </div>
       </div>
 
-      <!-- Bottom-Left Instrument Stack: Speedometer directly over Route Minimap (safe-area raised) -->
-      <div class="absolute bottom-[calc(env(safe-area-inset-bottom,0px)+20px)] left-2.5 flex flex-col items-start gap-1 pointer-events-none">
+      <!-- Bottom-Left Instrument Stack: Speedometer directly over Route Minimap (clear of Android nav bar) -->
+      <div class="absolute bottom-[calc(env(safe-area-inset-bottom,0px)+52px)] left-2.5 flex flex-col items-start gap-1 pointer-events-none">
         <div class="flex items-baseline gap-1 pl-1">
           <span id="hud-speed" class="spd-outline text-2xl tabular-nums leading-none">0</span>
           <span class="spd-outline text-xs">km/h</span>
@@ -187,8 +187,8 @@
         </div>
       </div>
 
-      <!-- Bottom-Right Thumb Cluster: Horn, Hop, Reverse & 3-Point U-Turn (safe-area raised) -->
-      <div class="absolute bottom-[calc(env(safe-area-inset-bottom,0px)+20px)] right-2.5 flex items-end gap-1 pointer-events-auto z-10">
+      <!-- Bottom-Right Thumb Cluster: Horn, Hop, Reverse & 3-Point U-Turn (clear of Android nav bar) -->
+      <div class="absolute bottom-[calc(env(safe-area-inset-bottom,0px)+52px)] right-2.5 flex items-end gap-1 pointer-events-auto z-10">
         <button id="btn-horn-pad" type="button" title="Honk Danfo Horn (H)"
           class="slab-btn w-10 h-10 sm:w-11 sm:h-11 bg-gradient-to-b from-[#fff8ec] to-[#fde047] text-[#14233b] text-base flex items-center justify-center">
           📯
@@ -4028,15 +4028,18 @@
         const busLat = Math.abs(toBusX * trx + toBusZ * trz);
         let mustBrake = busAhead > -2 && busAhead < 12 && busLat < 2.6;
 
-        // Traffic Mode ON: obey 3D intersection traffic lights!
+        // Traffic Mode ON: all vehicles obey upcoming 3D intersection traffic lights!
         if (trafficMode) {
           const isNS = Math.abs(tfz) > 0.5;
           const redForMe = isNS ? !nsGreen : nsGreen;
           if (redForMe) {
-            const nextGx = Math.round(tc.x / CELL);
-            const nextGz = Math.round(tc.z / CELL);
+            let nextGx = Math.round(tc.x / CELL), nextGz = Math.round(tc.z / CELL);
+            if ((nextGx * CELL - tc.x) * tfx + (nextGz * CELL - tc.z) * tfz < 0) {
+              nextGx += Math.round(tfx);
+              nextGz += Math.round(tfz);
+            }
             const distToNode = (nextGx * CELL - tc.x) * tfx + (nextGz * CELL - tc.z) * tfz;
-            if (distToNode > ROAD_HALF + 2.0 && distToNode < ROAD_HALF + 16.0) {
+            if (distToNode > ROAD_HALF + 1.5 && distToNode < ROAD_HALF + 20.0) {
               mustBrake = true;
             }
           }

@@ -4676,7 +4676,7 @@
         const relAng = wrapAngle(camHeading, angToStop);
         const distM = Math.round(Math.hypot(activeStop.x - bus.x, activeStop.z - bus.z));
         hudCtx.save();
-        hudCtx.translate(W * 0.5, 76);
+        hudCtx.translate(W * 0.5, 116);
         hudCtx.rotate(relAng);
         hudCtx.fillStyle = activeStop.kind === 'pickup' ? '#46d27a' : '#ffb347';
         hudCtx.strokeStyle = '#14233b';
@@ -4695,7 +4695,7 @@
         hudCtx.font = '800 11px system-ui, sans-serif';
         hudCtx.textAlign = 'center';
         hudCtx.fillStyle = '#14233b';
-        hudCtx.fillText(`${activeStop.kind === 'pickup' ? 'PICKUP' : 'DROP-OFF'} • ${distM}m`, W * 0.5, 104);
+        hudCtx.fillText(`${activeStop.kind === 'pickup' ? 'PICKUP' : 'DROP-OFF'} • ${distM}m`, W * 0.5, 144);
         hudCtx.restore();
       }
 

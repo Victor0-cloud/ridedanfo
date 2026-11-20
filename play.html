@@ -3185,6 +3185,10 @@
         window.location.href = './aburi_mountain.html?leg=' + (ch.id === 'aburi' ? '10' : '10b');
         return;
       }
+      if (ch.id === 'usa' || ch.id === 'usa_dc') {
+        window.location.href = './usa/index.html?route=' + (ch.id === 'usa' ? 'lenox' : 'i85');
+        return;
+      }
       campaign.tripsInChapter = 0;
       campaign.midSpoken = false;
       campaign.checkpointShown = false;

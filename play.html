@@ -187,8 +187,12 @@
         </div>
       </div>
 
-      <!-- Bottom-Right Thumb Cluster: Horn, Hop, Reverse & 3-Point U-Turn (clear of Android nav bar) -->
+      <!-- Bottom-Right Thumb Cluster: Turbo (Pro), Horn, Hop, Reverse & 3-Point U-Turn (clear of Android nav bar) -->
       <div class="absolute bottom-[calc(env(safe-area-inset-bottom,0px)+52px)] right-2.5 flex items-end gap-1 pointer-events-auto z-10">
+        <button id="btn-turbo" type="button" title="Turbo Power Boost — Pro Feature (T)"
+          class="slab-btn w-10 h-10 sm:w-11 sm:h-11 bg-gradient-to-b from-[#e0f2fe] to-[#7dd3fc] text-[#0c4a6e] text-base flex items-center justify-center">
+          ⚡
+        </button>
         <button id="btn-horn-pad" type="button" title="Honk Danfo Horn (H)"
           class="slab-btn w-10 h-10 sm:w-11 sm:h-11 bg-gradient-to-b from-[#fff8ec] to-[#fde047] text-[#14233b] text-base flex items-center justify-center">
           📯
@@ -2491,10 +2495,19 @@
       steer:  { level: 0, max: 3, cost: [1400, 3200, 6000], name: 'Power Steering Rack', desc: 'Tighter corner radius & quick U-turn' }
     };
 
+    let turboOn = false;
+    function isTurboUnlocked() {
+      try {
+        return localStorage.getItem('rideDanfoTestMode') === '1' ||
+          ['pro', 'vip'].includes(localStorage.getItem('rideDanfoTier') || 'free');
+      } catch { return false; }
+    }
+
     function getBusStats() {
+      const turboActive = turboOn && isTurboUnlocked();
       return {
-        speedMax: 46 + upgrades.engine.level * 7,
-        accelMax: 24 + upgrades.engine.level * 5,
+        speedMax: (46 + upgrades.engine.level * 7) * (turboActive ? 1.75 : 1),
+        accelMax: (24 + upgrades.engine.level * 5) * (turboActive ? 2.0 : 1),
         brakeMax: 54,
         capacity: 5 + upgrades.seats.level * 2,
         fuelMax: 100 + upgrades.tank.level * 35,
@@ -4437,6 +4450,28 @@
     document.getElementById('btn-hop').addEventListener('click', () => {
       triggerDanfoHop();
     });
+    const btnTurbo = document.getElementById('btn-turbo');
+    function syncTurboBtn() {
+      if (!btnTurbo) return;
+      const active = turboOn && isTurboUnlocked();
+      btnTurbo.className = active
+        ? 'slab-btn w-10 h-10 sm:w-11 sm:h-11 bg-gradient-to-b from-[#fef08a] via-[#fb923c] to-[#ea580c] text-[#431407] text-base flex items-center justify-center ring-2 ring-amber-300 shadow-[0_0_14px_rgba(251,146,60,0.85)]'
+        : 'slab-btn w-10 h-10 sm:w-11 sm:h-11 bg-gradient-to-b from-[#e0f2fe] to-[#7dd3fc] text-[#0c4a6e] text-base flex items-center justify-center';
+      btnTurbo.title = isTurboUnlocked()
+        ? `Turbo Boost: ${active ? 'ON' : 'OFF'} (T)`
+        : 'Turbo Power Boost — Pro Feature (T)';
+    }
+    function toggleTurbo() {
+      if (!isTurboUnlocked()) {
+        turboOn = false;
+        syncTurboBtn();
+        openPaywall('Turbo Power Boost (Pro)');
+        return;
+      }
+      turboOn = !turboOn;
+      syncTurboBtn();
+    }
+    btnTurbo?.addEventListener('click', toggleTurbo);
 
     // Weather Cycle Toggle (Auto / Rain / Snow / Fog / Dust / Breeze / Clear)
     document.getElementById('btn-weather').addEventListener('click', () => {
@@ -4686,6 +4721,7 @@
       if (e.code === 'Space' && !e.repeat) { e.preventDefault(); triggerDanfoHop(); }
       if (k === 'm' && !e.repeat) MusicPlayer.toggle();
       if (k === 'v' && !e.repeat) WeatherSystem.cycle(STORY_CHAPTERS[currentChapterIdx]);
+      if (k === 't' && !e.repeat) toggleTurbo();
     });
     window.addEventListener('keyup', e => {
       const k = e.key.toLowerCase();

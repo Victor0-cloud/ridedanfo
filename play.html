@@ -3903,9 +3903,13 @@
         for (const tc of traffic) {
           const dx = tc.x - bus.x, dz = tc.z - bus.z;
           const ahead = dx * Math.sin(bus.heading) + dz * -Math.cos(bus.heading);
-          const lat = Math.abs(dx * Math.cos(bus.heading) + dz * Math.sin(bus.heading));
+          const latSigned = dx * Math.cos(bus.heading) + dz * Math.sin(bus.heading);
+          const lat = Math.abs(latSigned);
           if (ahead > 0 && ahead < 13 && lat < 2.1) {
-            targetSpeed = Math.min(targetSpeed, Math.max(0, (ahead - 4.8) * 2.4));
+            targetSpeed = Math.min(targetSpeed, Math.max(3.5, (ahead - 4.8) * 2.4));
+            if (autoDriveEnabled && ahead < 10) {
+              bus.kerbBias = (latSigned >= 0 ? -1 : 1) * ROAD_HALF * 0.32;
+            }
           }
         }
       } else {
@@ -4041,8 +4045,9 @@
           bus.z += (dz / dist) * push * 0.6;
           tc.x -= (dx / dist) * push * 0.4;
           tc.z -= (dz / dist) * push * 0.4;
-          bus.speed = 0;
-          tc.curSpeed = 0;
+          bus.speed = Math.min(bus.speed, 6);
+          tc.curSpeed = Math.max(4, tc.curSpeed * 0.5);
+          tc.bypassUntil = now + 2200;
         }
       }
 

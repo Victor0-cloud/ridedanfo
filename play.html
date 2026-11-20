@@ -2149,29 +2149,29 @@
         group.add(dNS, dEW);
       }
 
-      // Street lights along the roads on every block + pole colliders
+      // Street lights along the roads on every block + pole colliders (set back on sidewalk so kerb pickups don't clip)
       for (const lz of [z0 + 8, cz, z1 - 8]) {
         const lampL = createStreetLightMesh(-1);
-        lampL.position.set(x0 + 0.6, 0.2, lz);
+        lampL.position.set(x0 + 1.05, 0.2, lz);
         const lampR = createStreetLightMesh(1);
-        lampR.position.set(x1 - 0.6, 0.2, lz);
+        lampR.position.set(x1 - 1.05, 0.2, lz);
         group.add(lampL, lampR);
-        poleColliders.push({ x: x0 + 0.6, z: lz }, { x: x1 - 0.6, z: lz });
+        poleColliders.push({ x: x0 + 1.05, z: lz }, { x: x1 - 1.05, z: lz });
       }
       // 3D Intersection Traffic Light Post (active when Traffic Mode is ON)
       const tlPost = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.12, 4.4, 8), MAT.darkSteel);
-      tlPost.position.set(x0 + 0.8, 2.2, z0 + 0.8);
+      tlPost.position.set(x0 + 1.15, 2.2, z0 + 1.15);
       const tlBox = new THREE.Mesh(new THREE.BoxGeometry(0.45, 0.95, 0.45), MAT.tire);
-      tlBox.position.set(x0 + 0.8, 4.3, z0 + 0.8);
+      tlBox.position.set(x0 + 1.15, 4.3, z0 + 1.15);
       const nsMat = new THREE.MeshBasicMaterial({ color: 0x22c55e });
       const ewMat = new THREE.MeshBasicMaterial({ color: 0xef4444 });
       const nsBulb = new THREE.Mesh(new THREE.BoxGeometry(0.24, 0.24, 0.48), nsMat);
-      nsBulb.position.set(x0 + 0.8, 4.3, z0 + 0.8);
+      nsBulb.position.set(x0 + 1.15, 4.3, z0 + 1.15);
       const ewBulb = new THREE.Mesh(new THREE.BoxGeometry(0.48, 0.24, 0.24), ewMat);
-      ewBulb.position.set(x0 + 0.8, 4.3, z0 + 0.8);
+      ewBulb.position.set(x0 + 1.15, 4.3, z0 + 1.15);
       group.add(tlPost, tlBox, nsBulb, ewBulb);
-      poleColliders.push({ x: x0 + 0.8, z: z0 + 0.8 });
-      trafficLightLamps.push({ x: x0 + 0.8, z: z0 + 0.8, nsMat, ewMat });
+      poleColliders.push({ x: x0 + 1.15, z: z0 + 1.15 });
+      trafficLightLamps.push({ x: x0 + 1.15, z: z0 + 1.15, nsMat, ewMat });
 
       // Every route spawns its physical 3D town landmarks, market stalls, Don P Hotel, or border plazas!
       const hasLandmark = ((qx + qz) & 1) === 0;
@@ -4011,16 +4011,21 @@
 
       confineBusToRoadCorridors();
 
-      // Bus vs. Streetlight / Traffic Light Poles (stop on collision unless hopping over!)
+      // Bus vs. Streetlight / Traffic Light Poles (deflect & slide smoothly so bus never wedges at 0 km/h)
       if (bus.hopY <= 0.6) {
+        const bfx = Math.sin(bus.heading), bfz = -Math.cos(bus.heading);
         for (const p of poleColliders) {
           const pdx = bus.x - p.x, pdz = bus.z - p.z;
           const pDist = Math.hypot(pdx, pdz);
-          if (pDist > 0.001 && pDist < 1.45) {
-            const push = 1.45 - pDist;
-            bus.x += (pdx / pDist) * push;
-            bus.z += (pdz / pDist) * push;
-            bus.speed = 0;
+          if (pDist > 0.001 && pDist < 1.35) {
+            const nx = pdx / pDist, nz = pdz / pDist;
+            const push = 1.35 - pDist;
+            bus.x += nx * push;
+            bus.z += nz * push;
+            // Deflect heading slightly away from the pole so the bus glides past instead of wedging
+            const cross = bfx * (-nz) - bfz * (-nx);
+            bus.heading += (cross >= 0 ? -1 : 1) * Math.min(0.22, 3.5 * dt);
+            bus.speed = Math.min(bus.speed, 8);
           }
         }
       }

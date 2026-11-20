@@ -81,53 +81,55 @@
       <canvas id="webgl-canvas" class="block w-full h-full cursor-grab active:cursor-grabbing" style="touch-action: none;"></canvas>
       <canvas id="hud-canvas" class="absolute inset-0 block w-full h-full pointer-events-none"></canvas>
 
-      <!-- Top-Left HUD: Money, Fuel, Seats & Reputation -->
-      <div class="absolute top-2.5 left-2.5 flex flex-col gap-1.5 pointer-events-none">
-        <div id="money-panel" class="slab-panel px-3 py-1 flex items-center gap-2 text-sm tabular-nums">
-          <span>💰</span>
-          <span id="hud-cash" class="text-base">₦5,000</span>
+      <!-- Aligned Top HUD Row: Left Stats + Right Action Bar (No overlap on portrait phones, safe-area aware) -->
+      <div class="absolute inset-x-2 top-[calc(env(safe-area-inset-top,0px)+6px)] flex flex-wrap items-start justify-between gap-1.5 pointer-events-none z-10">
+        <div class="flex flex-wrap items-center gap-1">
+          <div id="money-panel" class="slab-panel px-2 py-0.5 flex items-center gap-1 text-xs tabular-nums">
+            <span>💰</span>
+            <span id="hud-cash" class="text-xs sm:text-sm font-black">₦5,000</span>
+          </div>
+          <div id="fuel-panel" class="slab-panel px-2 py-0.5 flex items-center gap-1 text-[11px] tabular-nums">
+            <span>⛽</span><span id="hud-fuel" class="font-black">100</span><span class="opacity-60">L</span>
+            <span class="opacity-30">|</span>
+            <span>🪑</span><span id="hud-seats" class="font-black">0/6</span>
+          </div>
         </div>
-        <div id="fuel-panel" class="slab-panel px-3 py-1 flex items-center gap-2 text-xs tabular-nums">
-          <span>⛽</span>
-          <span id="hud-fuel" class="text-sm">100</span>
-          <span class="opacity-60">L</span>
-          <span class="mx-0.5 opacity-30">|</span>
-          <span>🪑</span>
-          <span id="hud-seats" class="text-sm">0/6</span>
+
+        <div class="flex flex-wrap items-center justify-end gap-1 pointer-events-auto ml-auto">
+          <button id="btn-traffic" type="button" title="Toggle Organized Traffic Lights (OFF = Wild Lagos Traffic)"
+            class="slab-btn px-1.5 py-0.5 bg-gradient-to-b from-[#fff8ec] to-[#ffe7bd] text-[#14233b] text-[10px] sm:text-[11px] flex items-center gap-1">
+            <span>🚦</span><span id="traffic-lbl">Traffic: OFF</span>
+          </button>
+          <button id="btn-weather" type="button" title="Cycle Weather (V)"
+            class="slab-btn px-1.5 py-0.5 bg-gradient-to-b from-[#e0f2fe] to-[#bae6fd] text-[#0c4a6e] text-[10px] sm:text-[11px] flex items-center gap-1">
+            <span id="weather-ico">🌦️</span><span id="weather-lbl">Auto</span>
+          </button>
+          <button id="btn-music" type="button" title="Toggle Regional Music (M)"
+            class="slab-btn px-1.5 py-0.5 bg-gradient-to-b from-[#fff8ec] to-[#ffe7bd] text-[#14233b] text-[10px] sm:text-[11px] flex items-center gap-1">
+            <span>🎵</span><span id="music-lbl">Music: OFF</span>
+          </button>
+          <button id="btn-routes" type="button" title="Story & Routes"
+            class="slab-btn px-1.5 py-0.5 bg-gradient-to-b from-[#c3cfe4] to-[#94a6c6] text-[#14233b] text-[10px] sm:text-[11px] flex items-center gap-1">
+            <span>🗺️</span><span>Routes</span>
+          </button>
+          <button id="btn-event" type="button" title="Open 3D Border / Finale Scene"
+            class="slab-btn px-1.5 py-0.5 bg-gradient-to-b from-[#fde047] to-[#f59e0b] text-[#14233b] text-[10px] sm:text-[11px] hidden items-center gap-1">
+            <span>🛂</span><span>Border</span>
+          </button>
+          <button id="btn-autodrive" type="button" class="slab-btn px-1.5 py-0.5 bg-gradient-to-b from-[#7ff0a8] to-[#46d27a] text-[#08351a] text-[10px] sm:text-[11px] flex items-center gap-1">
+            <span>🎬</span><span id="autodrive-lbl">Auto-Drive: ON</span>
+          </button>
+          <button id="btn-shop" type="button" class="slab-btn px-1.5 py-0.5 bg-gradient-to-b from-[#ffd27a] to-[#ffb347] text-[#2a1800] text-[10px] sm:text-[11px] flex items-center gap-1">
+            <span>🔧</span><span>Garage</span>
+          </button>
+          <button id="btn-horn" type="button" title="Honk Horn (H)" class="slab-btn w-6 h-6 bg-gradient-to-b from-[#fff8ec] to-[#ffe7bd] text-[#14233b] text-[11px] flex items-center justify-center">
+            📯
+          </button>
         </div>
       </div>
 
-      <!-- Top-Right Action Bar: Optional Music Toggle, Routes/Story Selector, Event Card, Auto-Drive, Garage & Horn -->
-      <div class="absolute top-2.5 right-2.5 max-w-[calc(100%-130px)] flex flex-wrap items-center justify-end gap-1 pointer-events-auto">
-        <button id="btn-weather" type="button" title="Cycle Weather: Auto / Rain / Snow / Fog / Dust / Breeze / Clear (V)"
-          class="slab-btn px-2 py-1 bg-gradient-to-b from-[#e0f2fe] to-[#bae6fd] text-[#0c4a6e] text-[11px] flex items-center gap-1">
-          <span id="weather-ico">🌦️</span><span id="weather-lbl">Auto</span>
-        </button>
-        <button id="btn-music" type="button" title="Toggle Optional Regional Music (Nigeria / Ghana / USA)"
-          class="slab-btn px-2 py-1 bg-gradient-to-b from-[#fff8ec] to-[#ffe7bd] text-[#14233b] text-[11px] flex items-center gap-1">
-          <span>🎵</span><span id="music-lbl">Music: OFF</span>
-        </button>
-        <button id="btn-routes" type="button" title="Switch Story Chapter & Route (Lagos → Ghana → Atlanta → The White House)"
-          class="slab-btn px-2 py-1 bg-gradient-to-b from-[#c3cfe4] to-[#94a6c6] text-[#14233b] text-[11px] flex items-center gap-1">
-          <span>🗺️</span><span>Story / Routes</span>
-        </button>
-        <button id="btn-event" type="button" title="Open 3D Border / Finale Scene"
-          class="slab-btn px-2 py-1 bg-gradient-to-b from-[#fde047] to-[#f59e0b] text-[#14233b] text-[11px] hidden items-center gap-1">
-          <span>🛂</span><span>Border Scene</span>
-        </button>
-        <button id="btn-autodrive" type="button" class="slab-btn px-2 py-1 bg-gradient-to-b from-[#7ff0a8] to-[#46d27a] text-[#08351a] text-[11px] flex items-center gap-1">
-          <span>🎬</span><span id="autodrive-lbl">Auto-Drive: ON</span>
-        </button>
-        <button id="btn-shop" type="button" class="slab-btn px-2 py-1 bg-gradient-to-b from-[#ffd27a] to-[#ffb347] text-[#2a1800] text-[11px] flex items-center gap-1">
-          <span>🔧</span><span>Garage</span>
-        </button>
-        <button id="btn-horn" type="button" title="Honk Horn (H)" class="slab-btn w-7 h-7 bg-gradient-to-b from-[#fff8ec] to-[#ffe7bd] text-[#14233b] text-xs flex items-center justify-center">
-          📯
-        </button>
-      </div>
-
-      <!-- Bottom-Right Peeking / Spying Character & Speech Bubble (hidden when idle, pops out only when needed!) -->
-      <div id="mate-box" class="absolute bottom-16 right-0 flex items-end gap-0.5 pointer-events-none transition-all duration-300 ease-out translate-x-[120%] opacity-0 z-10">
+      <!-- Bottom-Right Peeking / Spying Character & Speech Bubble (safe-area aware) -->
+      <div id="mate-box" class="absolute bottom-[calc(env(safe-area-inset-bottom,0px)+84px)] right-0 flex items-end gap-0.5 pointer-events-none transition-all duration-300 ease-out translate-x-[120%] opacity-0 z-10">
         <div class="relative max-w-[175px] sm:max-w-[195px] slab-panel px-2 py-1 text-[9.5px] leading-tight mb-1.5">
           <div class="flex items-center justify-between gap-1 font-extrabold text-amber-800 text-[8.5px] uppercase tracking-wide mb-0.5">
             <span id="mate-speaker" class="truncate">🧢 Chidi</span>
@@ -174,33 +176,43 @@
         </div>
       </div>
 
-      <!-- Bottom-Left Instrument Stack: Speedometer directly over Route Minimap -->
-      <div class="absolute bottom-2.5 left-2.5 flex flex-col items-start gap-1 pointer-events-none">
+      <!-- Bottom-Left Instrument Stack: Speedometer directly over Route Minimap (safe-area raised) -->
+      <div class="absolute bottom-[calc(env(safe-area-inset-bottom,0px)+20px)] left-2.5 flex flex-col items-start gap-1 pointer-events-none">
         <div class="flex items-baseline gap-1 pl-1">
           <span id="hud-speed" class="spd-outline text-2xl tabular-nums leading-none">0</span>
           <span class="spd-outline text-xs">km/h</span>
         </div>
-        <div class="w-[90px] h-[90px] rounded-xl border-[3px] border-[#14233b] bg-[#d5dfb8] shadow-[0_4px_0_#0a1526] overflow-hidden relative">
+        <div class="w-[78px] h-[78px] sm:w-[90px] sm:h-[90px] rounded-xl border-[3px] border-[#14233b] bg-[#d5dfb8] shadow-[0_4px_0_#0a1526] overflow-hidden relative">
           <canvas id="minimap-canvas" width="90" height="90" class="block w-full h-full"></canvas>
         </div>
       </div>
 
-      <!-- Bottom-Right Thumb Cluster: Horn, Hop, Reverse & 3-Point U-Turn -->
-      <div class="absolute bottom-2.5 right-2.5 flex items-end gap-1.5 pointer-events-auto">
+      <!-- On-Screen Touch Steering Arrow Console (always visible on touch/mobile, safe-area raised) -->
+      <div id="touch-arrows" class="absolute bottom-[calc(env(safe-area-inset-bottom,0px)+20px)] left-[92px] sm:left-1/2 sm:-translate-x-1/2 flex items-center gap-1 pointer-events-auto z-10">
+        <button id="btn-steer-left" type="button" title="Steer Left (A)"
+          class="slab-btn w-10 h-10 sm:w-11 sm:h-11 bg-gradient-to-b from-[#fff8ec] to-[#e2e8f0] text-[#14233b] text-base font-black flex items-center justify-center">◀</button>
+        <button id="btn-gas" type="button" title="Drive Forward (W)"
+          class="slab-btn w-10 h-10 sm:w-11 sm:h-11 bg-gradient-to-b from-[#bbf7d0] to-[#46d27a] text-[#08351a] text-base font-black flex items-center justify-center">▲</button>
+        <button id="btn-steer-right" type="button" title="Steer Right (D)"
+          class="slab-btn w-10 h-10 sm:w-11 sm:h-11 bg-gradient-to-b from-[#fff8ec] to-[#e2e8f0] text-[#14233b] text-base font-black flex items-center justify-center">▶</button>
+      </div>
+
+      <!-- Bottom-Right Thumb Cluster: Horn, Hop, Reverse & 3-Point U-Turn (safe-area raised) -->
+      <div class="absolute bottom-[calc(env(safe-area-inset-bottom,0px)+20px)] right-2.5 flex items-end gap-1 pointer-events-auto z-10">
         <button id="btn-horn-pad" type="button" title="Honk Danfo Horn (H)"
-          class="slab-btn w-11 h-11 bg-gradient-to-b from-[#fff8ec] to-[#fde047] text-[#14233b] text-lg flex items-center justify-center">
+          class="slab-btn w-10 h-10 sm:w-11 sm:h-11 bg-gradient-to-b from-[#fff8ec] to-[#fde047] text-[#14233b] text-base flex items-center justify-center">
           📯
         </button>
         <button id="btn-hop" type="button" title="Hop Danfo (Space)"
-          class="slab-btn w-11 h-11 bg-gradient-to-b from-[#d9f99d] to-[#84cc16] text-[#1a2e05] text-lg flex items-center justify-center">
+          class="slab-btn w-10 h-10 sm:w-11 sm:h-11 bg-gradient-to-b from-[#d9f99d] to-[#84cc16] text-[#1a2e05] text-base flex items-center justify-center">
           🦘
         </button>
         <button id="btn-rev" type="button" title="Hold to Reverse / Brake"
-          class="slab-btn w-11 h-11 bg-gradient-to-b from-[#fff4f1] to-[#ffd3ca] text-[#a82d1b] text-lg flex items-center justify-center">
+          class="slab-btn w-10 h-10 sm:w-11 sm:h-11 bg-gradient-to-b from-[#fff4f1] to-[#ffd3ca] text-[#a82d1b] text-base flex items-center justify-center">
           ▼
         </button>
         <button id="btn-uturn" type="button" title="3-Point U-Turn (Hold & drag to steer)"
-          class="slab-btn w-11 h-11 bg-gradient-to-b from-[#f7f2ff] to-[#dccdff] text-[#52349f] text-xl flex items-center justify-center">
+          class="slab-btn w-10 h-10 sm:w-11 sm:h-11 bg-gradient-to-b from-[#f7f2ff] to-[#dccdff] text-[#52349f] text-lg flex items-center justify-center">
           <span style="display:inline-block; transform: scaleX(-1);">↶</span>
         </button>
       </div>
@@ -208,12 +220,15 @@
       <!-- Motor Park & Route Selector Modal (ALL ROUTES / NIGERIA / GHANA / ATLANTA / USA) -->
       <div id="routes-modal" class="absolute inset-0 bg-[#0a1526]/80 z-30 hidden items-center justify-center p-2.5">
         <div class="slab-panel w-full max-w-lg p-3 space-y-2 pointer-events-auto max-h-[378px] flex flex-col">
-          <div class="flex items-center justify-between border-b-2 border-[#14233b]/15 pb-1.5">
-            <div>
-              <div class="text-sm font-black">🗺️ Motor Park: Lagos to The White House (14 Chained Legs)</div>
-              <div class="text-[11px] font-semibold opacity-75">Filter by region or drive the full linked journey</div>
+          <div class="flex items-center justify-between border-b-2 border-[#14233b]/15 pb-1.5 gap-2">
+            <div class="min-w-0">
+              <div class="text-sm font-black truncate">🗺️ Motor Park: Lagos to The White House (14 Chained Legs)</div>
+              <div class="text-[11px] font-semibold opacity-75">Filter by region or enable Test Mode to preview any route</div>
             </div>
-            <button id="btn-routes-close" type="button" class="slab-btn w-7 h-7 bg-[#fff8ec] text-xs flex items-center justify-center">✕</button>
+            <div class="flex items-center gap-1.5 shrink-0">
+              <button id="btn-test-mode" type="button" class="slab-btn px-2 py-1 bg-[#fff8ec] text-[#14233b] text-[10px] font-black">🧪 Test Mode: OFF</button>
+              <button id="btn-routes-close" type="button" class="slab-btn w-7 h-7 bg-[#fff8ec] text-xs flex items-center justify-center">✕</button>
+            </div>
           </div>
           <div id="route-tabs" class="flex flex-wrap items-center gap-1">
             <button type="button" data-tab="ALL" class="slab-btn px-2.5 py-1 text-[11px] bg-[#14233b] text-white">ALL ROUTES (14)</button>
@@ -2036,6 +2051,8 @@
     let currentChapterIdx = 0;
     const blockGroups = new Map();
     const servicePads = [];
+    const poleColliders = [];
+    const trafficLightLamps = [];
 
     const DASH_MAT = new THREE.MeshBasicMaterial({ color: 0xfacc15 });
     const ROOF_MAT_CACHE = new Map();
@@ -2052,6 +2069,8 @@
       }
       blockGroups.clear();
       servicePads.length = 0;
+      poleColliders.length = 0;
+      trafficLightLamps.length = 0;
       activePresidentPerformers.length = 0;
     }
 
@@ -2072,6 +2091,16 @@
       for (let i = servicePads.length - 1; i >= 0; i--) {
         if (Math.hypot(servicePads[i].x - bus.x, servicePads[i].z - bus.z) > 320) {
           servicePads.splice(i, 1);
+        }
+      }
+      for (let i = poleColliders.length - 1; i >= 0; i--) {
+        if (Math.hypot(poleColliders[i].x - bus.x, poleColliders[i].z - bus.z) > 320) {
+          poleColliders.splice(i, 1);
+        }
+      }
+      for (let i = trafficLightLamps.length - 1; i >= 0; i--) {
+        if (Math.hypot(trafficLightLamps[i].x - bus.x, trafficLightLamps[i].z - bus.z) > 320) {
+          trafficLightLamps.splice(i, 1);
         }
       }
       // Collect missing blocks in a 2-cell lookahead window & build at most 1 per frame (zero hitch!)
@@ -2126,14 +2155,29 @@
         group.add(dNS, dEW);
       }
 
-      // Street lights along the roads on every block (Victor's Look Rule)
+      // Street lights along the roads on every block + pole colliders
       for (const lz of [z0 + 8, cz, z1 - 8]) {
         const lampL = createStreetLightMesh(-1);
         lampL.position.set(x0 + 0.6, 0.2, lz);
         const lampR = createStreetLightMesh(1);
         lampR.position.set(x1 - 0.6, 0.2, lz);
         group.add(lampL, lampR);
+        poleColliders.push({ x: x0 + 0.6, z: lz }, { x: x1 - 0.6, z: lz });
       }
+      // 3D Intersection Traffic Light Post (active when Traffic Mode is ON)
+      const tlPost = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.12, 4.4, 8), MAT.darkSteel);
+      tlPost.position.set(x0 + 0.8, 2.2, z0 + 0.8);
+      const tlBox = new THREE.Mesh(new THREE.BoxGeometry(0.45, 0.95, 0.45), MAT.tire);
+      tlBox.position.set(x0 + 0.8, 4.3, z0 + 0.8);
+      const nsMat = new THREE.MeshBasicMaterial({ color: 0x22c55e });
+      const ewMat = new THREE.MeshBasicMaterial({ color: 0xef4444 });
+      const nsBulb = new THREE.Mesh(new THREE.BoxGeometry(0.24, 0.24, 0.48), nsMat);
+      nsBulb.position.set(x0 + 0.8, 4.3, z0 + 0.8);
+      const ewBulb = new THREE.Mesh(new THREE.BoxGeometry(0.48, 0.24, 0.24), ewMat);
+      ewBulb.position.set(x0 + 0.8, 4.3, z0 + 0.8);
+      group.add(tlPost, tlBox, nsBulb, ewBulb);
+      poleColliders.push({ x: x0 + 0.8, z: z0 + 0.8 });
+      trafficLightLamps.push({ x: x0 + 0.8, z: z0 + 0.8, nsMat, ewMat });
 
       // Every route spawns its physical 3D town landmarks, market stalls, Don P Hotel, or border plazas!
       const hasLandmark = ((qx + qz) & 1) === 0;
@@ -2442,6 +2486,7 @@
 
     const stick = createStick();
     let autoDriveEnabled = true;
+    let trafficMode = false; // OFF = wild Lagos traffic (default), ON = organized traffic obeying lights
     let lastHeldSteer = 0;
     let lastReleaseTime = -1e9;
     let flickSteer = 0;
@@ -3947,10 +3992,24 @@
 
       confineBusToRoadCorridors();
 
+      // Bus vs. Streetlight / Traffic Light Poles (stop on collision unless hopping over!)
+      if (bus.hopY <= 0.6) {
+        for (const p of poleColliders) {
+          const pdx = bus.x - p.x, pdz = bus.z - p.z;
+          const pDist = Math.hypot(pdx, pdz);
+          if (pDist > 0.001 && pDist < 1.45) {
+            const push = 1.45 - pDist;
+            bus.x += (pdx / pDist) * push;
+            bus.z += (pdz / pDist) * push;
+            bus.speed = 0;
+          }
+        }
+      }
+
       for (const tc of traffic) {
         if (bus.hopY > 0.65) continue; // Hop cleanly over cars, trucks & people!
         const dx = bus.x - tc.x, dz = bus.z - tc.z;
-        const minSep = 3.6;
+        const minSep = 3.8;
         const dist = Math.hypot(dx, dz);
         if (dist > 0.001 && dist < minSep) {
           const push = (minSep - dist);
@@ -3958,7 +4017,8 @@
           bus.z += (dz / dist) * push * 0.6;
           tc.x -= (dx / dist) * push * 0.4;
           tc.z -= (dz / dist) * push * 0.4;
-          bus.speed *= 0.85;
+          bus.speed = 0;
+          tc.curSpeed = 0;
         }
       }
 
@@ -3969,6 +4029,7 @@
         stickAskHome(stick, bus.homeAsk, now);
       }
 
+      const nsGreen = Math.floor(now / 8000) % 2 === 0;
       for (const tc of traffic) {
         const tfx = Math.sin(tc.heading), tfz = -Math.cos(tc.heading);
         const trx = Math.cos(tc.heading), trz = Math.sin(tc.heading);
@@ -3977,19 +4038,45 @@
         const busLat = Math.abs(toBusX * trx + toBusZ * trz);
         let mustBrake = busAhead > -2 && busAhead < 12 && busLat < 2.6;
 
-        // Prevent traffic vehicles from merging/jointing into each other
+        // Traffic Mode ON: obey 3D intersection traffic lights!
+        if (trafficMode) {
+          const isNS = Math.abs(tfz) > 0.5;
+          const redForMe = isNS ? !nsGreen : nsGreen;
+          if (redForMe) {
+            const nextGx = Math.round(tc.x / CELL);
+            const nextGz = Math.round(tc.z / CELL);
+            const distToNode = (nextGx * CELL - tc.x) * tfx + (nextGz * CELL - tc.z) * tfz;
+            if (distToNode > ROAD_HALF + 2.0 && distToNode < ROAD_HALF + 16.0) {
+              mustBrake = true;
+            }
+          }
+        }
+
+        // Prevent traffic vehicles from hitting/merging with other cars or poles (stop on hit!)
         for (const other of traffic) {
           if (other === tc) continue;
           const odx = other.x - tc.x, odz = other.z - tc.z;
           const oDist = Math.hypot(odx, odz);
-          if (oDist > 0.001 && oDist < 5.6) {
-            const push = (5.6 - oDist) * 0.5;
+          if (oDist > 0.001 && oDist < 4.5) {
+            const push = (4.5 - oDist) * 0.5;
             tc.x -= (odx / oDist) * push;
             tc.z -= (odz / oDist) * push;
+            tc.curSpeed = 0;
+            mustBrake = true;
           }
           const oAhead = odx * tfx + odz * tfz;
           const oLat = Math.abs(odx * trx + odz * trz);
-          if (oAhead > 0 && oAhead < 13 && oLat < 2.5) {
+          if (oAhead > 0 && oAhead < (trafficMode ? 15 : 10) && oLat < 2.5) {
+            mustBrake = true;
+          }
+        }
+        for (const p of poleColliders) {
+          const pdx = tc.x - p.x, pdz = tc.z - p.z;
+          const pDist = Math.hypot(pdx, pdz);
+          if (pDist > 0.001 && pDist < 1.35) {
+            tc.x += (pdx / pDist) * (1.35 - pDist);
+            tc.z += (pdz / pDist) * (1.35 - pDist);
+            tc.curSpeed = 0;
             mustBrake = true;
           }
         }
@@ -3999,6 +4086,13 @@
         tc.curSpeed += (spd - tc.curSpeed) * Math.min(1, 6 * dt);
         tc.x += tfx * tc.curSpeed * dt;
         tc.z += tfz * tc.curSpeed * dt;
+        // Keep every car strictly off sidewalks & houses
+        const tGx = Math.round(tc.x / CELL), tGz = Math.round(tc.z / CELL);
+        const dRoadX = Math.abs(tc.x - tGx * CELL), dRoadZ = Math.abs(tc.z - tGz * CELL);
+        if (dRoadX > ROAD_HALF - 1.2 && dRoadZ > ROAD_HALF - 1.2) {
+          if (dRoadX < dRoadZ) tc.x = tGx * CELL + Math.sign(tc.x - tGx * CELL) * (ROAD_HALF - 1.2);
+          else tc.z = tGz * CELL + Math.sign(tc.z - tGz * CELL) * (ROAD_HALF - 1.2);
+        }
         tc.wheelSpin += (tc.curSpeed / 0.35) * dt;
 
         if (Math.hypot(tc.x - bus.x, tc.z - bus.z) > 135) {
@@ -4173,6 +4267,32 @@
       WeatherSystem.cycle(STORY_CHAPTERS[currentChapterIdx]);
     });
 
+    // Traffic Mode Toggle (OFF = Wild Lagos Traffic, ON = Organized Traffic Lights)
+    const btnTraffic = document.getElementById('btn-traffic');
+    const lblTraffic = document.getElementById('traffic-lbl');
+    btnTraffic.addEventListener('click', () => {
+      trafficMode = !trafficMode;
+      lblTraffic.textContent = `Traffic: ${trafficMode ? 'ON' : 'OFF'}`;
+      btnTraffic.className = trafficMode
+        ? 'slab-btn px-1.5 py-0.5 bg-gradient-to-b from-[#7ff0a8] to-[#46d27a] text-[#08351a] text-[10px] sm:text-[11px] flex items-center gap-1'
+        : 'slab-btn px-1.5 py-0.5 bg-gradient-to-b from-[#fff8ec] to-[#ffe7bd] text-[#14233b] text-[10px] sm:text-[11px] flex items-center gap-1';
+    });
+
+    // On-screen Steering Arrow Console (always active on touch/mobile & desktop click)
+    function bindHoldKey(btnId, keyName) {
+      const el = document.getElementById(btnId);
+      if (!el) return;
+      const on = (e) => { e.preventDefault(); try { el.setPointerCapture(e.pointerId); } catch {} keys[keyName] = true; el.classList.add('pressed'); };
+      const off = () => { keys[keyName] = false; el.classList.remove('pressed'); };
+      el.addEventListener('pointerdown', on);
+      el.addEventListener('pointerup', off);
+      el.addEventListener('pointercancel', off);
+      el.addEventListener('lostpointercapture', off);
+    }
+    bindHoldKey('btn-steer-left', 'left');
+    bindHoldKey('btn-gas', 'up');
+    bindHoldKey('btn-steer-right', 'right');
+
     // Optional Music Toggle
     document.getElementById('btn-music').addEventListener('click', () => {
       MusicPlayer.toggle();
@@ -4194,6 +4314,26 @@
     const routeTabsEl = document.getElementById('route-tabs');
     let activeRouteTab = 'ALL';
 
+    let testMode = false;
+    try { testMode = localStorage.getItem('rideDanfoTestMode') === '1'; } catch {}
+    const btnTestMode = document.getElementById('btn-test-mode');
+    function syncTestModeBtn() {
+      if (!btnTestMode) return;
+      btnTestMode.textContent = `🧪 Test Mode: ${testMode ? 'ON' : 'OFF'}`;
+      btnTestMode.className = testMode
+        ? 'slab-btn px-2 py-1 bg-[#46d27a] text-[#08351a] text-[10px] font-black'
+        : 'slab-btn px-2 py-1 bg-[#fff8ec] text-[#14233b] text-[10px] font-black';
+    }
+    syncTestModeBtn();
+    if (btnTestMode) {
+      btnTestMode.addEventListener('click', () => {
+        testMode = !testMode;
+        try { localStorage.setItem('rideDanfoTestMode', testMode ? '1' : '0'); } catch {}
+        syncTestModeBtn();
+        renderRoutesModal();
+      });
+    }
+
     const Paywall = {
       getTier() {
         try { return localStorage.getItem('rideDanfoTier') || 'free'; } catch { return 'free'; }
@@ -4207,6 +4347,7 @@
         return 'vip';
       },
       canPlay(idx) {
+        if (testMode) return true;
         const t = this.getTier();
         const req = this.requiredTier(idx);
         if (req === 'free') return true;
@@ -4428,7 +4569,20 @@
       streamCityBlocks(gxCenter, gzCenter);
       bus.miles += Math.abs(bus.speed) * dt * 0.045;
       const milesEl = document.getElementById('hud-miles');
-      if (milesEl) milesEl.textContent = `${bus.miles.toFixed(1)} mi`;
+      if (milesEl) {
+        const isUS = ch.region === 'usa' || ch.region === 'usa_dc';
+        milesEl.textContent = isUS ? `${bus.miles.toFixed(1)} mi` : `${(bus.miles * 1.60934).toFixed(1)} km`;
+      }
+      const nsGreen = Math.floor(now / 8000) % 2 === 0;
+      for (const tl of trafficLightLamps) {
+        if (trafficMode) {
+          tl.nsMat.color.setHex(nsGreen ? 0x22c55e : 0xef4444);
+          tl.ewMat.color.setHex(nsGreen ? 0xef4444 : 0x22c55e);
+        } else {
+          tl.nsMat.color.setHex(0xfacc15);
+          tl.ewMat.color.setHex(0xfacc15);
+        }
+      }
       groundPlane.position.set(bus.x, 0, bus.z);
 
       danfoMesh.root.position.set(bus.x, bus.hopY, bus.z);

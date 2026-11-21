@@ -3632,6 +3632,8 @@
       const qx0 = Math.floor(bus.x / CELL);
       const qz0 = Math.floor(bus.z / CELL);
 
+      // Resolve only the single shallowest exit axis to prevent multi-block intersection snaps
+      let best = null;
       for (let qx = qx0 - 1; qx <= qx0 + 1; qx++) {
         for (let qz = qz0 - 1; qz <= qz0 + 1; qz++) {
           const minX = qx * CELL + ROAD_HALF;
@@ -3651,20 +3653,30 @@
             const penBot = eMaxZ - bus.z;
             const minPenX = Math.min(penLeft, penRight);
             const minPenZ = Math.min(penTop, penBot);
-
-            if (minPenX < minPenZ) {
-              bus.x = penLeft < penRight ? eMinX : eMaxX;
-              const targetH = cosH >= 0 ? 0 : Math.PI;
-              bus.heading += wrapAngle(bus.heading, targetH) * 0.22;
-            } else {
-              bus.z = penTop < penBot ? eMinZ : eMaxZ;
-              const targetH = sinH >= 0 ? Math.PI * 0.5 : -Math.PI * 0.5;
-              bus.heading += wrapAngle(bus.heading, targetH) * 0.22;
+            const pen = Math.min(minPenX, minPenZ);
+            if (!best || pen > best.pen) {
+              best = { pen, minPenX, minPenZ, penLeft, penRight, penTop, penBot, eMinX, eMaxX, eMinZ, eMaxZ };
             }
-            bus.speed *= 0.92;
           }
         }
       }
+      if (!best) return false;
+      const maxStep = 0.55;
+      if (best.minPenX < best.minPenZ) {
+        const targetX = best.penLeft < best.penRight ? best.eMinX : best.eMaxX;
+        const dx = targetX - bus.x;
+        bus.x += Math.sign(dx) * Math.min(Math.abs(dx), maxStep);
+        const targetH = cosH >= 0 ? 0 : Math.PI;
+        bus.heading += wrapAngle(bus.heading, targetH) * 0.22;
+      } else {
+        const targetZ = best.penTop < best.penBot ? best.eMinZ : best.eMaxZ;
+        const dz = targetZ - bus.z;
+        bus.z += Math.sign(dz) * Math.min(Math.abs(dz), maxStep);
+        const targetH = sinH >= 0 ? Math.PI * 0.5 : -Math.PI * 0.5;
+        bus.heading += wrapAngle(bus.heading, targetH) * 0.22;
+      }
+      bus.speed *= 0.92;
+      return true;
     }
 
     function keepPersonOutOfBus(px, pz) {
@@ -3687,6 +3699,9 @@
     }
 
     function gatherInput(now) {
+      if (document.hidden || (typeof document.hasFocus === 'function' && !document.hasFocus())) {
+        resetAllInputs();
+      }
       stickStepHome(stick, now);
       let s = stickSteer(stick);
       if (stick.down) {
@@ -3818,6 +3833,7 @@
 
       if (inWindow && turnDir !== 0 && along < 9.2) {
         bus.turning = true;
+        bus.turnStartedAt = now;
         bus.turnIntent = turnDir < 0 ? 'left' : 'right';
         bus.turnTarget = Math.atan2(Math.sin(snapH + turnDir * Math.PI / 2), Math.cos(snapH + turnDir * Math.PI / 2));
         bus.turnNode = { x: nodeX, z: nodeZ };
@@ -4018,13 +4034,27 @@
         const maxLat = ROAD_HALF - 1.25;
         if (Math.abs(newLat) > maxLat && along > ROAD_HALF) {
           const over = newLat - Math.sign(newLat) * maxLat;
-          bus.x -= rx * over;
-          bus.z -= rz * over;
+          const stepOver = Math.sign(over) * Math.min(Math.abs(over), 5.5 * dt);
+          bus.x -= rx * stepOver;
+          bus.z -= rz * stepOver;
           bus.heading += wrapAngle(bus.heading, snapH) * Math.min(1, 6 * dt);
         }
       }
 
-      confineBusToRoadCorridors();
+      const confinedByWall = confineBusToRoadCorridors();
+      // Abort junction turn-latch if timed out (>1.8s), wall-locked (>0.65s), braked, or steered opposite
+      if (bus.turning) {
+        const turnSign = bus.turnIntent === 'left' ? -1 : 1;
+        const oppositeSteer = Math.abs(inp.steer) > 0.5 && Math.sign(inp.steer) === -turnSign;
+        const timedOut = now - (bus.turnStartedAt || now) > 1800;
+        const wallLocked = confinedByWall && (now - (bus.turnStartedAt || now) > 650);
+        if (timedOut || wallLocked || inp.brake || oppositeSteer) {
+          bus.turning = false;
+          bus.turnIntent = null;
+          bus.turnNode = null;
+          bus.roadHeading = Math.round(bus.heading / (Math.PI / 2)) * (Math.PI / 2);
+        }
+      }
 
       // Bus vs. Streetlight / Traffic Light Poles (deflect & slide smoothly so bus never wedges at 0 km/h)
       if (bus.hopY <= 0.6) {
@@ -4045,20 +4075,48 @@
         }
       }
 
-      for (const tc of traffic) {
-        if (bus.hopY > 0.65) continue; // Hop cleanly over cars, trucks & people!
-        const dx = bus.x - tc.x, dz = bus.z - tc.z;
-        const minSep = 3.8;
-        const dist = Math.hypot(dx, dz);
-        if (dist > 0.001 && dist < minSep) {
-          const push = (minSep - dist);
-          bus.x += (dx / dist) * push * 0.6;
-          bus.z += (dz / dist) * push * 0.6;
-          tc.x -= (dx / dist) * push * 0.4;
-          tc.z -= (dz / dist) * push * 0.4;
-          bus.speed = Math.min(bus.speed, 6);
-          tc.curSpeed = Math.max(4, tc.curSpeed * 0.5);
-          tc.bypassUntil = now + 2200;
+      // Oriented bounding-box traffic separation (no phantom circle hits, no pushing stationary bus)
+      if (bus.hopY <= 0.65) {
+        const bfx = Math.sin(bus.heading), bfz = -Math.cos(bus.heading);
+        const brx = Math.cos(bus.heading), brz = Math.sin(bus.heading);
+        const reqF = 4.52, reqR = 2.14;
+        for (const tc of traffic) {
+          const dx = tc.x - bus.x, dz = tc.z - bus.z;
+          const localF = dx * bfx + dz * bfz;
+          const localR = dx * brx + dz * brz;
+          if (Math.abs(localF) < reqF && Math.abs(localR) < reqR) {
+            const penF = reqF - Math.abs(localF);
+            const penR = reqR - Math.abs(localR);
+            const fSign = Math.sign(localF || 1);
+            const rSign = Math.sign(localR || 1);
+            if (Math.abs(bus.speed) < 0.5) {
+              // Stationary bus: push passing traffic clear instead of moving parked bus
+              if (penF <= penR) {
+                tc.x += bfx * fSign * penF;
+                tc.z += bfz * fSign * penF;
+              } else {
+                tc.x += brx * rSign * penR;
+                tc.z += brz * rSign * penR;
+              }
+              tc.bypassUntil = now + 2200;
+            } else if (penF <= penR) {
+              // Longitudinal contact: push car ahead clear & damp speed without sideways snap
+              tc.x += bfx * fSign * Math.min(penF, 0.55);
+              tc.z += bfz * fSign * Math.min(penF, 0.55);
+              bus.speed = Math.min(bus.speed, 4);
+              tc.curSpeed = Math.max(4, tc.curSpeed * 0.5);
+              tc.bypassUntil = now + 2200;
+            } else {
+              // Lateral graze: dt-bounded separation without sideways teleport
+              const busStep = Math.min(penR * 0.4, 3.6 * dt);
+              const carStep = penR - busStep;
+              bus.x -= brx * rSign * busStep;
+              bus.z -= brz * rSign * busStep;
+              tc.x += brx * rSign * carStep;
+              tc.z += brz * rSign * carStep;
+              tc.bypassUntil = now + 2200;
+            }
+          }
         }
       }
 
@@ -4446,13 +4504,15 @@
     btnRev.addEventListener('pointercancel', endRev);
     btnRev.addEventListener('lostpointercapture', endRev);
 
-    window.addEventListener('blur', () => {
+    const resetAllInputs = () => {
       stickUp(stick);
       uturnPtr = -1;
       keys.left = keys.right = keys.up = keys.down = keys.rev = false;
       btnUturn.classList.remove('pressed');
       btnRev.classList.remove('pressed');
-    });
+    };
+    window.addEventListener('blur', resetAllInputs);
+    document.addEventListener('visibilitychange', () => { if (document.hidden) resetAllInputs(); });
 
     function triggerDanfoHop() {
       if (bus.hopY <= 0.02) {

@@ -361,8 +361,13 @@
     .cs-tilt-opts.hidden { display: none !important; }
     .cs-tilt-opts label { display: flex; align-items: center; gap: 8px; flex: 1; }
     .cs-tilt-opts input[type=range] { flex: 1; min-width: 80px; }
-    .cs-presets { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+    .cs-presets, .cs-routes { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
     .cs-presets-lbl { font-size: 10px; font-weight: 900; letter-spacing: 1px; text-transform: uppercase; color: #94a3b8; margin-right: 2px; }
+    .cs-routes a {
+      font-size: 11px; font-weight: 800; padding: 6px 9px; min-height: 32px;
+      border-radius: 999px; border: 2px solid #14532d; background: #dcfce7; color: #14532d;
+      text-decoration: none;
+    }
     .cs-chip {
       font-size: 11px; font-weight: 800; padding: 6px 9px; min-height: 32px;
       border-radius: 999px; border: 2px solid #334155; background: #e2e8f0; color: #14233b; cursor: pointer;
@@ -582,6 +587,14 @@
       </div>
 
       <p id="cs-pair-hint" class="cs-pair-hint" role="status" aria-live="polite"></p>
+      <div class="cs-routes" aria-label="Routes">
+        <span class="cs-presets-lbl">Routes</span>
+        <a href="?route=jamestown">🗼 Jamestown</a>
+        <a href="?route=aburi">⛰️ Aburi</a>
+        <a href="?route=lenox">🍑 Atlanta → D.C.</a>
+        <a href="?route=tennessee">🏔️ Tennessee → D.C.</a>
+        <a href="?route=texas">🤠 Texas → D.C.</a>
+      </div>
       <button type="button" id="cs-start" class="cs-start">Start with Circle + Auto-Drive ▶︎</button>
       <p class="cs-foot">You can change this later from 🎮 Controls or the C / P keys.</p>
     </div>
@@ -839,7 +852,7 @@
             </div>
           </div>
           <div id="route-tabs" class="flex flex-wrap items-center gap-1">
-            <button type="button" data-tab="ALL" class="slab-btn px-2.5 py-1 text-[11px] bg-[#14233b] text-white">ALL ROUTES (14)</button>
+            <button type="button" data-tab="ALL" class="slab-btn px-2.5 py-1 text-[11px] bg-[#14233b] text-white">ALL ROUTES (18)</button>
             <button type="button" data-tab="NIGERIA" class="slab-btn px-2.5 py-1 text-[11px] bg-[#fff8ec] text-[#14233b]">🇳🇬 NIGERIA (₦)</button>
             <button type="button" data-tab="GHANA" class="slab-btn px-2.5 py-1 text-[11px] bg-[#fff8ec] text-[#14233b]">🇬🇭 GHANA (GH₵)</button>
             <button type="button" data-tab="ATLANTA" class="slab-btn px-2.5 py-1 text-[11px] bg-[#fff8ec] text-[#14233b]">🍑 ATLANTA ($)</button>
@@ -9113,7 +9126,7 @@
     const routesModal = document.getElementById('routes-modal');
     const routesListEl = document.getElementById('routes-list');
     const routeTabsEl = document.getElementById('route-tabs');
-    let activeRouteTab = 'GHANA';
+    let activeRouteTab = 'ALL';
 
     // PILOT: testMode is declared earlier, in memory only (no localStorage)
     const btnTestMode = document.getElementById('btn-test-mode');
@@ -9143,7 +9156,8 @@
       },
       requiredTier(idx) {
         const ch = STORY_CHAPTERS[idx];
-        if (ch && String(ch.id).startsWith('rp_')) return 'free';
+        // Jamestown is the Ghana tro-tro chapter; the four rp_* runs are free alongside it.
+        if (ch && (String(ch.id).startsWith('rp_') || ch.id === PILOT_CHAPTER_ID)) return 'free';
         if (idx <= 2) return 'free';
         if (idx <= 9) return 'pro';
         return 'vip';
@@ -9184,7 +9198,19 @@
         });
       }
       routesListEl.innerHTML = '';
-      STORY_CHAPTERS.forEach((ch, idx) => {
+      const featuredIds = ['ghana', 'rp_aburi', 'rp_lenox', 'rp_tennessee', 'rp_texas'];
+      const indices = STORY_CHAPTERS.map((_, idx) => idx).sort((a, b) => {
+        const fa = featuredIds.indexOf(STORY_CHAPTERS[a].id);
+        const fb = featuredIds.indexOf(STORY_CHAPTERS[b].id);
+        if (fa !== -1 || fb !== -1) {
+          if (fa === -1) return 1;
+          if (fb === -1) return -1;
+          return fa - fb;
+        }
+        return a - b;
+      });
+      indices.forEach((idx) => {
+        const ch = STORY_CHAPTERS[idx];
         if (activeRouteTab !== 'ALL' && !(ch.tabs || []).includes(activeRouteTab)) return;
         const active = idx === currentChapterIdx;
         const unlocked = Paywall.canPlay(idx);

@@ -1825,7 +1825,8 @@
       bodyTilt.add(windFront);
 
       const windRear = new THREE.Mesh(createRoundedBox(1.66, 0.50, 0.10, 0.04, 2), MAT.glass);
-      windRear.position.set(0, 1.68, 2.11);
+      // Cabin rear face is z = 2.13. Keep the glass on that face instead of past it.
+      windRear.position.set(0, 1.68, 2.088);
       bodyTilt.add(windRear);
 
       const sideGlass = new THREE.Mesh(createRoundedBox(1.98, 0.48, 3.55, 0.05, 2), MAT.glass);
@@ -1851,15 +1852,18 @@
 
       const frontBumper = new THREE.Mesh(createRoundedBox(2.16, 0.18, 0.22, 0.06, 3), MAT.chrome);
       frontBumper.position.set(0, 0.44, -2.24);
-      const rearBumper = new THREE.Mesh(createRoundedBox(2.16, 0.18, 0.22, 0.06, 3), MAT.chrome);
-      rearBumper.position.set(0, 0.44, 2.24);
+      // Lower body rear face is z = 4.55 / 2. A bumper this deep, centred at 2.24, hung 7 cm past that face.
+      const rearFace = 4.55 * 0.5;
+      const rearBumper = new THREE.Mesh(createRoundedBox(1.80, 0.18, 0.22, 0.06, 3), MAT.chrome);
+      rearBumper.position.set(0, 0.44, rearFace - 0.07);
       bodyTilt.add(frontBumper, rearBumper);
 
       const tailGeom = createRoundedBox(0.34, 0.22, 0.08, 0.04, 2);
       const brakeLampL = new THREE.Mesh(tailGeom, MAT.brakeOff);
-      brakeLampL.position.set(-0.74, 0.90, 2.26);
+      // Sit on the flat rear panel, inboard of the rounded corners, 8 mm proud so they don't z-fight.
+      brakeLampL.position.set(-0.62, 0.90, rearFace - 0.032);
       const brakeLampR = new THREE.Mesh(tailGeom, MAT.brakeOff);
-      brakeLampR.position.set( 0.74, 0.90, 2.26);
+      brakeLampR.position.set( 0.62, 0.90, rearFace - 0.032);
       bodyTilt.add(brakeLampL, brakeLampR);
 
       const rackGroup = new THREE.Group();
@@ -1909,7 +1913,7 @@
       }
 
       const steerBarGroup = new THREE.Group();
-      steerBarGroup.position.set(0, 0.58, 2.31);
+      steerBarGroup.position.set(0, 0.58, rearFace - 0.034);
       const barHousing = new THREE.Mesh(createRoundedBox(1.42, 0.16, 0.08, 0.03, 2), MAT.tire);
       steerBarGroup.add(barHousing);
 
@@ -1923,7 +1927,7 @@
           roughness: 0.2
         });
         const led = new THREE.Mesh(ledGeom, mat);
-        led.position.set((i - 5) * 0.118, 0, 0.03);
+        led.position.set((i - 5) * 0.118, 0, 0.012);
         steerBarGroup.add(led);
         ledMaterials.push(mat);
       }

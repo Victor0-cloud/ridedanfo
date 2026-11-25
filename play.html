@@ -843,7 +843,7 @@
         <div class="slab-panel w-full max-w-lg p-3 space-y-2 pointer-events-auto max-h-[378px] flex flex-col">
           <div class="flex items-center justify-between border-b-2 border-[#14233b]/15 pb-1.5 gap-2">
             <div class="min-w-0">
-              <div class="text-sm font-black truncate">🗺️ Motor Park: Lagos to The White House (14 Chained Legs + 4 extra routes)</div>
+              <div class="text-sm font-black truncate">🗺️ Motor Park: Lagos, Ghana, and the roads to D.C.</div>
               <div class="text-[11px] font-semibold opacity-75">Filter by region or enable Test Mode to preview any route</div>
             </div>
             <div class="flex items-center gap-1.5 shrink-0">
@@ -852,7 +852,7 @@
             </div>
           </div>
           <div id="route-tabs" class="flex flex-wrap items-center gap-1">
-            <button type="button" data-tab="ALL" class="slab-btn px-2.5 py-1 text-[11px] bg-[#14233b] text-white">ALL ROUTES (18)</button>
+            <button type="button" data-tab="ALL" class="slab-btn px-2.5 py-1 text-[11px] bg-[#14233b] text-white">ALL ROUTES (14)</button>
             <button type="button" data-tab="NIGERIA" class="slab-btn px-2.5 py-1 text-[11px] bg-[#fff8ec] text-[#14233b]">🇳🇬 NIGERIA (₦)</button>
             <button type="button" data-tab="GHANA" class="slab-btn px-2.5 py-1 text-[11px] bg-[#fff8ec] text-[#14233b]">🇬🇭 GHANA (GH₵)</button>
             <button type="button" data-tab="ATLANTA" class="slab-btn px-2.5 py-1 text-[11px] bg-[#fff8ec] text-[#14233b]">🍑 ATLANTA ($)</button>
@@ -9245,17 +9245,23 @@
         });
       }
       routesListEl.innerHTML = '';
-      const featuredIds = ['ghana', 'rp_aburi', 'rp_lenox', 'rp_tennessee', 'rp_texas'];
-      const indices = STORY_CHAPTERS.map((_, idx) => idx).sort((a, b) => {
-        const fa = featuredIds.indexOf(STORY_CHAPTERS[a].id);
-        const fb = featuredIds.indexOf(STORY_CHAPTERS[b].id);
-        if (fa !== -1 || fb !== -1) {
-          if (fa === -1) return 1;
-          if (fb === -1) return -1;
-          return fa - fb;
-        }
-        return a - b;
-      });
+      // Old chapters stay in STORY_CHAPTERS (paywall tiers are index-based). The menu
+      // only hides the ones a new route replaces, and shows the new route in that slot.
+      const replacedRouteIds = new Set(['aburi', 'koforidua_downhill', 'usa', 'usa_dc']);
+      const menuSlot = {
+        classic: 0, market: 1, city: 2, arcade: 3, yaba: 4, countryside: 5, anambra: 6, kano: 7,
+        ghana: 8, rp_aburi: 9, kotoka_atlanta: 10, rp_lenox: 11, rp_tennessee: 12, rp_texas: 13
+      };
+      const allCount = STORY_CHAPTERS.filter(c => !replacedRouteIds.has(c.id)).length;
+      const allBtn = routeTabsEl && routeTabsEl.querySelector('button[data-tab="ALL"]');
+      if (allBtn) {
+        const on = activeRouteTab === 'ALL';
+        allBtn.textContent = `ALL ROUTES (${allCount})`;
+        allBtn.className = `slab-btn px-2.5 py-1 text-[11px] ${on ? 'bg-[#14233b] text-white' : 'bg-[#fff8ec] text-[#14233b]'}`;
+      }
+      const indices = STORY_CHAPTERS.map((_, idx) => idx)
+        .filter(idx => !replacedRouteIds.has(STORY_CHAPTERS[idx].id))
+        .sort((a, b) => (menuSlot[STORY_CHAPTERS[a].id] ?? 100) - (menuSlot[STORY_CHAPTERS[b].id] ?? 100) || a - b);
       indices.forEach((idx) => {
         const ch = STORY_CHAPTERS[idx];
         if (activeRouteTab !== 'ALL' && !(ch.tabs || []).includes(activeRouteTab)) return;

@@ -1,0 +1,21 @@
+0f6ef1bc476d	Koffi	en-NG-AbeoNeural	+4%	+18Hz	+0%	Medaase, driver!
+199cdc6dadf6	Passenger	en-NG-EzinneNeural	+8%	+45Hz	+0%	Thank you, driver!
+1e678feefcf6	Chidi	en-NG-AbeoNeural	+8%	+40Hz	+0%	Yaba! Ojuelegba to Yaba! Make we go!
+3d4d2387514c	Chidi	en-NG-AbeoNeural	+8%	+40Hz	+0%	Stadium! Hop and go! Make we go!
+48f4fc878ece	Chidi	en-NG-AbeoNeural	+8%	+40Hz	+0%	See Don P InterContinental! Ogidi big hotel. Chai, e fine o!
+51432fa4598f	Chidi	en-NG-AbeoNeural	+8%	+40Hz	+0%	Road clear! Make we go.
+522aa5bff3e8	Bobo	en-US-GuyNeural	+4%	+10Hz	+0%	Peachtree Road, baby! Half the streets in this city got Peachtree in the name.
+5e78964fd948	Koffi	en-NG-AbeoNeural	+4%	+18Hz	+0%	Circle Circle Circle! Makola! Accra Central! Enter, enter, let's go!
+67424f452942	Chidi	en-NG-AbeoNeural	+8%	+40Hz	+0%	CMS! Make una ready!
+6b65bc21e1a6	Keisha	en-US-AriaNeural	+2%	+5Hz	+0%	Driver, can you let me off by the corner store? Thank you, sweetie.
+6e84eee585d2	Auntie Ama	en-NG-EzinneNeural	-4%	-8Hz	+0%	Mate, bus stop! I am dropping at Makola, eh.
+7b833979bc34	Chidi	en-NG-AbeoNeural	+8%	+40Hz	+0%	Oga, your uncle's danfo is all he left you. Alhaji wants ₦60,000 in 30 days or he takes it back.
+7d3d908af2d2	Passenger	en-NG-EzinneNeural	+8%	+45Hz	+0%	My change be ₦700.
+90a6bcfc576f	Chidi	en-NG-AbeoNeural	+8%	+40Hz	+0%	Oyingbo! Market people, enter!
+a5a2ec182fdb	Koffi	en-NG-AbeoNeural	+4%	+18Hz	+0%	Aburi! Koforidua! Mountain road, hold tight!
+b2058936d11b	Pregnant passenger	en-NG-EzinneNeural	+8%	+45Hz	+0%	Thank you, driver! Nnewi, I don reach. Daalu!
+b50acb0a1e88	Chidi	en-NG-AbeoNeural	+8%	+40Hz	+0%	Balogun! Balogun! Bole! Make una check your belongings!
+baf718b49fb2	Chidi	en-NG-AbeoNeural	+8%	+40Hz	+0%	Oyingbo! Market people, enter! Make we go!
+bfe31aba6e51	Chidi	en-NG-AbeoNeural	+8%	+40Hz	+0%	Oya, Balogun Market! Make we go!
+f1bd580cf727	Chidi	en-NG-AbeoNeural	+8%	+40Hz	+0%	Make we go!
+93673dbd7506	Bobo	en-US-GuyNeural	+4%	+10Hz	+0%	Tennessee! Hold on — that's a snowy hill up ahead. Easy, Ray.

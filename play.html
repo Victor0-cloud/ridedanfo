@@ -6285,7 +6285,7 @@
     };
     const RP_DEFS = {
       rp_aburi: {
-        key: 'aburi', icon: '⛰️', bumps: [[-720, 60, 540, 56]], side: [-18, 26], lm: rpLmAburi,
+        key: 'aburi', icon: '⛰️', endGame: true, bumps: [[-720, 60, 540, 56]], side: [-18, 26], lm: rpLmAburi,
         sideMax: 2, // side-road (cross-street) cars near the bus at any one time (was ~half of the 10); they merge onto the main road only when it is clear (rpSideMerge)
         pickup: { n: 1, name: 'Aburi Junction', icon: '🚏' },
         stages: [
@@ -6679,8 +6679,49 @@
     // ---------- ROUTES PREVIEW: end of game (US routes): the White House is the final stop ----------
     // The drive freezes (bus parked, no next trip, no auto-restart, no chapter advance) and an End-of-Game card offers
     // "Play Again" (same route from its first stage) or "Choose Another Route" (opens the routes picker).
+    function rpAburiEnd(ch, st, earned) {
+      const d = RP.active;
+      RP.done = true; RP.ended = true; activeStop = null; stopZoneGroup.visible = false;
+      bus.speed = 0; bus.riders = [];
+      clearTimeout(RP.restartTimer);
+      const mins = Math.max(1, Math.round((performance.now() - (RP.t0 || performance.now())) / 60000));
+      const km = Math.round(Math.abs(d.stages[d.stages.length - 1].n * 90 - 32) * 0.61 / 100) / 10;
+      const lbl = document.getElementById('mm-label');
+      if (lbl) lbl.innerHTML = `🏁 <b>Accra Central</b><br><span style="opacity:.75">Aburi Mountain — end of the line</span>`;
+      document.getElementById('chapter-badge').textContent = rpBadge(ch);
+      showToast(`+${ch.currency}${earned.toLocaleString()}`, '🏁 Accra Central Lorry Station!');
+      let el = document.getElementById('rp-end');
+      if (!el) {
+        el = document.createElement('div'); el.id = 'rp-end';
+        el.className = 'absolute inset-0 z-40 flex items-center justify-center p-3 bg-[#0a1526]/70 pointer-events-auto';
+        document.getElementById('viewport-wrap').appendChild(el);
+      }
+      const fares = (RP.earned || earned).toLocaleString();
+      el.innerHTML = `<div class="slab-panel w-full max-w-md p-4 space-y-2 text-center text-[#14233b]" style="max-height:100%;overflow-y:auto">
+        <div class="text-[11px] font-black uppercase tracking-wide" style="color:#15803d">Route complete</div>
+        <div class="text-lg font-black leading-tight">⛰️ Medaase! Aburi Mountain is complete.</div>
+        <div class="text-xs font-bold opacity-80 leading-tight">Uphill to Koforidua, then down to Accra Central.</div>
+        <div class="grid grid-cols-2 gap-1.5 text-xs font-bold text-left">
+          <div class="rounded-lg bg-[#fff8ec] px-2 py-1">🛑 Stops: ${d.stages.length}/${d.stages.length}</div>
+          <div class="rounded-lg bg-[#fff8ec] px-2 py-1">💵 Fares: ${ch.currency}${fares}</div>
+          <div class="rounded-lg bg-[#fff8ec] px-2 py-1">🛣️ Distance: ~${km} km</div>
+          <div class="rounded-lg bg-[#fff8ec] px-2 py-1">⏱️ Time: ${mins} min</div>
+        </div>
+        <div class="text-sm font-black pt-1">Where to next?</div>
+        <div class="flex flex-wrap gap-2 justify-center">
+          <button id="rp-end-again" type="button" class="slab-btn px-3 py-2 text-xs font-black bg-[#46d27a] text-[#08351a]" style="min-height:44px">🔁 Play Aburi again</button>
+          <button id="rp-end-routes" type="button" class="slab-btn px-3 py-2 text-xs font-black bg-[#fff8ec] text-[#14233b]" style="min-height:44px">🗺️ Choose another route</button>
+          <button id="rp-end-home" type="button" class="slab-btn px-3 py-2 text-xs font-black bg-[#fde047] text-[#14233b]" style="min-height:44px">🏠 Main menu</button>
+        </div></div>`;
+      el.classList.remove('hidden');
+      const idx = currentChapterIdx;
+      document.getElementById('rp-end-again').onclick = () => { rpHideEnd(); applyChapter(idx); spawnMissionStop('pickup'); };
+      document.getElementById('rp-end-routes').onclick = () => { el.classList.add('hidden'); document.getElementById('btn-routes').click(); };
+      document.getElementById('rp-end-home').onclick = () => { window.location.href = './'; };
+    }
     function rpEndGame(ch, st, earned) {
       const d = RP.active;
+      if (d && d.key === 'aburi') return rpAburiEnd(ch, st, earned);
       RP.done = true; RP.ended = true; activeStop = null; stopZoneGroup.visible = false;
       bus.speed = 0; bus.riders = [];
       clearTimeout(RP.restartTimer);
@@ -6762,7 +6803,9 @@
         rp_tennessee: ['🏔️ Smokies → D.C.', ['Newfound Gap', 'Gatlinburg', 'Shenandoah Overlook', 'The White House']],
         rp_texas: ['🤠 Texas → D.C.', ['Central High, AR', 'Lorraine Motel, TN', 'Churchill Downs, KY', 'Monticello, VA', 'The White House']] }[ch.id];
       const i = Math.min(RP.stage, d.stages.length - 1);
-      if (RP.ended && RP.active === d) return `${SHORT[0]} • 🏁 The White House — the end`;
+      if (RP.ended && RP.active === d) return ch.id === 'rp_aburi'
+        ? `${SHORT[0]} • 🏁 Accra Central — the end`
+        : `${SHORT[0]} • 🏁 The White House — the end`;
       return `${SHORT[0]} • Stage ${i + 1}/${d.stages.length}: ${SHORT[1][i] || st.name}`;
     }
     function rpUpdateBadge() { const ch = STORY_CHAPTERS[currentChapterIdx]; const t = rpBadge(ch); if (t) document.getElementById('chapter-badge').textContent = t; }

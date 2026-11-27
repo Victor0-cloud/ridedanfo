@@ -844,7 +844,7 @@
           <div class="flex items-center justify-between border-b-2 border-[#14233b]/15 pb-1.5 gap-2">
             <div class="min-w-0">
               <div class="text-sm font-black truncate">🗺️ Motor Park: Lagos, Ghana, and the roads to D.C.</div>
-              <div class="text-[11px] font-semibold opacity-75">Filter by region or enable Test Mode to preview any route</div>
+              <div class="text-[11px] font-semibold opacity-75">Filter by region, open Classic Routes, or enable Test Mode to preview any route</div>
             </div>
             <div class="flex items-center gap-1.5 shrink-0">
               <button id="btn-test-mode" type="button" class="slab-btn px-2 py-1 bg-[#fff8ec] text-[#14233b] text-[10px] font-black">🧪 Test Mode: OFF</button>
@@ -857,6 +857,7 @@
             <button type="button" data-tab="GHANA" class="slab-btn px-2.5 py-1 text-[11px] bg-[#fff8ec] text-[#14233b]">🇬🇭 GHANA (GH₵)</button>
             <button type="button" data-tab="ATLANTA" class="slab-btn px-2.5 py-1 text-[11px] bg-[#fff8ec] text-[#14233b]">🍑 ATLANTA ($)</button>
             <button type="button" data-tab="USA" class="slab-btn px-2.5 py-1 text-[11px] bg-[#fff8ec] text-[#14233b]">🇺🇸 USA ($)</button>
+            <button type="button" data-tab="CLASSIC" class="slab-btn px-2.5 py-1 text-[11px] bg-[#fff8ec] text-[#14233b]">📼 CLASSIC</button>
           </div>
           <div id="routes-list" class="space-y-1.5 overflow-y-auto pr-1 text-xs flex-1"></div>
         </div>
@@ -1079,7 +1080,7 @@
         midDrop: "Auntie Ama (Makola Market): 'Mate, bus stop! I am dropping at Makola, eh. Medaase, driver. Makola, I have reached.'",
         startLine: "Koffi: 'Circle Circle Circle! Makola! Accra Central! Enter, enter, let's go! Under the Circle flyover we go gently — maximum thirty!'",
         midLine: "Koffi: 'Osu Oxford Street! Black Star Square — Freedom and Justice! See the Independence Arch and pastel shop-houses there!'",
-        arrivalLine: "Koffi: 'Jamestown fishing beach & lighthouse! Last stop. Medaase, everybody!' Next leg: Aburi Mountain Run to Koforidua!"
+        arrivalLine: "Koffi: 'Jamestown fishing beach & lighthouse! Last stop. Medaase, everybody!' Next leg: Aburi Mountain — uphill to Koforidua, then down to Accra Central!"
       },
       {
         id: 'aburi',
@@ -1133,7 +1134,7 @@
         midDrop: "Border Plaza: VISA & IMMIGRATION Stamps + Yellow-Fever Card check before Hartsfield-Jackson / College Park!",
         startLine: "Koffi: 'Atlanta! Hartsfield-Jackson! Papers ready, enter enter! Follow the BORDER CROSSING HERE / KOTOKA / HARTSFIELD signs!'",
         midLine: "Immigration Plaza: 'VISA and IMMIGRATION stamps + Yellow-Fever Card inspection. Accept GH₵20 fee or let Koffi argue!'",
-        arrivalLine: "Bobo (Bubba) & Ray: 'Hartsfield-Jackson / College Park! Welcome to Atlanta. Crew switched to MARTA bus GA MTA-110 ($)!'"
+        arrivalLine: "Bobo (Bubba) & Ray: 'Hartsfield-Jackson / College Park! Welcome to Atlanta. Next leg: Atlanta (Lenox Mall) to Washington, D.C.!'"
       },
       {
         id: 'usa',
@@ -1183,7 +1184,7 @@
         midDrop: 'Uphill: Botanical Gardens → Craft Village → Koforidua summit → downhill to the valley lorry station',
         startLine: "Koffi: 'Aburi! Koforidua! Mountain road — we climb the scarp, reach Koforidua, then come down again. Enter, let's go!'",
         midLine: "Koffi: 'Aburi road! Palm avenue ahead — Botanical Gardens first stop!'",
-        arrivalLine: "Koffi: 'We reach the foot of the mountain! Medaase, everybody!'" },
+        arrivalLine: "Koffi: 'We reach the foot of the mountain! Medaase, everybody!' Next leg: Kotoka Border to Atlanta!" },
       { id: 'rp_lenox', num: 'B', title: 'Atlanta, GA (Lenox Mall) → South Carolina → Virginia → Washington, D.C.', region: 'usa', tabs: ['ALL', 'USA'], biome: 'city', currency: '$', fareBase: 15,
         livery: { body: '#f8fafc', stripe: '#0284c7', text: 'GA MTA-110 • ATLANTA GA - SC - VA - D.C.', roof: 0xf97316, flag: 'US' },
         sky: 0x7cb8f0, fog: 0xdbeafe, ground: 0x3b6e4c, speaker: '🍑 Bobo (Bubba) & Ray — I-85 / I-95 North',
@@ -1220,6 +1221,52 @@
     }
 
     // PILOT: tiny helper for harmless notices (non-blocking chip)
+
+    const CAMPAIGN_ORDER = ['classic', 'market', 'city', 'arcade', 'yaba', 'countryside', 'anambra', 'kano', 'ghana', 'rp_aburi', 'kotoka_atlanta', 'rp_lenox', 'rp_tennessee', 'rp_texas'];
+    const REPLACED_ROUTE_IDS = new Set(['aburi', 'koforidua_downhill', 'usa', 'usa_dc']);
+    const LEGACY_IDX_TO_CAMPAIGN_ID = { 9: 'rp_aburi', 10: 'rp_aburi', 12: 'rp_lenox', 13: 'rp_lenox' };
+    const CLASSIC_ROUTES = [
+      { id: 'aburi', title: '10. Aburi Mountain Climb: Accra → Koforidua Summit', sub: 'Classic climb · Accra → Koforidua Summit', href: './aburi_mountain.html?leg=10', tier: 'pro' },
+      { id: 'koforidua_downhill', title: '10b. Koforidua Downhill: Summit → Accra Central', sub: 'Classic downhill · Summit → Accra Central', href: './aburi_mountain.html?leg=10b', tier: 'pro' },
+      { id: 'usa', title: '12. Atlanta MARTA Run: College Park → Lenox & Greenhouse', sub: 'Classic Atlanta MARTA · College Park → Lenox', href: './usa/index.html?route=lenox', tier: 'vip' },
+      { id: 'usa_dc', title: '13. Atlanta to D.C. Finale: Lenox Mall → The White House', sub: 'Classic I-85 / I-95 · Lenox Mall → The White House', href: './usa/index.html?route=i85', tier: 'vip' },
+      { id: 'jellico', title: 'Tennessee Mountain (I-75 North): Jellico Mountain → The White House', sub: 'Classic I-75 alternative · Chattanooga → Knoxville → Jellico Mountain → White House', href: './usa/index.html?route=jellico', tier: 'vip' }
+    ];
+    function storyIdxById(id) { return STORY_CHAPTERS.findIndex(c => c.id === id); }
+    function campaignPos(id) { return CAMPAIGN_ORDER.indexOf(id); }
+    function campaignLegNumber(id) { const p = campaignPos(id); return p >= 0 ? p + 1 : null; }
+    function nextCampaignStoryIdx(idx) {
+      const ch = STORY_CHAPTERS[idx];
+      const p = campaignPos(ch && ch.id);
+      if (p < 0 || p >= CAMPAIGN_ORDER.length - 1) return null;
+      return storyIdxById(CAMPAIGN_ORDER[p + 1]);
+    }
+    function remapLegacyStoryIdx(idx) {
+      const n = Number(idx);
+      if (Number.isInteger(n) && Object.prototype.hasOwnProperty.call(LEGACY_IDX_TO_CAMPAIGN_ID, n)) {
+        const mapped = storyIdxById(LEGACY_IDX_TO_CAMPAIGN_ID[n]);
+        return mapped >= 0 ? mapped : idx;
+      }
+      const ch = STORY_CHAPTERS[idx];
+      if (ch && REPLACED_ROUTE_IDS.has(ch.id)) {
+        const mapped = storyIdxById(({ aburi: 'rp_aburi', koforidua_downhill: 'rp_aburi', usa: 'rp_lenox', usa_dc: 'rp_lenox' })[ch.id]);
+        return mapped >= 0 ? mapped : idx;
+      }
+      return idx;
+    }
+    function campaignTitle(ch) {
+      const n = campaignLegNumber(ch.id);
+      if (n == null) return ch.title;
+      const raw = String(ch.title || '').replace(/^\s*\d+[a-z]?\.\s*/i, '');
+      return n + '. ' + raw;
+    }
+    function campaignBadge(ch) {
+      const n = campaignLegNumber(ch.id);
+      if (n == null) return ch.title;
+      const raw = String(ch.title || '').replace(/^\s*\d+[a-z]?\.\s*/i, '');
+      return `Leg ${n}/14 • ${raw}`;
+    }
+
     let pilotChipTimer = 0;
     function pilotNotice(msg, ms = 2200) {
       const el = document.getElementById('pilot-chip');
@@ -1427,8 +1474,15 @@
         osc.start(t0);
         osc.stop(t0 + dur + 0.02);
       }
+      // TESTER FIX (Nov 27): unlock (create + resume) the sound-effects context on the first real tap release,
+      // which is when Android grants audio permission for touch, so the first horn press is never silent.
+      const unlock = () => { try { const c = ensure(); if (c && c.state === 'running') { window.removeEventListener('touchend', unlock, true); window.removeEventListener('pointerup', unlock, true); window.removeEventListener('keydown', unlock, true); } } catch (e) {} };
+      window.addEventListener('touchend', unlock, true);
+      window.addEventListener('pointerup', unlock, true);
+      window.addEventListener('keydown', unlock, true);
       return {
         rawTone: tone,
+        state: () => (ctx ? ctx.state : 'none'),
         honk() {
           tone(370, 0.22, 'sawtooth', 0.08, 0);
           tone(466, 0.22, 'sawtooth', 0.08, 0);
@@ -3276,6 +3330,31 @@
       const u = Math.min(1, (a - JOY.DEAD) / (1 - JOY.DEAD));
       return Math.sign(nx) * Math.max(0, (1 - JOY.EXPO) * u + JOY.EXPO * u * u * u);
     }
+    // TESTER FIX (Nov 27): Circle, Wheel, Joystick and Tilt "swerve too much" (Arrows is fine). Their raw analog
+    // value reached full lock (1.0, stronger than the arrows' 0.85) from a small thumb move, with no speed scaling.
+    // Shape them like the arrows: a soft curve and a speed-scaled cap for lane steering (never an accidental
+    // junction turn), a clear push (>= 80%) gives the same 0.85 as an arrow press, and a slew limit stops twitches.
+    const ANALOG = { TURN_AT: 0.8, TURN_OUT: 0.85, LANE_MAX: 0.65, SLOW_KMH: 20, FAST_KMH: 60, FAST_SCALE: 0.75, IN_RATE: 3.2, TURN_RATE: 6, OUT_RATE: 7 };
+    const analogSt = { v: 0, t: 0 };
+    function conditionAnalogSteer(raw, now, expo = 1.4) { // expo 1 for inputs that already have a curve (joystick, tilt)
+      const dt = Math.min(0.05, Math.max(0, (now - (analogSt.t || now)) / 1000));
+      analogSt.t = now;
+      const a = Math.min(1, Math.abs(raw));
+      let target = 0;
+      if (a >= ANALOG.TURN_AT) target = Math.sign(raw) * ANALOG.TURN_OUT;
+      else if (a > 0) {
+        const kmh = Math.abs(bus.speed) * 2.2;
+        const k = Math.min(1, Math.max(0, (kmh - ANALOG.SLOW_KMH) / (ANALOG.FAST_KMH - ANALOG.SLOW_KMH)));
+        target = Math.sign(raw) * ANALOG.LANE_MAX * Math.pow(a / ANALOG.TURN_AT, expo) * (1 - k * (1 - ANALOG.FAST_SCALE));
+      }
+      const v = analogSt.v;
+      const growing = target !== 0 && (v === 0 || Math.sign(target) === Math.sign(v)) && Math.abs(target) > Math.abs(v);
+      const rate = growing ? (Math.abs(target) >= TURN_THRESH_KH ? ANALOG.TURN_RATE : ANALOG.IN_RATE) : ANALOG.OUT_RATE;
+      const d = target - v;
+      analogSt.v = Math.abs(d) <= rate * dt ? target : v + Math.sign(d) * rate * dt;
+      return analogSt.v;
+    }
+    function idleAnalogSteer(now) { analogSt.v = 0; analogSt.t = now; }
     // Sammy's Pad: tap-once cruise toggle (named after tester Sammy Gee's request)
     let sammyCruise = false;
     const smBtn = { left: { n: 0, rel: -1e9 }, right: { n: 0, rel: -1e9 }, brake: { n: 0, rel: -1e9 } };
@@ -4040,17 +4119,10 @@
     let pilotStarted = false;
     // Apply Chapter Look, Bus Livery, Flag Decal, Weather Atmosphere, Music Pool & Opening Story Beat
     function applyChapter(idx) {
+      idx = (typeof remapLegacyStoryIdx === 'function') ? remapLegacyStoryIdx(idx) : idx;
       currentChapterIdx = (idx + STORY_CHAPTERS.length) % STORY_CHAPTERS.length;
       const ch = STORY_CHAPTERS[currentChapterIdx];
       if (typeof rpOnApplyChapter === 'function') rpOnApplyChapter(ch);
-      if (ch.id === 'aburi' || ch.id === 'koforidua_downhill') {
-        window.location.href = './aburi_mountain.html?leg=' + (ch.id === 'aburi' ? '10' : '10b');
-        return;
-      }
-      if (ch.id === 'usa' || ch.id === 'usa_dc') {
-        window.location.href = './usa/index.html?route=' + (ch.id === 'usa' ? 'lenox' : 'i85');
-        return;
-      }
       campaign.tripsInChapter = 0;
       campaign.midSpoken = false;
       campaign.checkpointShown = false;
@@ -4081,8 +4153,12 @@
       }
 
       const isRp = !!(ch && String(ch.id).startsWith('rp_'));
-      document.getElementById('chapter-badge').textContent = (isRp && typeof rpBadge === 'function' && rpBadge(ch))
-        || (isRp ? `${ch.num} • ${ch.title}` : `Leg ${ch.num}/14 • ${ch.title}`);
+      const stage = (isRp && typeof rpBadge === 'function') ? rpBadge(ch) : null;
+      const n = (typeof campaignLegNumber === 'function') ? campaignLegNumber(ch.id) : null;
+      document.getElementById('chapter-badge').textContent = (n != null && stage)
+        ? `Leg ${n}/14 • ${stage}`
+        : ((typeof campaignBadge === 'function' && campaignBadge(ch))
+          || (isRp ? `${ch.num} • ${ch.title}` : `Leg ${ch.num}/14 • ${ch.title}`));
       storySay(ch.speaker, ch.startLine, ch.region);
     }
 
@@ -4315,28 +4391,47 @@
       stopPassengerPool.push(hm);
     }
 
-    // PILOT (e): Manhattan route along the road grid from the bus to the stop (for the mini-map)
+    // PILOT (e): Manhattan route along the road grid from the bus to the stop (mini-map line + HUD arrow).
+    // TESTER FIX (Nov 27): turn at the next junction AHEAD of the bus. It used Math.round, which picked the
+    // junction behind the bus once it was past mid-block, so the route (and the arrow) doubled back.
     function pilotRoutePath(stop) {
       const pts = [{ x: bus.x, z: bus.z }];
       const ns = Math.abs(Math.sin(bus.roadHeading)) < 0.5; // driving along z (north/south)
       const sGx = Math.round(stop.x / CELL) * CELL, sGz = Math.round(stop.z / CELL) * CELL;
       const stopOnNS = Math.abs(stop.x - sGx) < ROAD_HALF + 1; // stop sits on a N-S road
+      const nextJunction = (pos, dir) => { // first junction line at or ahead of pos (junction box counts as ahead)
+        const k = pos / CELL, m = (ROAD_HALF + 1) / CELL;
+        return (dir >= 0 ? Math.ceil(k - m) : Math.floor(k + m)) * CELL;
+      };
       if (ns) {
         const roadX = Math.round(bus.x / CELL) * CELL;
         if (stopOnNS && Math.abs(sGx - roadX) < 1) { pts.push({ x: stop.x, z: stop.z }); return pts; }
-        const turnZ = stopOnNS ? Math.round(bus.z / CELL) * CELL : sGz;
+        const dirZ = -Math.cos(bus.roadHeading) >= 0 ? 1 : -1;
+        const turnZ = stopOnNS ? nextJunction(bus.z, dirZ) : sGz;
         pts.push({ x: bus.x, z: turnZ });
         if (stopOnNS) { pts.push({ x: stop.x, z: turnZ }); }
         pts.push({ x: stop.x, z: stop.z });
       } else {
         const roadZ = Math.round(bus.z / CELL) * CELL;
         if (!stopOnNS && Math.abs(sGz - roadZ) < 1) { pts.push({ x: stop.x, z: stop.z }); return pts; }
-        const turnX = !stopOnNS ? Math.round(bus.x / CELL) * CELL : sGx;
+        const dirX = Math.sin(bus.roadHeading) >= 0 ? 1 : -1;
+        const turnX = !stopOnNS ? nextJunction(bus.x, dirX) : sGx;
         pts.push({ x: turnX, z: bus.z });
         if (!stopOnNS) { pts.push({ x: turnX, z: stop.z }); }
         pts.push({ x: stop.x, z: stop.z });
       }
       return pts;
+    }
+    // TESTER FIX (Nov 27): point on the route `ahead` world units from the bus (the stop itself when closer)
+    function pilotRouteLookahead(path, ahead) {
+      let left = ahead;
+      for (let i = 1; i < path.length; i++) {
+        const a = path[i - 1], b = path[i];
+        const L = Math.hypot(b.x - a.x, b.z - a.z);
+        if (L >= left && L > 1e-6) return { x: a.x + (b.x - a.x) * (left / L), z: a.z + (b.z - a.z) * (left / L) };
+        left -= L;
+      }
+      return path[path.length - 1];
     }
     function pilotPathLength(p) { let L = 0; for (let i = 1; i < p.length; i++) L += Math.hypot(p[i].x - p[i - 1].x, p[i].z - p[i - 1].z); return L; }
 
@@ -6709,12 +6804,14 @@
         </div>
         <div class="text-sm font-black pt-1">Where to next?</div>
         <div class="flex flex-wrap gap-2 justify-center">
+          ${rpContinueButtonHtml()}
           <button id="rp-end-again" type="button" class="slab-btn px-3 py-2 text-xs font-black bg-[#46d27a] text-[#08351a]" style="min-height:44px">🔁 Play Aburi again</button>
           <button id="rp-end-routes" type="button" class="slab-btn px-3 py-2 text-xs font-black bg-[#fff8ec] text-[#14233b]" style="min-height:44px">🗺️ Choose another route</button>
           <button id="rp-end-home" type="button" class="slab-btn px-3 py-2 text-xs font-black bg-[#fde047] text-[#14233b]" style="min-height:44px">🏠 Main menu</button>
         </div></div>`;
       el.classList.remove('hidden');
       const idx = currentChapterIdx;
+      bindRpContinueButton();
       document.getElementById('rp-end-again').onclick = () => { rpHideEnd(); applyChapter(idx); spawnMissionStop('pickup'); };
       document.getElementById('rp-end-routes').onclick = () => { el.classList.add('hidden'); document.getElementById('btn-routes').click(); };
       document.getElementById('rp-end-home').onclick = () => { window.location.href = './'; };
@@ -6747,15 +6844,41 @@
           <div class="rounded-lg bg-[#fff8ec] px-2 py-1">🛣️ Distance: ~${km} km</div>
           <div class="rounded-lg bg-[#fff8ec] px-2 py-1">⏱️ Time: ${mins} min</div>
         </div>
-        <div class="text-sm font-black pt-1">Play again?</div>
-        <div class="flex gap-2 justify-center">
+        <div class="text-sm font-black pt-1">${(typeof nextCampaignStoryIdx === 'function' && nextCampaignStoryIdx(currentChapterIdx) != null) ? 'Where to next?' : 'Play again?'}</div>
+        <div class="flex flex-wrap gap-2 justify-center">
+          ${rpContinueButtonHtml()}
           <button id="rp-end-again" type="button" class="slab-btn px-3 py-1.5 text-xs font-black bg-[#46d27a] text-[#08351a]">🔁 Play Again</button>
           <button id="rp-end-routes" type="button" class="slab-btn px-3 py-1.5 text-xs font-black bg-[#fff8ec] text-[#14233b]">🗺️ Choose Another Route</button>
         </div></div>`;
       el.classList.remove('hidden');
       const idx = currentChapterIdx;
+      bindRpContinueButton();
       document.getElementById('rp-end-again').onclick = () => { rpHideEnd(); applyChapter(idx); spawnMissionStop('pickup'); };
       document.getElementById('rp-end-routes').onclick = () => { el.classList.add('hidden'); document.getElementById('btn-routes').click(); };
+    }
+    function rpContinueButtonHtml() {
+      const nextIdx = (typeof nextCampaignStoryIdx === 'function') ? nextCampaignStoryIdx(currentChapterIdx) : null;
+      if (nextIdx == null) return '';
+      const next = STORY_CHAPTERS[nextIdx];
+      const locked = (typeof Paywall !== 'undefined' && !Paywall.canPlay(nextIdx));
+      const label = (typeof campaignTitle === 'function') ? campaignTitle(next) : next.title;
+      return `<button id="rp-end-next" type="button" class="slab-btn px-3 py-2 text-xs font-black ${locked ? 'bg-amber-300 text-[#14233b]' : 'bg-[#14233b] text-white'}" style="min-height:44px">${locked ? '🔒 ' : '▶ '}Continue to ${label}</button>`;
+    }
+    function bindRpContinueButton() {
+      const btn = document.getElementById('rp-end-next');
+      if (!btn) return;
+      btn.onclick = () => {
+        const nextIdx = nextCampaignStoryIdx(currentChapterIdx);
+        if (nextIdx == null) return;
+        if (typeof Paywall !== 'undefined' && !Paywall.canPlay(nextIdx)) {
+          rpHideEnd();
+          openPaywall(STORY_CHAPTERS[nextIdx].title);
+          return;
+        }
+        rpHideEnd();
+        applyChapter(nextIdx);
+        spawnMissionStop('pickup');
+      };
     }
     function rpHideEnd() { const el = document.getElementById('rp-end'); if (el) el.classList.add('hidden'); }
     function rpBadgeShort(ch) { const t = rpBadge(ch) || ''; return t.split(' • ')[0]; }
@@ -6808,7 +6931,13 @@
         : `${SHORT[0]} • 🏁 The White House — the end`;
       return `${SHORT[0]} • Stage ${i + 1}/${d.stages.length}: ${SHORT[1][i] || st.name}`;
     }
-    function rpUpdateBadge() { const ch = STORY_CHAPTERS[currentChapterIdx]; const t = rpBadge(ch); if (t) document.getElementById('chapter-badge').textContent = t; }
+    function rpUpdateBadge() {
+      const ch = STORY_CHAPTERS[currentChapterIdx];
+      const t = rpBadge(ch);
+      if (!t) return;
+      const n = (typeof campaignLegNumber === 'function') ? campaignLegNumber(ch.id) : null;
+      document.getElementById('chapter-badge').textContent = (n != null) ? `Leg ${n}/14 • ${t}` : t;
+    }
     function rpSpawnStop(kind) {
       const d = RP.active; if (!d) return false;
       if (RP.done) { activeStop = null; stopZoneGroup.visible = false; return true; }
@@ -6970,13 +7099,18 @@
 
     const _urlParams = new URLSearchParams(window.location.search);
     const _urlLeg = _urlParams.get('leg');
+    const _classicBoot = (_urlParams.get('classic') || '').toLowerCase().trim();
     const _rpBoot = (typeof rpUrlRouteIdx === 'function') ? rpUrlRouteIdx() : null;
-    const _bootIdx = _rpBoot != null ? _rpBoot
+    let _bootIdx = _rpBoot != null ? _rpBoot
       : (_urlLeg !== null && !Number.isNaN(Number(_urlLeg)) ? Number(_urlLeg) : 0);
-    applyChapter(_bootIdx);
-    spawnMissionStop('pickup');
-    if (_urlParams.get('routes') === '1') {
+    if (typeof remapLegacyStoryIdx === 'function') _bootIdx = remapLegacyStoryIdx(_bootIdx);
+    if (!_classicBoot) {
+      applyChapter(_bootIdx);
+      spawnMissionStop('pickup');
+    }
+    if (_urlParams.get('routes') === '1' || _urlParams.get('routes') === 'classic' || _classicBoot) {
       setTimeout(() => {
+        if (_classicBoot || _urlParams.get('routes') === 'classic') activeRouteTab = 'CLASSIC';
         const br = document.getElementById('btn-routes');
         if (br) br.click();
       }, 150);
@@ -7221,8 +7355,10 @@
       let accel = manualActive ? ((stick.down && !stickBrake) || keys.up || keys.left || keys.right || flickUntil > now) : (autoDriveEnabled && !autoHold);
       let brake = keys.down || keys.rev || stickBrake;
       let throttle = 1;
+      if (controlMode === 'circle' && (stick.down || flickUntil > now) && !kbDir) finalSteer = conditionAnalogSteer(s, now); // TESTER FIX (Nov 27)
+      else if (!wheelOn) idleAnalogSteer(now);
       if (wheelOn) {
-        finalSteer = wheel.steer;
+        finalSteer = kbDir ? kbDir * 0.85 : conditionAnalogSteer(wheel.steer, now); // TESTER FIX (Nov 27)
         throttle = Math.max(0, wheel.throttle);
         accel = throttle > 0.12 || keys.up;
         brake = brake || wheel.brake > 0.35;
@@ -7412,8 +7548,12 @@
       trWasAccel = wantAccel;
       if (wantBrake) lastReverseAt = now;
       joyPaint();
+      // TESTER FIX (Nov 27): stick output goes through the analog conditioner (A/D keys stay at 85%)
+      let jSteer;
+      if (!kd && (joy.down || Math.abs(joy.steer) > 1e-4)) jSteer = conditionAnalogSteer(joy.steer, now, 1);
+      else { idleAnalogSteer(now); jSteer = Math.abs(joy.steer) > 1e-4 ? joy.steer : null; }
       return {
-        steer: Math.abs(joy.steer) > 1e-4 ? joy.steer : (steering ? 0 : autoSteer),
+        steer: jSteer !== null ? jSteer : (steering ? 0 : autoSteer),
         accel,
         brake: wantBrake,
         throttle: wantAccel ? trThrottle : 1,
@@ -7510,7 +7650,11 @@
       }
       if (wantBrake) lastReverseAt = now;
       const accel = autoDriveEnabled ? (!autoHold && !wantBrake) : wantAccel;
-      const st = Math.abs(joy.steer) > 1e-4 ? joy.steer : (steering ? 0 : autoSteer);
+      // TESTER FIX (Nov 27): phone tilt goes through the analog conditioner (arrow keys stay at 85%)
+      let tOut = null;
+      if (!kd && Math.abs(joy.steer) > 1e-4) tOut = conditionAnalogSteer(joy.steer, now, 1);
+      else { idleAnalogSteer(now); if (Math.abs(joy.steer) > 1e-4) tOut = joy.steer; }
+      const st = tOut !== null ? tOut : (steering ? 0 : autoSteer);
       return {
         creep: false, steer: st, accel, brake: wantBrake, throttle: wantAccel ? 1 : (autoDriveEnabled && !autoHold && !wantBrake ? 1 : 0),
         reverse: wantReverse, uturn: (now - uturnRequestedAt) < 650
@@ -7719,9 +7863,15 @@
               showToast(`+${ch.currency}${earned.toLocaleString()}`, `${ch.title} Delivered!`);
               storySay(ch.speaker, ch.arrivalLine, ch.region);
 
-              // Advance to next chapter in the Lagos -> Ghana -> Atlanta -> Washington D.C. storyline!
+              // Advance to the next campaign route (skips retired classic chapters).
               setTimeout(() => {
-                applyChapter(currentChapterIdx + 1);
+                const nextIdx = (typeof nextCampaignStoryIdx === 'function') ? nextCampaignStoryIdx(currentChapterIdx) : currentChapterIdx + 1;
+                if (nextIdx == null) return;
+                if (typeof Paywall !== 'undefined' && !Paywall.canPlay(nextIdx)) {
+                  openPaywall(STORY_CHAPTERS[nextIdx].title);
+                  return;
+                }
+                applyChapter(nextIdx);
                 spawnMissionStop('pickup');
               }, 3400);
               spawnMissionStop('pickup');
@@ -8429,15 +8579,19 @@
       }
     }
 
-    document.getElementById('btn-horn').addEventListener('click', () => {
-      AudioFx.honk();
-    });
-    document.getElementById('btn-horn-pad').addEventListener('click', () => {
-      AudioFx.honk();
-    });
-    document.getElementById('btn-hop').addEventListener('click', () => {
-      triggerDanfoHop();
-    });
+    // TESTER FIX (Nov 27): "horn not working". Android only sends `click` for the first finger, so a horn tap
+    // while a thumb is on the circle / wheel / joystick / pedals never fired. Fire on pointerdown (every finger);
+    // keep `click` only for keyboard activation (detail 0) so a tap never honks twice.
+    function bindTapButton(id, fn) {
+      const el = document.getElementById(id);
+      if (!el) return;
+      el.addEventListener('pointerdown', e => { e.preventDefault(); fn(); });
+      el.addEventListener('click', e => { if (e.detail === 0) fn(); });
+      el.addEventListener('contextmenu', e => e.preventDefault());
+    }
+    bindTapButton('btn-horn', () => AudioFx.honk());
+    bindTapButton('btn-horn-pad', () => AudioFx.honk());
+    bindTapButton('btn-hop', () => triggerDanfoHop());
     const btnTurbo = document.getElementById('btn-turbo');
     function syncTurboBtn() {
       if (!btnTurbo) return;
@@ -9205,6 +9359,8 @@
         const ch = STORY_CHAPTERS[idx];
         // Jamestown is the Ghana tro-tro chapter; the four rp_* runs are free alongside it.
         if (ch && (String(ch.id).startsWith('rp_') || ch.id === PILOT_CHAPTER_ID)) return 'free';
+        if (ch && (ch.id === 'aburi' || ch.id === 'koforidua_downhill')) return 'pro';
+        if (ch && (ch.id === 'usa' || ch.id === 'usa_dc')) return 'vip';
         if (idx <= 2) return 'free';
         if (idx <= 9) return 'pro';
         return 'vip';
@@ -9214,6 +9370,14 @@
         const t = this.getTier();
         const req = this.requiredTier(idx);
         if (req === 'free') return true;
+        if (req === 'pro') return t === 'pro' || t === 'vip';
+        return t === 'vip';
+      },
+      canPlayClassic(entry) {
+        if (testMode) return true;
+        const t = this.getTier();
+        const req = entry && entry.tier;
+        if (!req || req === 'free') return true;
         if (req === 'pro') return t === 'pro' || t === 'vip';
         return t === 'vip';
       }
@@ -9247,33 +9411,63 @@
       routesListEl.innerHTML = '';
       // Old chapters stay in STORY_CHAPTERS (paywall tiers are index-based). The menu
       // only hides the ones a new route replaces, and shows the new route in that slot.
-      const replacedRouteIds = new Set(['aburi', 'koforidua_downhill', 'usa', 'usa_dc']);
-      const menuSlot = {
-        classic: 0, market: 1, city: 2, arcade: 3, yaba: 4, countryside: 5, anambra: 6, kano: 7,
-        ghana: 8, rp_aburi: 9, kotoka_atlanta: 10, rp_lenox: 11, rp_tennessee: 12, rp_texas: 13
-      };
-      const allCount = STORY_CHAPTERS.filter(c => !replacedRouteIds.has(c.id)).length;
+      const allCount = CAMPAIGN_ORDER.length;
       const allBtn = routeTabsEl && routeTabsEl.querySelector('button[data-tab="ALL"]');
       if (allBtn) {
         const on = activeRouteTab === 'ALL';
         allBtn.textContent = `ALL ROUTES (${allCount})`;
         allBtn.className = `slab-btn px-2.5 py-1 text-[11px] ${on ? 'bg-[#14233b] text-white' : 'bg-[#fff8ec] text-[#14233b]'}`;
       }
+      if (activeRouteTab === 'CLASSIC') {
+        CLASSIC_ROUTES.forEach((entry) => {
+          const unlocked = Paywall.canPlayClassic(entry);
+          const req = (entry.tier || 'vip').toUpperCase();
+          const row = document.createElement('div');
+          row.className = `flex items-center justify-between gap-2 p-2 rounded-xl border-2 border-[#14233b] ${unlocked ? 'bg-[#fff8ec]' : 'bg-slate-100 opacity-95'}`;
+          row.innerHTML = `
+          <div class="min-w-0 flex-1">
+            <div class="font-black text-[#14233b] leading-tight break-words">${unlocked ? '' : '🔒 '}${entry.title}</div>
+            <div class="text-[11px] opacity-85 leading-tight break-words">Classic pack • ${req} to play</div>
+            <div class="text-[10px] text-amber-900 font-bold leading-tight break-words">${entry.sub || ''}</div>
+          </div>
+          <div class="flex items-center gap-1 shrink-0">
+            <button type="button" data-classic="${entry.id}"
+              class="slab-btn px-2.5 py-1 text-xs ${unlocked ? 'bg-[#46d27a] text-[#08351a]' : 'bg-amber-300 text-[#14233b]'}">
+              ${unlocked ? 'DRIVE' : `🔒 ${req}`}
+            </button>
+          </div>`;
+          routesListEl.appendChild(row);
+        });
+        routesListEl.querySelectorAll('button[data-classic]').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const entry = CLASSIC_ROUTES.find(e => e.id === btn.dataset.classic);
+            if (!entry) return;
+            if (!Paywall.canPlayClassic(entry)) {
+              routesModal.classList.add('hidden');
+              routesModal.classList.remove('flex');
+              openPaywall(entry.title);
+              return;
+            }
+            window.location.href = entry.href;
+          });
+        });
+        return;
+      }
       const indices = STORY_CHAPTERS.map((_, idx) => idx)
-        .filter(idx => !replacedRouteIds.has(STORY_CHAPTERS[idx].id))
-        .sort((a, b) => (menuSlot[STORY_CHAPTERS[a].id] ?? 100) - (menuSlot[STORY_CHAPTERS[b].id] ?? 100) || a - b);
+        .filter(idx => !REPLACED_ROUTE_IDS.has(STORY_CHAPTERS[idx].id))
+        .sort((a, b) => (campaignPos(STORY_CHAPTERS[a].id) - campaignPos(STORY_CHAPTERS[b].id)) || a - b);
       indices.forEach((idx) => {
         const ch = STORY_CHAPTERS[idx];
         if (activeRouteTab !== 'ALL' && !(ch.tabs || []).includes(activeRouteTab)) return;
         const active = idx === currentChapterIdx;
         const unlocked = Paywall.canPlay(idx);
         const req = Paywall.requiredTier(idx).toUpperCase();
-        const isBorder = ['kano', 'kotoka_atlanta', 'usa_dc'].includes(ch.id);
+        const isBorder = ['kano', 'kotoka_atlanta'].includes(ch.id);
         const row = document.createElement('div');
         row.className = `flex items-center justify-between gap-2 p-2 rounded-xl border-2 border-[#14233b] ${active ? 'bg-amber-200' : unlocked ? 'bg-[#fff8ec]' : 'bg-slate-100 opacity-95'}`;
         row.innerHTML = `
           <div class="min-w-0 flex-1">
-            <div class="font-black text-[#14233b] leading-tight break-words">${unlocked ? '' : '🔒 '}${ch.title}</div>
+            <div class="font-black text-[#14233b] leading-tight break-words">${unlocked ? '' : '🔒 '}${campaignTitle(ch)}</div>
             <div class="text-[11px] opacity-85 leading-tight break-words">${ch.speaker} • 5×Fare: ${ch.currency}${ch.fareBase}</div>
             <div class="text-[10px] text-amber-900 font-bold leading-tight break-words">${ch.midDrop || ''}</div>
           </div>
@@ -9330,6 +9524,26 @@
       routesModal.classList.add('hidden');
       routesModal.classList.remove('flex');
     });
+
+    // Deep link ?classic=aburi|koforidua|koforidua_downhill|usa|i85|jellico opens the Classic pack.
+    // Unlocked players go to the standalone page; otherwise the paywall is shown. Never used for the main campaign boot.
+    (function bootClassicParam() {
+      const key = (_classicBoot || '').replace(/-/g, '_');
+      if (!key) return;
+      const aliases = { '10': 'aburi', climb: 'aburi', koforidua: 'koforidua_downhill', '10b': 'koforidua_downhill', downhill: 'koforidua_downhill', marta: 'usa', lenox: 'usa', i85: 'usa_dc', finale: 'usa_dc', i75: 'jellico' };
+      const id = aliases[key] || key;
+      const entry = CLASSIC_ROUTES.find(e => e.id === id);
+      if (!entry) return;
+      applyChapter(typeof _bootIdx === 'number' ? _bootIdx : 0);
+      spawnMissionStop('pickup');
+      if (Paywall.canPlayClassic(entry)) {
+        window.location.href = entry.href;
+        return;
+      }
+      activeRouteTab = 'CLASSIC';
+      renderRoutesModal();
+      openPaywall(entry.title);
+    })();
 
     const shopModal = document.getElementById('shop-modal');
     const shopItemsEl = document.getElementById('shop-items');
@@ -9569,12 +9783,28 @@
       hudCtx.clearRect(0, 0, W, H);
 
       if (activeStop) {
-        const angToStop = Math.atan2(activeStop.x - bus.x, -(activeStop.z - bus.z));
-        const relAng = wrapAngle(camHeading, angToStop);
-        const distM = Math.round(Math.hypot(activeStop.x - bus.x, activeStop.z - bus.z));
+        // TESTER FIX (Nov 27): the arrow follows the road route (same line as the mini-map) instead of the
+        // straight line through buildings, the distance is the same route metres as the mini-map label, and
+        // the arrow drops below the passenger speech bubble / fare toast instead of being hidden under them.
+        const navPath = pilotRoutePath(activeStop);
+        const navLen = pilotPathLength(navPath);
+        const navAim = pilotRouteLookahead(navPath, 30);
+        const relAng = wrapAngle(camHeading, Math.atan2(navAim.x - bus.x, -(navAim.z - bus.z)));
+        const distM = Math.round(navLen * 0.61); // world units -> metres (matches the mini-map label)
+        const uTurn = Math.abs(relAng) > 2.0 && distM > 25;
         const hudBar = document.getElementById('top-hud-bar');
         const hudBarH = hudBar ? (hudBar.getBoundingClientRect().bottom - rect.top) : 82;
-        const compassY = Math.max(92, Math.min(200, Math.round(hudBarH + 28)));
+        let compassY = Math.max(92, Math.min(200, Math.round(hudBarH + 28)));
+        for (const id of ['mate-box', 'fare-toast']) {
+          const el = document.getElementById(id);
+          if (!el || el.classList.contains('hidden') || el.classList.contains('opacity-0')) continue;
+          const r = el.getBoundingClientRect();
+          if (r.width < 4 || r.bottom - rect.top < compassY - 22 || r.top - rect.top > compassY + 34) continue;
+          if (r.left - rect.left > W * 0.5 + 18 || r.right - rect.left < W * 0.5 - 18) continue;
+          compassY = Math.round(r.bottom - rect.top + 24);
+        }
+        compassY = Math.min(compassY, Math.round(H * 0.6));
+        window.__arrowDbg = { ang: relAng, shown: true, dist: distM, y: compassY, aimX: navAim.x, aimZ: navAim.z };
         hudCtx.save();
         hudCtx.translate(W * 0.5, compassY);
         hudCtx.rotate(relAng);
@@ -9595,8 +9825,10 @@
         hudCtx.font = '800 11px system-ui, sans-serif';
         hudCtx.textAlign = 'center';
         hudCtx.fillStyle = '#14233b';
-        hudCtx.fillText(`${activeStop.kind === 'pickup' ? 'PICKUP' : 'DROP-OFF'} • ${distM}m`, W * 0.5, compassY + 28);
+        hudCtx.fillText(`${activeStop.kind === 'pickup' ? 'PICKUP' : 'DROP-OFF'} • ${distM}m${uTurn ? ' • U-TURN' : ''}`, W * 0.5, compassY + 28);
         hudCtx.restore();
+      } else {
+        window.__arrowDbg = { ang: 0, shown: false, dist: 0 };
       }
 
       if (stick.down) {
@@ -9635,7 +9867,7 @@
       mmCtx.fillRect(0, 0, 90, 90);
       mmCtx.save();
       mmCtx.translate(45, 53);
-      mmCtx.rotate(camHeading);
+      mmCtx.rotate(-camHeading); // TESTER FIX (Nov 27): heading-up map (rotate(+h) flipped it 180° on east/west roads)
       const mmScale = 0.28;
       mmCtx.strokeStyle = '#64748b';
       mmCtx.lineWidth = 5;
@@ -9669,7 +9901,7 @@
         mmCtx.strokeStyle = '#14233b'; mmCtx.lineWidth = 2;
         mmCtx.beginPath(); mmCtx.arc(sx, sz, far ? 4.5 : 6, 0, Math.PI * 2); mmCtx.fill(); mmCtx.stroke();
         if (activeStop.kind === 'dropoff') {
-          mmCtx.save(); mmCtx.translate(sx, sz); mmCtx.rotate(-camHeading);
+          mmCtx.save(); mmCtx.translate(sx, sz); mmCtx.rotate(camHeading);
           mmCtx.font = '900 9px sans-serif'; mmCtx.textAlign = 'center'; mmCtx.fillStyle = '#fff'; mmCtx.fillText(rpStopIcon(), 0, 3.5);
           mmCtx.restore();
         }

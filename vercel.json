@@ -8,6 +8,24 @@
           "value": "accelerometer=(self), gyroscope=(self), magnetometer=(self)"
         }
       ]
+    },
+    {
+      "source": "/aburi_mountain.html",
+      "headers": [
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex, nofollow"
+        }
+      ]
+    },
+    {
+      "source": "/usa/(.*)",
+      "headers": [
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex, nofollow"
+        }
+      ]
     }
   ]
 }
